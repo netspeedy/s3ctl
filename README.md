@@ -7,7 +7,7 @@
 [![Release](https://img.shields.io/github/v/release/soakes/s3ctl?sort=semver&style=flat-square)](https://github.com/soakes/s3ctl/releases)
 [![APT Repository](https://img.shields.io/badge/APT-signed%20repo-A81D33?style=flat-square&logo=debian&logoColor=white)](https://soakes.github.io/s3ctl/)
 [![GHCR](https://img.shields.io/badge/GHCR-published-2088FF?style=flat-square&logo=github)](https://ghcr.io/soakes/s3ctl)
-[![Go](https://img.shields.io/badge/Go-1.26.2-00ADD8.svg?style=flat-square&logo=go&logoColor=white)](https://go.dev/)
+[![Go](https://img.shields.io/badge/Go-1.26.3-00ADD8.svg?style=flat-square&logo=go&logoColor=white)](https://go.dev/)
 
 `s3ctl` is for teams that need repeatable bucket provisioning without manual
 storage and IAM setup. It creates buckets, issues scoped credentials, rotates
