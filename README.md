@@ -322,7 +322,7 @@ docker run --rm \
 
 ## Release process
 
-Stable releases publish Linux and macOS archives, Debian packages, checksums,
+Stable releases publish Linux and macOS archives, Debian packages, signed checksums,
 GHCR images, release-hub metadata, and signed APT repository metadata. Release
 candidates use tags such as `v1.2.3-rc.1` while a version is being validated.
 

@@ -38,6 +38,7 @@ const requiredDOMIDs = [
   "install-container-link",
   "install-release-link",
   "deb-command",
+  "deb-verify-command",
   "checksum-note",
   "footer-release-link",
   "footer-apt-link",
@@ -97,7 +98,7 @@ for (const domID of requiredDOMIDs) {
   assert(indexHTML.includes(`id="${domID}"`), `index.html is missing required id="${domID}"`);
 }
 
-for (const tabID of ["homebrew", "installer", "apt", "container", "package"]) {
+for (const tabID of ["homebrew", "installer", "apt", "container"]) {
   assert(indexHTML.includes(`data-tab="${tabID}"`), `index.html is missing data-tab="${tabID}"`);
   assert(indexHTML.includes(`id="panel-${tabID}"`), `index.html is missing id="panel-${tabID}"`);
 }

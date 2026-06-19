@@ -442,6 +442,34 @@ code {
   margin-top: 0.8rem;
 }
 
+.install-subsection {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.install-subsection-title {
+  margin: 0 0 0.35rem;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.install-subsection-note {
+  margin: 0 0 0.9rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.install-subsection .code-block {
+  margin-top: 0.5rem;
+}
+
+.install-subsection .code-block + .install-subsection-title {
+  margin-top: 1.5rem;
+}
+
 .install-directory {
   border-top: 1px solid var(--line);
 }

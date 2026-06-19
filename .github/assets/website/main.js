@@ -33,6 +33,7 @@ function normalizeMetadata(metadata = {}) {
   const apt = metadata.apt_repository || {};
   const rawContainerURL = metadata.container_url || defaultMetadata.container_url;
   const rawContainerImage = metadata.container_image || (rawContainerURL.includes("ghcr.io/") ? rawContainerURL.replace(/^https?:\/\//, "") : "");
+  const aptKeyUrl = apt.key_url || defaultMetadata.apt_repository.key_url;
 
   return {
     ...defaultMetadata,
@@ -50,7 +51,8 @@ function normalizeMetadata(metadata = {}) {
       ...defaultMetadata.apt_repository,
       ...apt,
       url: `${apt.url || defaultMetadata.apt_repository.url}`.replace(/\/?$/, "/"),
-      key_url: apt.key_url || defaultMetadata.apt_repository.key_url,
+      key_url: aptKeyUrl,
+      key_asc_url: apt.key_asc_url || aptKeyUrl.replace(/\.gpg$/, ".asc"),
       fingerprint: apt.fingerprint || "",
       available: Boolean(apt.available),
     },
@@ -149,7 +151,11 @@ function chooseDirectDebAsset(assets = []) {
 }
 
 function chooseChecksumAsset(assets = []) {
-  return assets.find((asset) => asset.name.includes("SHA256SUMS")) || null;
+  return assets.find((asset) => asset.name === "SHA256SUMS") || assets.find((asset) => asset.name.includes("SHA256SUMS") && !asset.name.endsWith(".asc")) || null;
+}
+
+function chooseSignatureAsset(assets = []) {
+  return assets.find((asset) => asset.name === "SHA256SUMS.asc") || assets.find((asset) => asset.name.endsWith("SHA256SUMS.asc")) || null;
 }
 
 function setText(id, value) {
@@ -171,8 +177,10 @@ function renderCommands(metadata) {
   const assets = release?.assets || [];
   const directDebAsset = chooseDirectDebAsset(assets);
   const checksumAsset = chooseChecksumAsset(assets);
+  const signatureAsset = chooseSignatureAsset(assets);
   const releaseTag = release?.tag_name || "latest";
   const containerImage = metadata.container_image.replace(/^https?:\/\//, "");
+  const keyAscUrl = metadata.apt_repository.key_asc_url;
 
   setText("homebrew-command", "brew tap netspeedy/s3ctl\nbrew install s3ctl");
   setText(
@@ -206,15 +214,35 @@ sudo apt update && sudo apt install s3ctl`,
   setText("container-command", `docker run --rm ${containerImage}:${releaseTag}`);
 
   if (directDebAsset) {
+    const releaseBase = `https://github.com/${metadata.github_repository}/releases/download/${release?.tag_name || "latest"}`;
     setText("deb-command", `curl -fsSLO ${directDebAsset.browser_download_url}\nsudo apt install ./${directDebAsset.name}`);
+
+    if (signatureAsset) {
+      setText(
+        "deb-verify-command",
+        `curl -fsSLO ${releaseBase}/SHA256SUMS
+curl -fsSLO ${signatureAsset.browser_download_url}
+curl -fsSL ${keyAscUrl} | gpg --import
+gpg --verify ${signatureAsset.name} SHA256SUMS
+sha256sum -c SHA256SUMS --ignore-missing`,
+      );
+      setText("checksum-note", "Checksums are GPG-signed with the release key shown above.");
+    } else {
+      setText(
+        "deb-verify-command",
+        `curl -fsSLO ${releaseBase}/SHA256SUMS
+sha256sum -c SHA256SUMS --ignore-missing`,
+      );
+      setText(
+        "checksum-note",
+        checksumAsset ? `Verify direct downloads with ${checksumAsset.name} from the release page.` : "Checksums are linked from the matching GitHub release.",
+      );
+    }
   } else {
     setText("deb-command", "Linux release packages will appear here after the next published stable release.");
+    setText("deb-verify-command", "Release verification metadata will appear here after publication.");
+    setText("checksum-note", "Checksums are linked from the matching GitHub release.");
   }
-
-  setText(
-    "checksum-note",
-    checksumAsset ? `Verify direct downloads with ${checksumAsset.name} from the release page.` : "Checksums are linked from the matching GitHub release.",
-  );
 }
 
 function renderMetadata(rawMetadata) {

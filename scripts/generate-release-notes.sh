@@ -390,7 +390,7 @@ done
   printf '```bash\n'
   printf 'docker run --rm ghcr.io/netspeedy/s3ctl:%s\n' "${tag_name}"
   printf '```\n\n'
-  printf "Verify downloaded archives and packages with the attached \`SHA256SUMS\` file.\n\n"
+  printf "Verify downloaded archives and packages with the attached \`SHA256SUMS\` file; the detached \`SHA256SUMS.asc\` signature is produced by the release key.\n\n"
 
   if [ "${release_channel}" = "prerelease" ]; then
     printf "> This is a release candidate. It publishes tagged archives, Debian packages, checksums, and an \`:rc\` container image, but it does not move the Homebrew tap, stable APT channel, or \`:latest\` container tag.\n\n"
@@ -440,7 +440,7 @@ done
   printf -- "- Release binaries for \`linux/amd64\`, \`linux/arm64\`, \`linux/arm/v7\`, \`darwin/amd64\`, and \`darwin/arm64\`\n"
   printf -- "- Debian packages for \`amd64\`, \`arm64\`, and \`armhf\`\n"
   printf -- '- Homebrew formula updates for stable releases\n'
-  printf -- '- SHA256 checksums attached to the release\n'
+  printf -- '- SHA256 checksums attached to the release, with a detached GPG signature\n'
   printf -- "- Container images published to \`ghcr.io/netspeedy/s3ctl\`\n"
   if [ "${release_channel}" = "prerelease" ]; then
     printf -- "- Prerelease artifacts are attached to GitHub Releases and the \`:rc\` container tag is refreshed\n"

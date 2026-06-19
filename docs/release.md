@@ -13,7 +13,7 @@ Stable releases publish:
 - Linux and macOS archives for `amd64`, `arm64`, and Linux `arm/v7`
 - Debian packages for `amd64`, `arm64`, and `armhf`
 - Homebrew formula updates for stable releases
-- a `SHA256SUMS` checksum file
+- a signed `SHA256SUMS` checksum file with a detached GPG signature
 - GHCR images for the stable version, `latest`, and semver convenience tags
 - the GitHub Pages release hub with current installer and asset metadata
 - signed APT repository metadata for the stable channel

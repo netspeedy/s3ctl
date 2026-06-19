@@ -5,6 +5,7 @@ Published artifacts cover the supported installation paths:
 - GitHub release archives for `linux/amd64`, `linux/arm64`, `linux/arm/v7`, `darwin/amd64`, and `darwin/arm64`
 - a signed APT repository
 - Debian `.deb` packages for `amd64`, `arm64`, and `armhf`
+- signed `SHA256SUMS` checksums (with a detached GPG signature) for every archive and Debian package
 - a Homebrew tap for macOS and Linux
 - a GitHub Pages release hub with install commands and release metadata
 - a multi-arch GHCR image
@@ -77,11 +78,24 @@ EOF
 sudo apt update && sudo apt install s3ctl
 ```
 
-## Direct Debian package
+### Direct Debian package
+
+Install a single package without wiring an APT source:
 
 ```bash
 curl -fsSLO https://github.com/netspeedy/s3ctl/releases/latest/download/s3ctl_1.2.3_amd64.deb
 sudo apt install ./s3ctl_1.2.3_amd64.deb
+```
+
+Verify the download against the signed checksums. The detached signature is
+produced by the same key that signs the APT repository:
+
+```bash
+curl -fsSLO https://github.com/netspeedy/s3ctl/releases/latest/download/SHA256SUMS
+curl -fsSLO https://github.com/netspeedy/s3ctl/releases/latest/download/SHA256SUMS.asc
+curl -fsSL https://netspeedy.github.io/s3ctl/apt/s3ctl-archive-keyring.asc | gpg --import
+gpg --verify SHA256SUMS.asc SHA256SUMS
+sha256sum -c SHA256SUMS --ignore-missing
 ```
 
 ## Container
