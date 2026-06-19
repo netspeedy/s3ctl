@@ -39,8 +39,7 @@ Dependency updates are managed by Dependabot. Related AWS SDK for Go v2 module
 updates are grouped into one pull request so shared `go.mod` and `go.sum`
 changes do not create a queue of conflicting PRs.
 
-The Dependabot auto-merge workflow runs after `Build and Validate` succeeds and
-on a daily maintenance schedule. When a Dependabot PR is conflicted or missing
-validation for its current head revision, it comments `@dependabot rebase` once
-for that head and waits for the refreshed branch to pass validation before
-merging.
+The automation auto-merge workflow runs after `Build and Validate` succeeds and
+on a weekly maintenance schedule. It handles Dependabot PRs and first-party
+automation PRs, then merges only open, clean PRs with successful validation for
+their current head revision.
