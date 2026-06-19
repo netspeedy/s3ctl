@@ -1,8 +1,6 @@
 <p align="center">
-  <img src=".github/assets/website/favicon.svg" width="96" height="96" alt="s3ctl">
+  <img src=".github/assets/website/logo.svg" width="300" alt="s3ctl">
 </p>
-
-<h1 align="center">s3ctl</h1>
 
 <p align="center">
   A single-binary CLI for creating S3-compatible buckets and issuing bucket-scoped credentials.
@@ -23,7 +21,27 @@ OVHcloud keys, deletes empty buckets safely, and is available as release
 archives, Debian packages, a Homebrew formula, a signed APT repository, and a
 container image.
 
+`s3ctl` is a single command driven entirely by flags, JSON config, or CSV batch
+input — there are no subcommands to memorize. Run `s3ctl --help` for a short
+operator quick reference, or `s3ctl --help-full` for the complete flag, template,
+and CSV field reference.
+
 **Links:** [Releases](https://github.com/netspeedy/s3ctl/releases) | [GHCR](https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl) | [Release Hub / APT](https://netspeedy.github.io/s3ctl/) | [Examples](examples) | [Docs](docs)
+
+## Contents
+
+- [Overview](#overview)
+- [Capabilities](#capabilities)
+- [Quick start](#quick-start)
+- [Installation](#installation)
+- [Usage](#usage)
+- [OVHcloud notes](#ovhcloud-notes)
+- [Container](#container)
+- [Release process](#release-process)
+- [Development](#development)
+- [Project structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
 
 <a id="overview"></a>
 
@@ -58,7 +76,7 @@ flowchart LR
   output --> operator["Endpoint, region, and scoped credentials"]
 ```
 
-### First Bucket Checklist
+### First bucket checklist
 
 1. Put shared provider settings in `~/.config/s3ctl/config.json`.
 2. Run `s3ctl --bucket app-data --dry-run --output json`.
@@ -74,11 +92,12 @@ flowchart LR
 
 - **Bucket provisioning**: creates one bucket, many buckets, or CSV-driven batches
 - **Scoped credentials**: creates bucket-specific IAM-style users and access keys
+- **Built-in policy templates**: applies ready-made bucket policies and scoped-credential policies without hand-writing JSON
 - **OVHcloud support**: creates containers, Public Cloud users, S3 keys, policies, and optional encryption
 - **Credential rotation**: rotates OVHcloud S3 keypairs by bucket/user name
 - **OVHcloud policy repair**: reapplies scoped S3 user policies to existing bucket users
 - **Safe deletion**: deletes empty buckets without `--force` and requires `--force` for non-empty buckets
-- **JSON output**: emits success and error payloads for machine workflows
+- **Dry-run and JSON output**: previews every action and emits machine-readable success and error payloads
 - **Install options**: provides release archives, Debian packages, Homebrew, a signed APT repository, and GHCR images
 - **Validated releases**: publishes stable builds after release-candidate validation
 
@@ -86,7 +105,7 @@ flowchart LR
 
 <a id="quick-start"></a>
 
-## Quick Start
+## Quick start
 
 Install the latest published binary:
 
@@ -100,9 +119,6 @@ downloads may be blocked by Gatekeeper unless the quarantine marker is removed.
 The installer handles that step after placing the binary in a user-owned bin
 directory.
 
-`s3ctl --help` is a short operator quick reference. Use `s3ctl --help-full`
-when you need the complete flag, template, and batch CSV reference.
-
 Plan a single bucket with generated scoped credentials:
 
 ```bash
@@ -111,7 +127,6 @@ s3ctl \
   --endpoint https://objects.example.com \
   --region us-east-1 \
   --create-scoped-credentials \
-  --credential-policy-template bucket-readwrite \
   --dry-run
 ```
 
@@ -124,6 +139,29 @@ s3ctl \
   --region UK \
   --ovh-service-name PUBLIC_CLOUD_PROJECT_ID \
   --output json
+```
+
+> For the `ovh` provider, `--region` is an OVHcloud Public Cloud region such as
+> `UK`, `GRA`, `BHS`, `SBG`, or `EU-WEST-PAR` — not an AWS-style region like the
+> `us-east-1` used by the default `s3` provider above.
+
+Beyond creating buckets, `s3ctl` runs the rest of the bucket lifecycle from the
+same command:
+
+```bash
+# Rotate an existing OVHcloud bucket keypair
+s3ctl --provider ovh --bucket app-data --ovh-rotate-credentials --output json
+
+# Re-scope an existing OVHcloud bucket user policy
+s3ctl --provider ovh --bucket app-data --ovh-repair-policies --output json
+
+# Delete an empty bucket (preview first with --dry-run)
+s3ctl --bucket app-data --delete --dry-run
+s3ctl --bucket app-data --delete                 # empty bucket, no --force needed
+s3ctl --bucket app-data --delete --force         # non-empty bucket requires --force
+
+# Show the installed version (add --output json for a machine-readable payload)
+s3ctl --version
 ```
 
 See [docs/usage.md](docs/usage.md) for batch provisioning, credential rotation,
@@ -156,17 +194,70 @@ macOS quarantine notes, and container examples.
 
 `s3ctl` can run one bucket at a time, multiple buckets from repeated `--bucket`
 flags, or CSV batches from `--batch-file`. Shared defaults can live in JSON
-config, while command-specific values stay in flags.
+config, while command-specific values stay in flags. Configuration is resolved
+in this order: CLI flags, then JSON config, then built-in defaults.
 
 The main usage guide covers batch input, JSON config, built-in policy templates,
 IAM permissions, JSON errors, and safe bucket deletion. See
 [docs/usage.md](docs/usage.md).
 
+<details>
+<summary><strong>Built-in policy templates</strong></summary>
+
+`s3ctl` ships two distinct sets of templates. **Bucket policy templates** are
+attached to the bucket itself (S3 provider only); **scoped-credential policy
+templates** are attached to the IAM/OVH user that `--create-scoped-credentials`
+generates.
+
+Bucket policy templates (`--bucket-policy-template`):
+
+| Template | Coverage |
+| --- | --- |
+| `deny-insecure-transport` | Denies all S3 actions against the bucket and objects when requests do not use secure transport. |
+| `public-read` | Allows public `s3:GetObject` access to objects in the bucket. |
+
+Scoped-credential policy templates (`--credential-policy-template`, default `bucket-readwrite`):
+
+| Template | Coverage |
+| --- | --- |
+| `bucket-readonly` | Bucket location lookup, bucket listing, and object reads for one bucket. |
+| `bucket-readwrite` | Bucket location lookup, listing, object reads, writes, deletes, and multipart uploads for one bucket. |
+| `bucket-admin` | All S3 actions against one bucket and its objects. |
+
+</details>
+
+<details>
+<summary><strong>Common flags</strong></summary>
+
+`s3ctl` exposes 40+ flags; these are the ones most operators reach for. Run
+`s3ctl --help-full` for the complete reference.
+
+| Flag | Purpose |
+| --- | --- |
+| `--provider s3\|ovh` | Provider to target; defaults to `s3` |
+| `--bucket` | Bucket name; repeat for many, or use `--batch-file` for CSV |
+| `--config` / `-c` | Path to a JSON config file |
+| `--endpoint` / `--region` | S3 endpoint and region |
+| `--create-scoped-credentials` | Create an IAM/OVH user and access key scoped to each bucket |
+| `--credential-policy-template` | Scoped-credential template (default `bucket-readwrite`) |
+| `--bucket-policy-template` / `--bucket-policy-file` | Built-in or custom bucket policy |
+| `--enable-versioning` | Enable bucket versioning after creation |
+| `--delete` | Delete buckets instead of creating them (`--force` for non-empty) |
+| `--ovh-rotate-credentials` | Rotate OVHcloud S3 keypairs (OVHcloud only) |
+| `--ovh-repair-policies` | Re-apply scoped OVHcloud user policies (OVHcloud only) |
+| `--dry-run` | Show the planned actions without making changes |
+| `--output text\|json` | Output format; defaults to `text` |
+| `--timeout` | Overall operation timeout; defaults to `10m` |
+| `--version` | Print version information |
+| `--help` / `--help-full` | Short reference / complete flag, template, and CSV reference |
+
+</details>
+
 ---
 
 <a id="ovhcloud-notes"></a>
 
-## OVHcloud Notes
+## OVHcloud notes
 
 Use `--provider ovh` to create OVHcloud Object Storage through the Public Cloud
 API. OVHcloud calls buckets "containers"; `s3ctl` keeps the CLI wording as
@@ -229,7 +320,7 @@ docker run --rm \
 
 <a id="release-process"></a>
 
-## Release Process
+## Release process
 
 Stable releases publish Linux and macOS archives, Debian packages, checksums,
 GHCR images, release-hub metadata, and signed APT repository metadata. Release
@@ -273,6 +364,8 @@ make website-capture
 `gofmt` is the baseline formatter. The pinned `golangci-lint` configuration adds
 `gofumpt`, `goimports`, `staticcheck`, `errcheck`, and `revive`.
 
+<a id="project-structure"></a>
+
 ## Project structure
 
 ```text
@@ -293,12 +386,16 @@ s3ctl/
 └── README.md                 # Project overview
 ```
 
+<a id="contributing"></a>
+
 ## Contributing
 
 Issues and pull requests are welcome at [netspeedy/s3ctl](https://github.com/netspeedy/s3ctl).
 The development commands above are the expected minimum validation before a
 change lands; see [AGENTS.md](AGENTS.md) for the full repository conventions.
 Releases are automated; see [docs/release.md](docs/release.md).
+
+<a id="license"></a>
 
 ## License
 
