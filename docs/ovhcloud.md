@@ -183,7 +183,7 @@ Least-privilege actions for `s3ctl`:
 - `publicCloudProject:apiovh:region/storage/get`
 - `publicCloudProject:apiovh:region/storage/policy/create`
 
-The policy body in `examples/ovh-iam-policy.json` is a starting point for the
+The policy body in `examples/ovh/ovh-iam-policy.json` is a starting point for the
 API route, `POST /iam/policy`. Get the service account identity URN from
 `GET /me/api/oauth2/client/{clientId}`. OVHcloud documents the format as
 `urn:v1:<eu|ca>:identity:credential:<account-id>/oauth2-<clientId>`. Get the

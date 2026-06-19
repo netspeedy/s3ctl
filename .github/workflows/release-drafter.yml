@@ -94,7 +94,7 @@ jobs:
         run: |
           while IFS='=' read -r key value; do
             echo "${key}=${value}" >> "${GITHUB_OUTPUT}"
-          done < <(bash scripts/next-release.sh)
+          done < <(bash scripts/release/next-release.sh)
 
       - name: Delete stale automated draft release
         if: github.event_name != 'pull_request_target' && steps.release_gate.outputs.release_required != 'true'

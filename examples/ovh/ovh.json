@@ -1,5 +1,6 @@
 {
   "provider": "ovh",
+  "bucket": "app-data",
   "ovh_service_name": "PUBLIC_CLOUD_PROJECT_ID",
   "ovh_client_id": "CLIENT_ID",
   "ovh_client_secret": "CLIENT_SECRET",

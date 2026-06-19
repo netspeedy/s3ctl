@@ -134,7 +134,7 @@ jobs:
       - name: Build Debian package
         if: ${{ matrix.deb_arch != '' }}
         run: |
-          bash scripts/build-deb-package.sh \
+          bash scripts/package/build-deb-package.sh \
             dist/${{ matrix.artifact_name }} \
             dist \
             "${{ steps.meta.outputs.version }}" \
@@ -264,7 +264,7 @@ jobs:
       - name: Write release notes
         run: |
           mkdir -p release
-          bash scripts/generate-release-notes.sh \
+          bash scripts/release/generate-release-notes.sh \
             "${{ steps.release.outputs.previous_tag }}" \
             "${{ steps.release.outputs.release_sha }}" \
             release/release-notes.md

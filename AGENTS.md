@@ -100,8 +100,8 @@
 - If you change release tagging, release notes, or publish workflows, also run:
   ```bash
   bash -n scripts/*.sh
-  bash scripts/next-release.sh
-  bash scripts/generate-release-notes.sh "$(git describe --tags --abbrev=0 2>/dev/null || true)" HEAD /tmp/s3ctl-release-notes.md
+  bash scripts/release/next-release.sh
+  bash scripts/release/generate-release-notes.sh "$(git describe --tags --abbrev=0 2>/dev/null || true)" HEAD /tmp/s3ctl-release-notes.md
   ```
 
 ## Commit & PR Rules

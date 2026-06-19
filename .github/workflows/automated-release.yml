@@ -84,7 +84,7 @@ jobs:
         run: |
           while IFS='=' read -r key value; do
             echo "${key}=${value}" >> "${GITHUB_OUTPUT}"
-          done < <(bash scripts/next-release.sh)
+          done < <(bash scripts/release/next-release.sh)
 
       - name: Compute next prerelease tag
         id: candidate
@@ -121,7 +121,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          bash scripts/wait-for-tag-workflow-runs.sh \
+          bash scripts/release/wait-for-tag-workflow-runs.sh \
             "${{ steps.candidate.outputs.candidate_tag }}" \
             "${RELEASE_SHA}" \
             release-assets.yml \
@@ -145,7 +145,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          bash scripts/wait-for-tag-workflow-runs.sh \
+          bash scripts/release/wait-for-tag-workflow-runs.sh \
             "${{ steps.candidate.outputs.stable_tag }}" \
             "${RELEASE_SHA}" \
             release-assets.yml \

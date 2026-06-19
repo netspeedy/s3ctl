@@ -1,4 +1,4 @@
-package s3ctl
+package cli
 
 import (
 	"bytes"

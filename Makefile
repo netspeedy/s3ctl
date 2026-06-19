@@ -34,7 +34,7 @@ fmt-check:
 
 lint-install:
 	test -n "$(GOLANGCI_LINT_VERSION)"
-	bash scripts/install-golangci-lint.sh "$(GOLANGCI_LINT_VERSION)" "$(CURDIR)/bin"
+	bash scripts/toolchain/install-golangci-lint.sh "$(GOLANGCI_LINT_VERSION)" "$(CURDIR)/bin"
 
 lint:
 	test -x "$(GOLANGCI_LINT)" || (printf 'missing %s; run `make lint-install`\n' "$(GOLANGCI_LINT)" >&2 && exit 1)
@@ -88,7 +88,7 @@ package-deb:
 	test -n "$(BINARY_PATH)"
 	test -n "$(DEB_ARCH)"
 	mkdir -p dist
-	bash scripts/build-deb-package.sh "$(BINARY_PATH)" dist "$(VERSION)" "$(DEB_ARCH)"
+	bash scripts/package/build-deb-package.sh "$(BINARY_PATH)" dist "$(VERSION)" "$(DEB_ARCH)"
 
 docker-build:
 	docker build \
@@ -114,7 +114,7 @@ website-capture:
 	npm --prefix $(WEBSITE_DIR) run capture
 
 refresh-go-toolchain:
-	GO_TOOLCHAIN_VERSION="$(GO_TOOLCHAIN_VERSION)" bash scripts/refresh-go-toolchain.sh
+	GO_TOOLCHAIN_VERSION="$(GO_TOOLCHAIN_VERSION)" bash scripts/toolchain/refresh-go-toolchain.sh
 
 clean:
 	rm -rf dist

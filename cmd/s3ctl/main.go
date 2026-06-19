@@ -4,9 +4,9 @@ package main
 import (
 	"os"
 
-	"github.com/netspeedy/s3ctl/internal/s3ctl"
+	"github.com/netspeedy/s3ctl/internal/cli"
 )
 
 func main() {
-	os.Exit(s3ctl.Main(os.Args[1:], os.Stdout, os.Stderr))
+	os.Exit(cli.Main(os.Args[1:], os.Stdout, os.Stderr))
 }

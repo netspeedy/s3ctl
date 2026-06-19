@@ -274,7 +274,7 @@ Run against the bundled examples from the host:
 docker run --rm \
   -v "$PWD/examples:/examples:ro" \
   ghcr.io/netspeedy/s3ctl:latest \
-  --config /examples/s3ctl.json \
+  --config /examples/aws/s3ctl.json \
   --dry-run \
   --output json
 ```
@@ -332,10 +332,16 @@ make website-capture
 ```text
 s3ctl/
 ├── cmd/s3ctl/                # CLI entrypoint
-├── internal/                 # Application and provider logic
+├── internal/                 # CLI, provider, and build metadata packages
 ├── docs/                     # OVHcloud and release documentation
-├── examples/                 # JSON, CSV, and OVH policy examples
-├── scripts/                  # Install, package, and release helpers
+├── examples/
+│   ├── aws/                  # Generic S3 JSON and CSV examples
+│   └── ovh/                  # OVHcloud config and policy examples
+├── scripts/
+│   ├── install.sh            # Public installer copied to the website
+│   ├── package/              # Debian and apt repository helpers
+│   ├── release/              # Release notes and tag workflow helpers
+│   └── toolchain/            # Go and lint toolchain helpers
 ├── .github/
 │   ├── assets/website/       # GitHub Pages release hub
 │   └── workflows/            # Validation and release automation

@@ -83,7 +83,7 @@ Plan a batch from CSV:
 
 ```bash
 s3ctl \
-  --batch-file ./examples/s3ctl-batch.csv \
+  --batch-file ./examples/aws/s3ctl-batch.csv \
   --endpoint https://objects.example.com \
   --region us-east-1 \
   --create-scoped-credentials \
@@ -134,7 +134,7 @@ Example config:
 Run it:
 
 ```bash
-s3ctl --config ./examples/s3ctl.json --dry-run --output json
+s3ctl --config ./examples/aws/s3ctl.json --dry-run --output json
 ```
 
 When `--output json` or `"output": "json"` is set, command failures are also
@@ -227,7 +227,7 @@ Install that as your per-user default:
 
 ```bash
 install -d -m 700 "${XDG_CONFIG_HOME:-$HOME/.config}/s3ctl"
-install -m 600 ./examples/user-config.json "${XDG_CONFIG_HOME:-$HOME/.config}/s3ctl/config.json"
+install -m 600 ./examples/aws/user-config.json "${XDG_CONFIG_HOME:-$HOME/.config}/s3ctl/config.json"
 ```
 
 ## Built-in templates

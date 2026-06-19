@@ -87,7 +87,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          bash scripts/wait-for-tag-workflow-runs.sh \
+          bash scripts/release/wait-for-tag-workflow-runs.sh \
             "${{ steps.promote.outputs.stable_tag }}" \
             "${{ steps.promote.outputs.release_sha }}" \
             release-assets.yml \

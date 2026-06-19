@@ -37,7 +37,7 @@ categories:
 version-resolver:
   # Documentation, CI, and maintenance labels can still appear in grouped
   # release notes when they ship alongside release-bearing work, but they
-  # should not bump the version on their own. `scripts/next-release.sh` is the
+  # should not bump the version on their own. `scripts/release/next-release.sh` is the
   # gating source of truth for whether a new draft or tag should exist at all.
   major:
     labels:
@@ -89,9 +89,9 @@ autolabeler:
       - '/^fix\(release\):/i'
       - '/^release(\([^)]+\))?:/i'
     files:
-      - "scripts/next-release.sh"
-      - "scripts/generate-release-notes.sh"
-      - "scripts/wait-for-tag-workflow-runs.sh"
+      - "scripts/release/next-release.sh"
+      - "scripts/release/generate-release-notes.sh"
+      - "scripts/release/wait-for-tag-workflow-runs.sh"
       - ".github/release-drafter.yml"
       - ".github/workflows/automated-release.yml"
       - ".github/workflows/container-image.yml"
@@ -128,8 +128,8 @@ autolabeler:
     title:
       - '/^(packaging|build)(\([^)]+\))?:/i'
     files:
-      - "scripts/build-apt-repository.sh"
-      - "scripts/build-deb-package.sh"
+      - "scripts/package/build-apt-repository.sh"
+      - "scripts/package/build-deb-package.sh"
       - ".github/workflows/deploy-pages-site.yml"
   - label: maintenance
     title:

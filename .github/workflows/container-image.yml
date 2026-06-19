@@ -94,7 +94,7 @@ jobs:
           docker run --rm \
             -v "$PWD/examples:/examples:ro" \
             s3ctl:test \
-            --config /examples/s3ctl.json \
+            --config /examples/aws/s3ctl.json \
             --dry-run \
             --output json > /tmp/s3ctl.json
           grep -F '"resource_count": 2' /tmp/s3ctl.json

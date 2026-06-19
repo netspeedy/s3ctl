@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+repo_root="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
 version="${1:-$(tr -d '[:space:]' < "${repo_root}/.golangci-lint-version")}"
 bin_dir="${2:-${repo_root}/bin}"
 
@@ -19,9 +19,9 @@ trap cleanup EXIT
 install_script="${temp_dir}/install.sh"
 
 if command -v curl >/dev/null 2>&1; then
-  curl -fsSL https://golangci-lint.run/install.sh -o "${install_script}"
+  curl -fsSL https://github.com/golangci/golangci-lint/raw/HEAD/install.sh -o "${install_script}"
 elif command -v wget >/dev/null 2>&1; then
-  wget -qO "${install_script}" https://golangci-lint.run/install.sh
+  wget -qO "${install_script}" https://github.com/golangci/golangci-lint/raw/HEAD/install.sh
 else
   printf 'either curl or wget is required to install golangci-lint\n' >&2
   exit 1

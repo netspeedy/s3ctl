@@ -116,7 +116,7 @@ Run against the bundled examples from the host:
 docker run --rm \
   -v "$PWD/examples:/examples:ro" \
   ghcr.io/netspeedy/s3ctl:latest \
-  --config /examples/s3ctl.json \
+  --config /examples/aws/s3ctl.json \
   --dry-run \
   --output json
 ```

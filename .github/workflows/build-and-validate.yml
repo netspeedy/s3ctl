@@ -81,12 +81,12 @@ jobs:
 
       - name: Validate packaging and website assets
         run: |
-          bash -n scripts/*.sh
-          bash scripts/generate-release-notes.sh '' HEAD /tmp/s3ctl-release-notes.md
+          bash -n scripts/*.sh scripts/*/*.sh
+          bash scripts/release/generate-release-notes.sh '' HEAD /tmp/s3ctl-release-notes.md
           grep -F '## Release Overview' /tmp/s3ctl-release-notes.md
           grep -F '## Installation' /tmp/s3ctl-release-notes.md
           grep -F '## Published Artifacts' /tmp/s3ctl-release-notes.md
-          bash scripts/next-release.sh > /tmp/s3ctl-next-release.txt
+          bash scripts/release/next-release.sh > /tmp/s3ctl-next-release.txt
           grep -F 'release_required=' /tmp/s3ctl-next-release.txt
 
           bash scripts/install.sh --help > /tmp/s3ctl-install-help.txt
@@ -94,7 +94,7 @@ jobs:
           test -f .github/assets/website/dist/index.html
 
           make build-cross GOOS=linux GOARCH=amd64 OUTPUT=dist/s3ctl-linux-amd64
-          bash scripts/build-deb-package.sh dist/s3ctl-linux-amd64 dist v0.0.0 amd64
+          bash scripts/package/build-deb-package.sh dist/s3ctl-linux-amd64 dist v0.0.0 amd64
           test -f dist/s3ctl_0.0.0_amd64.deb
 
       - name: Smoke test built binary
@@ -118,7 +118,7 @@ jobs:
           grep -F 'Configuration precedence:' /tmp/s3ctl-help-full.txt
           grep -F 'Built-in scoped credential policy templates:' /tmp/s3ctl-help-full.txt
 
-          ./dist/s3ctl --config examples/s3ctl.json --dry-run --output json > /tmp/s3ctl-config.json
+          ./dist/s3ctl --config examples/aws/s3ctl.json --dry-run --output json > /tmp/s3ctl-config.json
           grep -F '"resource_count": 2' /tmp/s3ctl-config.json
           grep -F '"bucket_name": "app-data"' /tmp/s3ctl-config.json
           grep -F '"created": true' /tmp/s3ctl-config.json
@@ -127,7 +127,7 @@ jobs:
           grep -F 'Bucket create planned: yes' /tmp/s3ctl-single.txt
           grep -F 'IAM user: app-data' /tmp/s3ctl-single.txt
 
-          ./dist/s3ctl --batch-file examples/s3ctl-batch.csv --create-scoped-credentials --dry-run --output json > /tmp/s3ctl-batch.json
+          ./dist/s3ctl --batch-file examples/aws/s3ctl-batch.csv --create-scoped-credentials --dry-run --output json > /tmp/s3ctl-batch.json
           grep -F '"bucket_name": "logs-archive"' /tmp/s3ctl-batch.json
           grep -F '"policy_template": "bucket-readonly"' /tmp/s3ctl-batch.json
 
