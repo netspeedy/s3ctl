@@ -5,7 +5,7 @@
 <h1 align="center">s3ctl</h1>
 
 <p align="center">
-  A single-binary CLI for creating S3-compatible buckets and issuing bucket-scoped credentials.
+  Provision S3 buckets with scoped credentials in one run — no console clicking, no hand-built IAM drift.
 </p>
 
 <p align="center">
@@ -38,7 +38,9 @@ curl -fsSL https://netspeedy.github.io/s3ctl/install.sh | bash
 Debian/Ubuntu APT, pinned versions, and the GHCR container image are covered in
 [docs/installation.md](docs/installation.md).
 
-**Docs:** [Install](docs/installation.md) · [Usage](docs/usage.md) · [OVHcloud](docs/ovhcloud.md) · [Release](docs/release.md) · [Examples](examples) · [Releases](https://github.com/netspeedy/s3ctl/releases)
+**Docs:** [Website](https://netspeedy.github.io/s3ctl/) · [Install](docs/installation.md) · [Usage](docs/usage.md) · [OVHcloud](docs/ovhcloud.md) · [Release](docs/release.md) · [Examples](examples) · [Releases](https://github.com/netspeedy/s3ctl/releases)
+
+---
 
 ## Overview
 
@@ -72,14 +74,6 @@ flowchart LR
   output --> operator["Endpoint, region, and scoped credentials"]
 ```
 
-### First bucket checklist
-
-1. Put shared provider settings in `~/.config/s3ctl/config.json`.
-2. Run `s3ctl --bucket app-data --dry-run --output json`.
-3. Confirm the endpoint, region, and credential scope in the plan.
-4. Run `s3ctl --bucket app-data --output json`.
-5. Store the returned access key and secret securely; secrets are only printed once.
-
 ---
 
 ## Capabilities
@@ -92,8 +86,6 @@ flowchart LR
 - **OVHcloud policy repair**: reapplies scoped S3 user policies to existing bucket users
 - **Safe deletion**: deletes empty buckets without `--force` and requires `--force` for non-empty buckets
 - **Dry-run and JSON output**: previews every action and emits machine-readable success and error payloads
-- **Install options**: provides release archives, Debian packages, Homebrew, a signed APT repository, and GHCR images
-- **Validated releases**: publishes stable builds after release-candidate validation
 
 ---
 
@@ -153,6 +145,14 @@ policy repair, bucket deletion, JSON config, and full CLI usage examples, and
 [docs/ovhcloud.md](docs/ovhcloud.md) for OVHcloud setup and provider-specific
 behaviour.
 
+### First bucket checklist
+
+1. Put shared provider settings in `~/.config/s3ctl/config.json`.
+2. Run `s3ctl --bucket app-data --dry-run --output json`.
+3. Confirm the endpoint, region, and credential scope in the plan.
+4. Run `s3ctl --bucket app-data --output json`.
+5. Store the returned access key and secret securely; secrets are only printed once.
+
 ---
 
 ## Usage
@@ -162,9 +162,9 @@ flags, or CSV batches from `--batch-file`. Shared defaults can live in JSON
 config, while command-specific values stay in flags. Configuration is resolved
 in this order: CLI flags, then JSON config, then built-in defaults.
 
-The main usage guide covers batch input, JSON config, built-in policy templates,
-IAM permissions, JSON errors, and safe bucket deletion. See
-[docs/usage.md](docs/usage.md).
+The full reference — batch input, JSON config, IAM permissions, and JSON error
+payloads — lives in [docs/usage.md](docs/usage.md). The built-in policy templates
+and the flags most operators reach for are summarised below.
 
 <details>
 <summary><strong>Built-in policy templates</strong></summary>
@@ -279,6 +279,8 @@ docker run --rm \
   --output json
 ```
 
+---
+
 ## Release process
 
 Stable releases publish Linux and macOS archives, Debian packages, signed checksums,
@@ -287,6 +289,8 @@ candidates use tags such as `v1.2.3-rc.1` while a version is being validated.
 
 See [docs/release.md](docs/release.md) for release, website preview, and
 dependency update notes.
+
+---
 
 ## Development
 
@@ -321,6 +325,8 @@ make website-capture
 `gofmt` is the baseline formatter. The pinned `golangci-lint` configuration adds
 `gofumpt`, `goimports`, `staticcheck`, `errcheck`, and `revive`.
 
+---
+
 ## Project structure
 
 ```text
@@ -341,12 +347,16 @@ s3ctl/
 └── README.md                 # Project overview
 ```
 
+---
+
 ## Contributing
 
 Issues and pull requests are welcome at [netspeedy/s3ctl](https://github.com/netspeedy/s3ctl).
 The development commands above are the expected minimum validation before a
 change lands; see [AGENTS.md](AGENTS.md) for the full repository conventions.
 Releases are automated; see [docs/release.md](docs/release.md).
+
+---
 
 ## License
 
