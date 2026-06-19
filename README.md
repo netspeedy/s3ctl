@@ -1,5 +1,5 @@
 <p align="center">
-  <img src=".github/assets/website/logo.svg" width="300" alt="s3ctl">
+  <img src=".github/assets/website/public/og-image.svg" width="720" alt="s3ctl">
 </p>
 
 <p align="center">
