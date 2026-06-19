@@ -88,6 +88,14 @@ checkNodeSyntax("vite.config.js");
 
 assert(indexHTML.includes('<script type="module" src="./main.js"></script>'), "index.html must load ./main.js");
 assert(indexHTML.includes('<link rel="icon" href="./favicon.svg" type="image/svg+xml" />'), "index.html must declare ./favicon.svg");
+assert(existsSync(path.join(websiteRoot, "public", "og-image.png")), "Missing required social share image: public/og-image.png");
+assert(indexHTML.includes('property="og:image"'), "index.html must declare og:image for social previews");
+assert(indexHTML.includes('property="og:image:type" content="image/png"'), "og:image:type must be image/png");
+assert(indexHTML.includes('property="og:image:width" content="1200"'), "og:image:width must be 1200");
+assert(indexHTML.includes('property="og:image:height" content="630"'), "og:image:height must be 630");
+assert(indexHTML.includes('property="og:image:alt"'), "index.html must declare og:image:alt for accessibility");
+assert(indexHTML.includes('name="twitter:card" content="summary_large_image"'), "twitter:card must be summary_large_image for large preview cards");
+assert(indexHTML.includes('name="twitter:image"'), "index.html must declare twitter:image for social previews");
 assert(mainJS.includes('import "./style.css";') || mainJS.includes("import './style.css';"), "main.js must import ./style.css");
 assert(viteConfig.includes('base: "./"') || viteConfig.includes("base: './'"), "vite.config.js must keep base set to ./");
 
