@@ -3,10 +3,10 @@
 Published artifacts cover the supported installation paths:
 
 - GitHub release archives for `linux/amd64`, `linux/arm64`, `linux/arm/v7`, `darwin/amd64`, and `darwin/arm64`
+- a signed APT repository
 - Debian `.deb` packages for `amd64`, `arm64`, and `armhf`
 - a Homebrew tap for macOS and Linux
 - a GitHub Pages release hub with install commands and release metadata
-- a signed APT repository
 - a multi-arch GHCR image
 
 Release candidates use tags like `v1.2.3-rc.1`. They are useful for testing a
@@ -59,13 +59,6 @@ Custom install location:
 curl -fsSL https://netspeedy.github.io/s3ctl/install.sh | bash -s -- --install-dir "$HOME/.local/bin"
 ```
 
-## Direct Debian package
-
-```bash
-curl -fsSLO https://github.com/netspeedy/s3ctl/releases/latest/download/s3ctl_1.2.3_amd64.deb
-sudo apt install ./s3ctl_1.2.3_amd64.deb
-```
-
 ## Signed APT repository
 
 ```bash
@@ -82,6 +75,13 @@ Signed-By: /etc/apt/keyrings/s3ctl-archive-keyring.gpg
 EOF
 
 sudo apt update && sudo apt install s3ctl
+```
+
+## Direct Debian package
+
+```bash
+curl -fsSLO https://github.com/netspeedy/s3ctl/releases/latest/download/s3ctl_1.2.3_amd64.deb
+sudo apt install ./s3ctl_1.2.3_amd64.deb
 ```
 
 ## Container

@@ -137,8 +137,8 @@ Rotated scoped credentials for app-data</code></pre>
             <button class="tab active" type="button" role="tab" data-tab="homebrew" aria-selected="true">Homebrew</button>
             <button class="tab" type="button" role="tab" data-tab="installer" aria-selected="false">Installer</button>
             <button class="tab" type="button" role="tab" data-tab="apt" aria-selected="false">Signed APT</button>
-            <button class="tab" type="button" role="tab" data-tab="container" aria-selected="false">Container</button>
             <button class="tab" type="button" role="tab" data-tab="package" aria-selected="false">.deb package</button>
+            <button class="tab" type="button" role="tab" data-tab="container" aria-selected="false">Container</button>
           </div>
           <div class="tab-panels">
             <div class="tab-panel active" id="panel-homebrew" role="tabpanel">
@@ -162,18 +162,18 @@ brew install s3ctl</code></pre></div>
               <div class="code-block"><pre><code id="apt-command">APT repository metadata will appear here after publication.</code></pre></div>
               <p class="tab-note mono" id="apt-fingerprint-row"></p>
             </div>
-            <div class="tab-panel" id="panel-container" role="tabpanel">
-              <div class="tab-description">
-                <p>Use the published multi-arch GHCR image for container-native automation.</p>
-              </div>
-              <div class="code-block"><pre><code id="container-command">docker run --rm ghcr.io/netspeedy/s3ctl:latest</code></pre></div>
-            </div>
             <div class="tab-panel" id="panel-package" role="tabpanel">
               <div class="tab-description">
                 <p>Download the Debian package directly when you do not want to wire an APT source.</p>
               </div>
               <div class="code-block"><pre><code id="deb-command">Release package metadata will appear here after publication.</code></pre></div>
               <p class="tab-note" id="checksum-note">Checksums are linked from the matching GitHub release.</p>
+            </div>
+            <div class="tab-panel" id="panel-container" role="tabpanel">
+              <div class="tab-description">
+                <p>Use the published multi-arch GHCR image for container-native automation.</p>
+              </div>
+              <div class="code-block"><pre><code id="container-command">docker run --rm ghcr.io/netspeedy/s3ctl:latest</code></pre></div>
             </div>
           </div>
           <div class="install-directory" aria-label="Published install channels">
@@ -193,14 +193,14 @@ brew install s3ctl</code></pre></div>
               <a href="#" id="install-apt-link">APT repository</a>
             </div>
             <div class="install-directory-row">
-              <strong>Container</strong>
-              <span>Docker and CI automation</span>
-              <a href="https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl" id="install-container-link">GitHub package</a>
-            </div>
-            <div class="install-directory-row">
               <strong>Archives</strong>
               <span>Direct downloads and checksums</span>
               <a href="https://github.com/netspeedy/s3ctl/releases" id="install-release-link">GitHub releases</a>
+            </div>
+            <div class="install-directory-row">
+              <strong>Container</strong>
+              <span>Docker and CI automation</span>
+              <a href="https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl" id="install-container-link">GitHub package</a>
             </div>
           </div>
         </div>
