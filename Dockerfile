@@ -29,7 +29,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 GOOS="${TARGETOS}" GOARCH="${TARGETARCH}" GOARM="${goarm}" \
       go build \
         -trimpath \
-        -ldflags="-s -w -X github.com/soakes/s3ctl/internal/buildinfo.Version=${VERSION} -X github.com/soakes/s3ctl/internal/buildinfo.Commit=${VCS_REF} -X github.com/soakes/s3ctl/internal/buildinfo.BuildDate=${BUILD_DATE}" \
+        -ldflags="-s -w -X github.com/netspeedy/s3ctl/internal/buildinfo.Version=${VERSION} -X github.com/netspeedy/s3ctl/internal/buildinfo.Commit=${VCS_REF} -X github.com/netspeedy/s3ctl/internal/buildinfo.BuildDate=${BUILD_DATE}" \
         -o /out/s3ctl \
         ./cmd/s3ctl
 
@@ -41,8 +41,8 @@ ARG BUILD_DATE=unknown
 
 LABEL org.opencontainers.image.title="s3ctl" \
       org.opencontainers.image.description="CLI for provisioning S3 buckets and bucket policies" \
-      org.opencontainers.image.url="https://github.com/soakes/s3ctl" \
-      org.opencontainers.image.source="https://github.com/soakes/s3ctl" \
+      org.opencontainers.image.url="https://github.com/netspeedy/s3ctl" \
+      org.opencontainers.image.source="https://github.com/netspeedy/s3ctl" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.created="${BUILD_DATE}"

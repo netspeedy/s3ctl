@@ -9,7 +9,7 @@ deb_arch="${4:?debian architecture is required}"
 package_name="${PACKAGE_NAME:-s3ctl}"
 maintainer="${PACKAGE_MAINTAINER:-s3ctl release automation <noreply@github.com>}"
 description="${PACKAGE_DESCRIPTION:-Professional S3 bucket provisioning CLI with scoped credential automation}"
-homepage="${PACKAGE_HOMEPAGE:-https://github.com/soakes/s3ctl}"
+homepage="${PACKAGE_HOMEPAGE:-https://github.com/netspeedy/s3ctl}"
 
 normalize_deb_version() {
   local value="${1#v}"

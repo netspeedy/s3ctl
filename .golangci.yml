@@ -49,7 +49,7 @@ formatters:
   settings:
     gofumpt:
       extra-rules: true
-      module-path: github.com/soakes/s3ctl
+      module-path: github.com/netspeedy/s3ctl
     goimports:
       local-prefixes:
-        - github.com/soakes/s3ctl
+        - github.com/netspeedy/s3ctl

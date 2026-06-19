@@ -373,22 +373,27 @@ done
     printf -- '- Provision one or many S3 buckets from CLI flags, environment variables, JSON config, or CSV batch input.\n'
     printf -- '- Generate bucket-scoped IAM users and fresh access keys automatically with built-in credential policy templates.\n'
     printf -- '- Support dry-run planning, bucket versioning, custom bucket policies, and operator-friendly text or JSON output.\n'
-    printf -- '- Ship as cross-platform binaries, Debian packages, a multi-arch GHCR image, and a GitHub Pages install hub.\n\n'
+    printf -- '- Ship as cross-platform binaries, Debian packages, a Homebrew formula, a multi-arch GHCR image, and a GitHub Pages install hub.\n\n'
   fi
 
   printf '## Installation\n\n'
   printf 'Installer script:\n\n'
   printf '```bash\n'
-  printf 'curl -fsSL https://soakes.github.io/s3ctl/install.sh | bash -s -- --version %s\n' "${tag_name}"
+  printf 'curl -fsSL https://netspeedy.github.io/s3ctl/install.sh | bash -s -- --version %s\n' "${tag_name}"
+  printf '```\n\n'
+  printf 'Homebrew:\n\n'
+  printf '```bash\n'
+  printf 'brew tap netspeedy/s3ctl\n'
+  printf 'brew install s3ctl\n'
   printf '```\n\n'
   printf 'Container image:\n\n'
   printf '```bash\n'
-  printf 'docker run --rm ghcr.io/soakes/s3ctl:%s --help\n' "${tag_name}"
+  printf 'docker run --rm ghcr.io/netspeedy/s3ctl:%s --help\n' "${tag_name}"
   printf '```\n\n'
   printf "Verify downloaded archives and packages with the attached \`SHA256SUMS\` file.\n\n"
 
   if [ "${release_channel}" = "prerelease" ]; then
-    printf "> This is a release candidate. It publishes tagged archives, Debian packages, checksums, and an \`:rc\` container image, but it does not move the stable APT channel or \`:latest\` container tag.\n\n"
+    printf "> This is a release candidate. It publishes tagged archives, Debian packages, checksums, and an \`:rc\` container image, but it does not move the Homebrew tap, stable APT channel, or \`:latest\` container tag.\n\n"
   fi
 
   if [ -s "${tmpdir}/breaking.md" ]; then
@@ -434,8 +439,9 @@ done
   printf '## Published Artifacts\n\n'
   printf -- "- Release binaries for \`linux/amd64\`, \`linux/arm64\`, \`linux/arm/v7\`, \`darwin/amd64\`, and \`darwin/arm64\`\n"
   printf -- "- Debian packages for \`amd64\`, \`arm64\`, and \`armhf\`\n"
+  printf -- '- Homebrew formula updates for stable releases\n'
   printf -- '- SHA256 checksums attached to the release\n'
-  printf -- "- Container images published to \`ghcr.io/soakes/s3ctl\`\n"
+  printf -- "- Container images published to \`ghcr.io/netspeedy/s3ctl\`\n"
   if [ "${release_channel}" = "prerelease" ]; then
     printf -- "- Prerelease artifacts are attached to GitHub Releases and the \`:rc\` container tag is refreshed\n"
   else

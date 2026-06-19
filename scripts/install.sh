@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo="${S3CTL_INSTALL_REPO:-soakes/s3ctl}"
+repo="${S3CTL_INSTALL_REPO:-netspeedy/s3ctl}"
 project="${S3CTL_INSTALL_PROJECT:-s3ctl}"
 binary_name="${S3CTL_INSTALL_BINARY_NAME:-s3ctl}"
 install_dir="${INSTALL_DIR:-}"
@@ -23,7 +23,7 @@ Options:
   --install-dir <path>        Destination directory for the binary
                                (default: macOS home bin dir, otherwise /usr/local/bin)
   --binary-name <name>        Installed binary name (default: s3ctl)
-  --repo <owner/repo>         GitHub repository to install from (default: soakes/s3ctl)
+  --repo <owner/repo>         GitHub repository to install from (default: netspeedy/s3ctl)
   --project <name>            Release asset name prefix (default: s3ctl)
   -h, --help                  Show this help text
 

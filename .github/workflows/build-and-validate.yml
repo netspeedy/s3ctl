@@ -59,14 +59,14 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: website/package-lock.json
+          cache-dependency-path: .github/assets/website/package-lock.json
 
       - name: Check gofmt formatting
         run: make fmt-check
 
       - name: Validate GitHub Pages website
         run: |
-          npm ci --prefix website
+          npm ci --prefix .github/assets/website
           make website-check
           make website-build
 
@@ -91,7 +91,7 @@ jobs:
 
           bash scripts/install.sh --help > /tmp/s3ctl-install-help.txt
           grep -F -- '--version <tag|latest>' /tmp/s3ctl-install-help.txt
-          test -f website/dist/index.html
+          test -f .github/assets/website/dist/index.html
 
           make build-cross GOOS=linux GOARCH=amd64 OUTPUT=dist/s3ctl-linux-amd64
           bash scripts/build-deb-package.sh dist/s3ctl-linux-amd64 dist v0.0.0 amd64

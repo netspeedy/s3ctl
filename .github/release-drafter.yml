@@ -130,7 +130,7 @@ autolabeler:
     files:
       - "scripts/build-apt-repository.sh"
       - "scripts/build-deb-package.sh"
-      - ".github/workflows/pages-site.yml"
+      - ".github/workflows/deploy-pages-site.yml"
   - label: maintenance
     title:
       - '/^(chore|refactor|test)(\([^)]+\))?:/i'
@@ -143,6 +143,7 @@ template: |
 
   - Release binaries for `linux/amd64`, `linux/arm64`, `linux/arm/v7`, `darwin/amd64`, and `darwin/arm64`
   - Debian packages for `amd64`, `arm64`, and `armhf`
+  - Homebrew formula updates for stable releases
   - SHA256 checksums attached to the release
-  - Container images published to `ghcr.io/soakes/s3ctl`
+  - Container images published to `ghcr.io/netspeedy/s3ctl`
   - Stable releases refresh the GitHub Pages install hub and signed APT repository metadata when signing secrets are configured

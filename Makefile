@@ -1,7 +1,7 @@
 GO ?= go
 BINARY ?= s3ctl
 CMD_PATH ?= ./cmd/$(BINARY)
-PKG ?= github.com/soakes/s3ctl
+PKG ?= github.com/netspeedy/s3ctl
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || printf '%s' dev)
 COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || printf '%s' packaged)
 BUILD_DATE ?= $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -13,6 +13,7 @@ DEB_ARCH ?=
 GO_TOOLCHAIN_VERSION ?=
 GOLANGCI_LINT ?= $(CURDIR)/bin/golangci-lint
 GOLANGCI_LINT_VERSION ?= $(shell tr -d '[:space:]' < .golangci-lint-version 2>/dev/null)
+WEBSITE_DIR ?= .github/assets/website
 LDFLAGS ?= -s -w \
 	-X $(PKG)/internal/buildinfo.Version=$(VERSION) \
 	-X $(PKG)/internal/buildinfo.Commit=$(COMMIT) \
@@ -98,19 +99,19 @@ docker-build:
 		.
 
 website-install:
-	npm --prefix website install
+	npm --prefix $(WEBSITE_DIR) install
 
 website-build:
-	test -d website/node_modules || (printf 'missing website dependencies; run `make website-install`\n' >&2 && exit 1)
-	npm --prefix website run build
+	test -d $(WEBSITE_DIR)/node_modules || (printf 'missing website dependencies; run `make website-install`\n' >&2 && exit 1)
+	npm --prefix $(WEBSITE_DIR) run build
 
 website-check:
-	test -d website/node_modules || (printf 'missing website dependencies; run `make website-install`\n' >&2 && exit 1)
-	npm --prefix website run check
+	test -d $(WEBSITE_DIR)/node_modules || (printf 'missing website dependencies; run `make website-install`\n' >&2 && exit 1)
+	npm --prefix $(WEBSITE_DIR) run check
 
 website-capture:
-	test -d website/node_modules || (printf 'missing website dependencies; run `make website-install`\n' >&2 && exit 1)
-	npm --prefix website run capture
+	test -d $(WEBSITE_DIR)/node_modules || (printf 'missing website dependencies; run `make website-install`\n' >&2 && exit 1)
+	npm --prefix $(WEBSITE_DIR) run capture
 
 refresh-go-toolchain:
 	GO_TOOLCHAIN_VERSION="$(GO_TOOLCHAIN_VERSION)" bash scripts/refresh-go-toolchain.sh

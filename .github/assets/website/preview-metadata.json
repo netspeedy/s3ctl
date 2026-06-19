@@ -1,0 +1,71 @@
+{
+  "site_url": "https://netspeedy.github.io/s3ctl/",
+  "github_repository": "netspeedy/s3ctl",
+  "github_url": "https://github.com/netspeedy/s3ctl",
+  "release_url": "https://github.com/netspeedy/s3ctl/releases",
+  "container_url": "https://ghcr.io/netspeedy/s3ctl",
+  "homebrew_url": "https://github.com/netspeedy/homebrew-s3ctl",
+  "install_script_url": "https://netspeedy.github.io/s3ctl/install.sh",
+  "release_commit": "3723c72437deaedba052a056a9644ece62ee1bf7",
+  "latest_release": {
+    "tag_name": "v0.1.2",
+    "html_url": "https://github.com/netspeedy/s3ctl/releases/tag/v0.1.2",
+    "published_at": "2026-04-24T21:10:58Z",
+    "body": "## Release Overview\n\nStable release for `s3ctl`.\n\n- Published tag: [`v0.1.2`](https://github.com/netspeedy/s3ctl/releases/tag/v0.1.2)\n- Full diff: [`v0.1.1...v0.1.2`](https://github.com/netspeedy/s3ctl/compare/v0.1.1...v0.1.2)\n\n## Included Changes\n\n### Fixes\n\n- Refresh live release metadata rail ([`3723c72`](https://github.com/netspeedy/s3ctl/commit/3723c72437deaedba052a056a9644ece62ee1bf7))\n\n## Published Artifacts\n\n- Release binaries for `linux/amd64`, `linux/arm64`, `linux/arm/v7`, `darwin/amd64`, and `darwin/arm64`\n- Debian packages for `amd64`, `arm64`, and `armhf`\n- Homebrew formula updates for stable releases\n- SHA256 checksums attached to the release\n- Container images published to `ghcr.io/netspeedy/s3ctl`\n- The GitHub Pages release hub is refreshed with install commands, release assets, and APT repository metadata\n",
+    "assets": [
+      {
+        "name": "s3ctl-linux-amd64.tar.gz",
+        "browser_download_url": "https://github.com/netspeedy/s3ctl/releases/download/v0.1.2/s3ctl-linux-amd64.tar.gz",
+        "size": 4020060
+      },
+      {
+        "name": "s3ctl-linux-arm64.tar.gz",
+        "browser_download_url": "https://github.com/netspeedy/s3ctl/releases/download/v0.1.2/s3ctl-linux-arm64.tar.gz",
+        "size": 3592110
+      },
+      {
+        "name": "s3ctl-linux-armv7.tar.gz",
+        "browser_download_url": "https://github.com/netspeedy/s3ctl/releases/download/v0.1.2/s3ctl-linux-armv7.tar.gz",
+        "size": 3817370
+      },
+      {
+        "name": "s3ctl-darwin-amd64.tar.gz",
+        "browser_download_url": "https://github.com/netspeedy/s3ctl/releases/download/v0.1.2/s3ctl-darwin-amd64.tar.gz",
+        "size": 4071800
+      },
+      {
+        "name": "s3ctl-darwin-arm64.tar.gz",
+        "browser_download_url": "https://github.com/netspeedy/s3ctl/releases/download/v0.1.2/s3ctl-darwin-arm64.tar.gz",
+        "size": 3728221
+      },
+      {
+        "name": "s3ctl_0.1.2_amd64.deb",
+        "browser_download_url": "https://github.com/netspeedy/s3ctl/releases/download/v0.1.2/s3ctl_0.1.2_amd64.deb",
+        "size": 3265622
+      },
+      {
+        "name": "s3ctl_0.1.2_arm64.deb",
+        "browser_download_url": "https://github.com/netspeedy/s3ctl/releases/download/v0.1.2/s3ctl_0.1.2_arm64.deb",
+        "size": 2891602
+      },
+      {
+        "name": "s3ctl_0.1.2_armhf.deb",
+        "browser_download_url": "https://github.com/netspeedy/s3ctl/releases/download/v0.1.2/s3ctl_0.1.2_armhf.deb",
+        "size": 3019924
+      },
+      {
+        "name": "SHA256SUMS",
+        "browser_download_url": "https://github.com/netspeedy/s3ctl/releases/download/v0.1.2/SHA256SUMS",
+        "size": 721
+      }
+    ]
+  },
+  "apt_repository": {
+    "available": true,
+    "url": "https://netspeedy.github.io/s3ctl/apt/",
+    "suite": "stable",
+    "component": "main",
+    "key_url": "https://netspeedy.github.io/s3ctl/apt/s3ctl-archive-keyring.gpg",
+    "fingerprint": "7E6A 3D77 36C6 E573 16AC 2920 418B 37C1 CF46 53F1"
+  }
+}

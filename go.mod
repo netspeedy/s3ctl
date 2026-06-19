@@ -1,4 +1,4 @@
-module github.com/soakes/s3ctl
+module github.com/netspeedy/s3ctl
 
 go 1.26.0
 

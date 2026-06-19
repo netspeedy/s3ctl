@@ -8,8 +8,9 @@
 - Keep application logic under `internal/`; avoid adding new top-level Go
   packages at the repository root.
 - Keep first-party automation, packaging, and release assets at the root,
-  under `.github/`, `scripts/`, `examples/`, and `website/`.
-- Treat `website/` as a first-party release surface, not a throwaway demo.
+  under `.github/`, `scripts/`, `examples/`, and `.github/assets/website/`.
+- Treat `.github/assets/website/` as a first-party release surface, not a
+  throwaway demo.
 
 ## Build, Lint, and Test Commands
 

@@ -91,7 +91,8 @@ jobs:
             "${{ steps.promote.outputs.stable_tag }}" \
             "${{ steps.promote.outputs.release_sha }}" \
             release-assets.yml \
-            container-image.yml
+            container-image.yml \
+            publish-homebrew-formula.yml
 
       - name: Write workflow summary
         run: |

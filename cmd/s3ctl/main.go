@@ -4,7 +4,7 @@ package main
 import (
 	"os"
 
-	"github.com/soakes/s3ctl/internal/s3ctl"
+	"github.com/netspeedy/s3ctl/internal/s3ctl"
 )
 
 func main() {

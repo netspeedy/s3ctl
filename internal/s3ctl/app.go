@@ -27,7 +27,7 @@ import (
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 	"github.com/spf13/pflag"
 
-	"github.com/soakes/s3ctl/internal/buildinfo"
+	"github.com/netspeedy/s3ctl/internal/buildinfo"
 )
 
 const binaryName = "s3ctl"

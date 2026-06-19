@@ -1,0 +1,146 @@
+name: Publish Homebrew Formula
+
+on:
+  push:
+    tags:
+      - v*
+  workflow_dispatch:
+    inputs:
+      release_ref:
+        description: Stable release tag to publish, for example v1.0.0
+        required: false
+        type: string
+
+concurrency:
+  group: publish-homebrew-${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || inputs.release_ref || github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CHECKOUT_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.release_ref || github.sha }}
+  RELEASE_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.release_ref || github.ref_name }}
+
+jobs:
+  verify-release-tag:
+    name: Verify Release Tag
+    if: |
+      (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-rc.')) ||
+      (github.event_name == 'workflow_dispatch' && startsWith(inputs.release_ref || '', 'v') && !contains(inputs.release_ref || '', '-rc.'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ env.CHECKOUT_REF }}
+
+      - name: Ensure release tag points to main
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          default_branch="${DEFAULT_BRANCH}"
+          release_commit="$(git rev-parse HEAD^0)"
+
+          git fetch origin "${default_branch}:refs/remotes/origin/${default_branch}" --force
+          git merge-base --is-ancestor "${release_commit}" "refs/remotes/origin/${default_branch}"
+
+  publish:
+    name: Publish Homebrew Formula
+    if: |
+      (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-rc.')) ||
+      (github.event_name == 'workflow_dispatch' && startsWith(inputs.release_ref || '', 'v') && !contains(inputs.release_ref || '', '-rc.'))
+    needs:
+      - verify-release-tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          ref: ${{ env.CHECKOUT_REF }}
+
+      - name: Resolve release archive SHA256 sums
+        id: formula
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${RELEASE_REF#v}"
+
+          for attempt in $(seq 1 12); do
+            if checksums="$(gh release download "${RELEASE_REF}" --pattern 'SHA256SUMS' --output - 2>/dev/null)"; then
+              break
+            fi
+            echo "Waiting for release assets (attempt ${attempt}/12)..."
+            sleep 10
+          done
+
+          sha_for() {
+            asset="$1"
+            printf '%s\n' "${checksums}" | awk -v asset="${asset}" '$2 == asset { print $1; found=1 } END { exit found ? 0 : 1 }'
+          }
+
+          {
+            echo "version=${version}"
+            echo "darwin_amd64=$(sha_for s3ctl-darwin-amd64.tar.gz)"
+            echo "darwin_arm64=$(sha_for s3ctl-darwin-arm64.tar.gz)"
+            echo "linux_amd64=$(sha_for s3ctl-linux-amd64.tar.gz)"
+            echo "linux_arm64=$(sha_for s3ctl-linux-arm64.tar.gz)"
+            echo "linux_armv7=$(sha_for s3ctl-linux-armv7.tar.gz)"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Update formula and publish to tap
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_AUTOMATION_TOKEN || github.token }}
+        run: |
+          version="${{ steps.formula.outputs.version }}"
+          darwin_amd64="${{ steps.formula.outputs.darwin_amd64 }}"
+          darwin_arm64="${{ steps.formula.outputs.darwin_arm64 }}"
+          linux_amd64="${{ steps.formula.outputs.linux_amd64 }}"
+          linux_arm64="${{ steps.formula.outputs.linux_arm64 }}"
+          linux_armv7="${{ steps.formula.outputs.linux_armv7 }}"
+          tap_repo="${{ github.repository_owner }}/homebrew-s3ctl"
+
+          tmpdir="$(mktemp -d)"
+          trap 'rm -rf "${tmpdir}"' EXIT
+
+          gh repo clone "${tap_repo}" "${tmpdir}/tap" -- --depth=1
+          cd "${tmpdir}/tap"
+
+          test -f Formula/s3ctl.rb
+          VERSION="${version}" perl -0pi -e 's/version "[^"]+"/"version \"$ENV{VERSION}\""/e' Formula/s3ctl.rb
+          VERSION="${version}" perl -0pi -e 's#(releases/download/)v[^/]+/(s3ctl-[^"]+\.tar\.gz)#$1 . "v" . $ENV{VERSION} . "/" . $2#ge' Formula/s3ctl.rb
+
+          set_sha() {
+            asset="$1"
+            sha="$2"
+            awk -v asset="${asset}" -v sha="${sha}" '
+              index($0, asset) { pending = 1 }
+              pending && /^[[:space:]]*sha256 / {
+                sub(/sha256 "[^"]+"/, "sha256 \"" sha "\"")
+                pending = 0
+              }
+              { print }
+            ' Formula/s3ctl.rb > Formula/s3ctl.rb.tmp
+            mv Formula/s3ctl.rb.tmp Formula/s3ctl.rb
+          }
+
+          set_sha s3ctl-darwin-amd64.tar.gz "${darwin_amd64}"
+          set_sha s3ctl-darwin-arm64.tar.gz "${darwin_arm64}"
+          set_sha s3ctl-linux-amd64.tar.gz "${linux_amd64}"
+          set_sha s3ctl-linux-arm64.tar.gz "${linux_arm64}"
+          set_sha s3ctl-linux-armv7.tar.gz "${linux_armv7}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/s3ctl.rb
+          git diff --cached --quiet && echo "No formula changes" && exit 0
+          git commit -m "chore: update formula for v${version}"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${tap_repo}.git"
+          git push

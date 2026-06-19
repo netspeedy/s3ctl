@@ -149,7 +149,8 @@ jobs:
             "${{ steps.candidate.outputs.stable_tag }}" \
             "${RELEASE_SHA}" \
             release-assets.yml \
-            container-image.yml
+            container-image.yml \
+            publish-homebrew-formula.yml
 
       - name: Write workflow summary
         if: steps.automation.outputs.enabled == 'true'

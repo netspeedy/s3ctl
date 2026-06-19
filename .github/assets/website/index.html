@@ -32,9 +32,10 @@
       </a>
 
       <nav class="masthead-links hide-mobile">
-        <a href="https://github.com/soakes/s3ctl" class="nav-link" id="nav-github-link">GitHub</a>
-        <a href="https://github.com/soakes/s3ctl/releases" class="nav-link" id="nav-releases-link">Releases</a>
-        <a href="https://ghcr.io/soakes/s3ctl" class="nav-link" id="nav-container-link">GHCR</a>
+        <a href="https://github.com/netspeedy/s3ctl" class="nav-link" id="nav-github-link">GitHub</a>
+        <a href="https://github.com/netspeedy/s3ctl/releases" class="nav-link" id="nav-releases-link">Releases</a>
+        <a href="https://github.com/netspeedy/homebrew-s3ctl" class="nav-link" id="nav-homebrew-link">Homebrew</a>
+        <a href="https://ghcr.io/netspeedy/s3ctl" class="nav-link" id="nav-container-link">GHCR</a>
         <a href="#" class="nav-link" id="nav-apt-link">APT</a>
       </nav>
     </header>
@@ -48,14 +49,14 @@
             <span class="text-gradient">a cleaner operator path</span>
           </h1>
           <p class="hero-lead">
-            Install `s3ctl` from a single shell command, a signed Debian repository,
-            direct `.deb` packages, GitHub Releases, or GHCR. The release hub keeps
-            the supported delivery paths obvious.
+            Install `s3ctl` from a single shell command, Homebrew, a signed Debian
+            repository, direct `.deb` packages, GitHub Releases, or GHCR. The release
+            hub keeps the supported delivery paths obvious.
           </p>
           <div class="hero-actions">
             <a href="#install" class="btn btn-primary">Install</a>
-            <a href="https://github.com/soakes/s3ctl/releases" class="btn btn-secondary" id="hero-release-link">Releases</a>
-            <a href="https://github.com/soakes/s3ctl/releases" class="btn btn-secondary" id="hero-checksum-link">Checksums</a>
+            <a href="https://github.com/netspeedy/s3ctl/releases" class="btn btn-secondary" id="hero-release-link">Releases</a>
+            <a href="https://github.com/netspeedy/s3ctl/releases" class="btn btn-secondary" id="hero-checksum-link">Checksums</a>
           </div>
         </div>
 
@@ -95,7 +96,7 @@
           </div>
           <div class="highlight-item">
             <span class="h-label">Distribution</span>
-            <strong>Shell, APT, GHCR</strong>
+            <strong>Shell, Brew, APT, GHCR</strong>
             <p>One release workflow, several operator-ready installation paths.</p>
           </div>
           <div class="highlight-item">
@@ -112,7 +113,7 @@
           <h2>Pick your delivery path.</h2>
           <p class="section-lead">
             The high-confidence routes stay closest to hand: a direct installer, a signed
-            APT repository, a direct Debian package, and a pinned GHCR runtime path.
+            APT repository, Homebrew, a direct Debian package, and a pinned GHCR runtime path.
           </p>
         </div>
 
@@ -137,6 +138,28 @@
             </div>
             <p class="card-note" id="install-script-note">
               The installer supports --version, --install-dir, and --binary-name; macOS uses a user-owned home bin dir.
+            </p>
+          </article>
+
+          <article class="install-card glass-card hover-lift">
+            <div class="card-head flex j-between a-center">
+              <h3>Homebrew tap</h3>
+              <span class="badge primary-badge">macOS and Linux</span>
+            </div>
+            <p class="card-desc">
+              Use the Netspeedy tap when you want the normal Homebrew upgrade flow on workstations and build hosts.
+            </p>
+            <div class="pill-list pill-list-muted">
+              <span>Separate tap repository</span>
+              <span>Stable formula updates</span>
+            </div>
+            <div class="code-wrap">
+              <button class="copy-button" type="button" data-copy-target="homebrew-command">Copy</button>
+              <pre class="code-block" id="homebrew-command">brew tap netspeedy/s3ctl
+brew install s3ctl</pre>
+            </div>
+            <p class="card-note" id="homebrew-note">
+              The tap is ready for the first stable formula update from the release workflow.
             </p>
           </article>
 
@@ -192,7 +215,7 @@
             </div>
             <div class="code-wrap">
               <button class="copy-button" type="button" data-copy-target="container-command">Copy</button>
-              <pre class="code-block" id="container-command">docker run --rm ghcr.io/soakes/s3ctl:latest --help</pre>
+              <pre class="code-block" id="container-command">docker run --rm ghcr.io/netspeedy/s3ctl:latest --help</pre>
             </div>
             <p class="card-note" id="container-note">
               Use the published image when you want the install path to stay container-native.
@@ -224,9 +247,9 @@
             <div class="asset-empty">Publish a stable release to populate download links and package metadata.</div>
           </div>
           <div class="asset-meta-links">
-            <a class="meta-link" id="asset-release-link" href="https://github.com/soakes/s3ctl/releases">Release page</a>
+            <a class="meta-link" id="asset-release-link" href="https://github.com/netspeedy/s3ctl/releases">Release page</a>
             <span class="meta-link-sep">&bull;</span>
-            <a class="meta-link" id="asset-checksum-link" href="https://github.com/soakes/s3ctl/releases">Checksums</a>
+            <a class="meta-link" id="asset-checksum-link" href="https://github.com/netspeedy/s3ctl/releases">Checksums</a>
             <span class="meta-link-sep">&bull;</span>
             <a class="meta-link" id="asset-key-link" href="./apt/s3ctl-archive-keyring.gpg">APT keyring</a>
             <span class="meta-link-sep">&bull;</span>
@@ -243,7 +266,7 @@
             Use the release hub for installation, then drive bucket provisioning from flags,
             environment variables, JSON config, or CSV batch input.
           </p>
-          <a href="https://github.com/soakes/s3ctl#readme" class="btn btn-primary large-btn">Open Documentation</a>
+          <a href="https://github.com/netspeedy/s3ctl#readme" class="btn btn-primary large-btn">Open Documentation</a>
         </div>
       </section>
     </main>

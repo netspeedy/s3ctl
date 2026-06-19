@@ -1,6 +1,6 @@
 dist/
 bin/
 .cache/
-website/node_modules/
-website/.captures/
-website/dist/
+.github/assets/website/node_modules/
+.github/assets/website/.captures/
+.github/assets/website/dist/

@@ -4,10 +4,11 @@ const defaultSiteURL = new URL("./", window.location.href).href;
 
 const defaultMetadata = {
   site_url: defaultSiteURL,
-  github_repository: "soakes/s3ctl",
-  github_url: "https://github.com/soakes/s3ctl",
-  release_url: "https://github.com/soakes/s3ctl/releases",
-  container_url: "https://ghcr.io/soakes/s3ctl",
+  github_repository: "netspeedy/s3ctl",
+  github_url: "https://github.com/netspeedy/s3ctl",
+  release_url: "https://github.com/netspeedy/s3ctl/releases",
+  container_url: "https://ghcr.io/netspeedy/s3ctl",
+  homebrew_url: "https://github.com/netspeedy/homebrew-s3ctl",
   install_script_url: `${defaultSiteURL}install.sh`,
   release_commit: "",
   latest_release: null,
@@ -75,6 +76,7 @@ function normalizeMetadata(metadata = {}) {
     ...defaultMetadata,
     ...metadata,
     site_url: `${metadata.site_url || defaultMetadata.site_url}`.replace(/\/?$/, "/"),
+    homebrew_url: metadata.homebrew_url || defaultMetadata.homebrew_url,
     install_script_url: metadata.install_script_url || defaultMetadata.install_script_url,
     release_commit: metadata.release_commit || "",
     latest_release: metadata.latest_release || null,
@@ -324,6 +326,8 @@ function renderCommands(metadata) {
   const aptCommand = document.getElementById("apt-command");
   const aptCopy = document.getElementById("apt-copy");
   const aptFingerprint = document.getElementById("apt-fingerprint-row");
+  const homebrewCommand = document.getElementById("homebrew-command");
+  const homebrewNote = document.getElementById("homebrew-note");
   const debCommand = document.getElementById("deb-command");
   const debNote = document.getElementById("deb-note");
 
@@ -339,8 +343,8 @@ function renderCommands(metadata) {
 
   if (containerCommand) {
     containerCommand.textContent = release?.tag_name
-      ? `docker run --rm ghcr.io/soakes/s3ctl:${release.tag_name} --help`
-      : "docker run --rm ghcr.io/soakes/s3ctl:latest --help";
+      ? `docker run --rm ghcr.io/netspeedy/s3ctl:${release.tag_name} --help`
+      : "docker run --rm ghcr.io/netspeedy/s3ctl:latest --help";
   }
 
   if (containerNote) {
@@ -381,6 +385,17 @@ sudo apt update && sudo apt install s3ctl`;
       : "";
   }
 
+  if (homebrewCommand) {
+    homebrewCommand.textContent = `brew tap netspeedy/s3ctl
+brew install s3ctl`;
+  }
+
+  if (homebrewNote) {
+    homebrewNote.textContent = release?.tag_name
+      ? `The tap tracks stable releases; current formula automation targets ${release.tag_name}.`
+      : "The tap is ready for the first stable formula update from the release workflow.";
+  }
+
   if (debCommand) {
     if (directDebAsset) {
       debCommand.textContent = `curl -fsSLO ${directDebAsset.browser_download_url}
@@ -407,6 +422,7 @@ function renderLinks(metadata) {
   setHref("nav-github-link", metadata.github_url);
   setHref("nav-releases-link", metadata.release_url);
   setHref("nav-apt-link", metadata.apt_repository.url);
+  setHref("nav-homebrew-link", metadata.homebrew_url);
   setHref("hero-release-link", releasePageURL);
   setHref("nav-container-link", metadata.container_url);
   setLinkState("hero-checksum-link", {
