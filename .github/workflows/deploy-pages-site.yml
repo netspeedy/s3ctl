@@ -165,7 +165,17 @@ jobs:
           touch site/.nojekyll
 
           if [ "${{ steps.latest.outputs.available }}" = "true" ]; then
-            latest_release_json="$(cat latest-release.json)"
+            latest_release_json="$({
+              jq \
+                --arg old_repo "https://github.com/soakes/${{ github.event.repository.name }}" \
+                --arg new_repo "https://github.com/${GITHUB_REPOSITORY}" \
+                --arg old_pages "https://soakes.github.io/${{ github.event.repository.name }}" \
+                --arg new_pages "${site_url%/}" \
+                --arg old_ghcr "ghcr.io/soakes/${{ github.event.repository.name }}" \
+                --arg new_ghcr "ghcr.io/${GITHUB_REPOSITORY}" \
+                'if .body then .body |= (gsub($old_repo; $new_repo) | gsub($old_pages; $new_pages) | gsub($old_ghcr; $new_ghcr)) else . end' \
+                latest-release.json
+            })"
           else
             latest_release_json='null'
           fi
