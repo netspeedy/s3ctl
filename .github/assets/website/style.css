@@ -442,6 +442,48 @@ code {
   margin-top: 0.8rem;
 }
 
+.install-directory {
+  border-top: 1px solid var(--line);
+}
+
+.install-directory-row {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.8fr) minmax(12rem, 1.4fr) minmax(9rem, 0.8fr);
+  gap: 1rem;
+  align-items: center;
+  padding: 0.85rem 1.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.install-directory-row:first-child {
+  border-top: 0;
+}
+
+.install-directory-row strong {
+  color: var(--text);
+}
+
+.install-directory-row a {
+  color: var(--blue-strong);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.install-directory-row a:hover {
+  text-decoration: underline;
+}
+
+.install-directory-head {
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .site-footer {
   margin-top: 2rem;
   border-top: 1px solid var(--line);
@@ -555,6 +597,15 @@ code {
   .footer-top,
   .footer-bottom {
     flex-direction: column;
+  }
+
+  .install-directory-row {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .install-directory-head {
+    display: none;
   }
 }
 

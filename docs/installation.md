@@ -86,6 +86,8 @@ sudo apt update && sudo apt install s3ctl
 
 ## Container
 
+Package page: [github.com/netspeedy/s3ctl/pkgs/container/s3ctl](https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl)
+
 Use the published image:
 
 ```bash

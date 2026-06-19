@@ -13,7 +13,7 @@
   <a href="https://github.com/netspeedy/s3ctl/actions/workflows/container-image.yml"><img src="https://img.shields.io/github/actions/workflow/status/netspeedy/s3ctl/container-image.yml?branch=main&style=flat-square&label=container" alt="Container"></a>
   <a href="https://github.com/netspeedy/s3ctl/releases"><img src="https://img.shields.io/github/v/release/netspeedy/s3ctl?sort=semver&style=flat-square" alt="Release"></a>
   <a href="https://netspeedy.github.io/s3ctl/"><img src="https://img.shields.io/badge/APT-signed%20repo-A81D33?style=flat-square&logo=debian&logoColor=white" alt="APT Repository"></a>
-  <a href="https://ghcr.io/netspeedy/s3ctl"><img src="https://img.shields.io/badge/GHCR-published-2088FF?style=flat-square&logo=github" alt="GHCR"></a>
+  <a href="https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl"><img src="https://img.shields.io/badge/GHCR-published-2088FF?style=flat-square&logo=github" alt="GHCR"></a>
   <a href="https://go.dev/"><img src="https://img.shields.io/badge/Go-1.26.3-00ADD8.svg?style=flat-square&logo=go&logoColor=white" alt="Go"></a>
 </p>
 
@@ -23,7 +23,7 @@ OVHcloud keys, deletes empty buckets safely, and is available as release
 archives, Debian packages, a Homebrew formula, a signed APT repository, and a
 container image.
 
-**Links:** [Releases](https://github.com/netspeedy/s3ctl/releases) | [GHCR](https://ghcr.io/netspeedy/s3ctl) | [Release Hub / APT](https://netspeedy.github.io/s3ctl/) | [Examples](examples) | [Docs](docs)
+**Links:** [Releases](https://github.com/netspeedy/s3ctl/releases) | [GHCR](https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl) | [Release Hub / APT](https://netspeedy.github.io/s3ctl/) | [Examples](examples) | [Docs](docs)
 
 <a id="overview"></a>
 

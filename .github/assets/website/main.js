@@ -14,7 +14,8 @@ const defaultMetadata = {
   github_url: "https://github.com/netspeedy/s3ctl",
   release_url: "https://github.com/netspeedy/s3ctl/releases",
   homebrew_url: "https://github.com/netspeedy/homebrew-s3ctl",
-  container_url: "https://ghcr.io/netspeedy/s3ctl",
+  container_url: "https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl",
+  container_image: "ghcr.io/netspeedy/s3ctl",
   install_script_url: `${defaultSiteURL}install.sh`,
   release_commit: "",
   latest_release: null,
@@ -30,6 +31,8 @@ const defaultMetadata = {
 
 function normalizeMetadata(metadata = {}) {
   const apt = metadata.apt_repository || {};
+  const rawContainerURL = metadata.container_url || defaultMetadata.container_url;
+  const rawContainerImage = metadata.container_image || (rawContainerURL.includes("ghcr.io/") ? rawContainerURL.replace(/^https?:\/\//, "") : "");
 
   return {
     ...defaultMetadata,
@@ -38,7 +41,8 @@ function normalizeMetadata(metadata = {}) {
     github_url: metadata.github_url || defaultMetadata.github_url,
     release_url: metadata.release_url || defaultMetadata.release_url,
     homebrew_url: metadata.homebrew_url || defaultMetadata.homebrew_url,
-    container_url: metadata.container_url || defaultMetadata.container_url,
+    container_url: rawContainerURL.includes("ghcr.io/") ? defaultMetadata.container_url : rawContainerURL,
+    container_image: rawContainerImage || defaultMetadata.container_image,
     install_script_url: metadata.install_script_url || defaultMetadata.install_script_url,
     release_commit: metadata.release_commit || "",
     latest_release: metadata.latest_release || null,
@@ -168,7 +172,7 @@ function renderCommands(metadata) {
   const directDebAsset = chooseDirectDebAsset(assets);
   const checksumAsset = chooseChecksumAsset(assets);
   const releaseTag = release?.tag_name || "latest";
-  const containerImage = metadata.container_url.replace(/^https?:\/\//, "");
+  const containerImage = metadata.container_image.replace(/^https?:\/\//, "");
 
   setText("homebrew-command", "brew tap netspeedy/s3ctl\nbrew install s3ctl");
   setText(
@@ -224,7 +228,12 @@ function renderMetadata(rawMetadata) {
   setHref("nav-homebrew-link", metadata.homebrew_url);
   setHref("nav-apt-link", metadata.apt_repository.url);
   setHref("nav-container-link", metadata.container_url);
+  setHref("install-homebrew-link", metadata.homebrew_url);
+  setHref("install-apt-link", metadata.apt_repository.url);
+  setHref("install-container-link", metadata.container_url);
+  setHref("install-release-link", metadata.release_url);
   setHref("footer-apt-link", metadata.apt_repository.url);
+  setHref("footer-container-link", metadata.container_url);
   setHref("footer-release-link", release?.html_url || metadata.release_url);
 
   setText("release-version", release?.tag_name || "Awaiting release");
