@@ -1,6 +1,8 @@
 <p align="center">
-  <img src=".github/assets/website/readme-card.svg" width="600" alt="s3ctl">
+  <img src=".github/assets/website/favicon.svg" width="96" height="96" alt="s3ctl">
 </p>
+
+<h1 align="center">s3ctl</h1>
 
 <p align="center">
   A single-binary CLI for creating S3-compatible buckets and issuing bucket-scoped credentials.
@@ -14,6 +16,8 @@
   <a href="https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl"><img src="https://img.shields.io/badge/GHCR-published-2088FF?style=flat-square&logo=github" alt="GHCR"></a>
   <a href="https://go.dev/"><img src="https://img.shields.io/badge/Go-1.26.3-00ADD8.svg?style=flat-square&logo=go&logoColor=white" alt="Go"></a>
 </p>
+
+---
 
 `s3ctl` is for teams that need repeatable bucket provisioning without manual
 storage and IAM setup. It creates buckets, issues scoped credentials, rotates
