@@ -29,11 +29,11 @@
           <small>Bucket provisioning CLI</small>
         </span>
       </a>
-      <nav class="masthead-links">
-        <a href="https://github.com/netspeedy/s3ctl/releases" id="nav-releases-link">Releases</a>
+      <nav class="masthead-links" aria-label="Primary navigation">
         <a href="https://github.com/netspeedy/homebrew-s3ctl" id="nav-homebrew-link">Homebrew</a>
         <a href="#" id="nav-apt-link">APT</a>
-        <a href="https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl" id="nav-container-link">GHCR</a>
+        <a href="https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl" id="nav-container-link">Docker</a>
+        <a href="https://github.com/netspeedy/s3ctl/releases" id="nav-releases-link">Releases</a>
         <a href="https://github.com/netspeedy/s3ctl" id="nav-github-link">GitHub</a>
       </nav>
     </header>
@@ -56,21 +56,21 @@
 
         <aside class="terminal-shot" aria-label="s3ctl terminal output preview">
           <div class="terminal-top"><span></span><span></span><span></span></div>
-          <pre><code>$ s3ctl --bucket app-data \
-  --create-scoped-credentials --dry-run
-Bucket: app-data
-  create planned: yes
-  versioning:     enabled
-  IAM user:       app-data
-  policy:         bucket-readwrite
+          <pre><code><span class="terminal-prompt">$</span> <span class="terminal-command">s3ctl --bucket app-data \
+  --create-scoped-credentials --dry-run</span>
+<span class="terminal-label">Bucket:</span> <span class="terminal-value">app-data</span>
+  <span class="terminal-key">create planned:</span> <span class="terminal-value">yes</span>
+  <span class="terminal-key">versioning:</span>     <span class="terminal-value">enabled</span>
+  <span class="terminal-key">IAM user:</span>       <span class="terminal-value">app-data</span>
+  <span class="terminal-key">policy:</span>         <span class="terminal-value">bucket-readwrite</span>
 
-$ s3ctl --config ./examples/s3ctl.json \
-  --output json | jq '.resource_count'
-2
+<span class="terminal-prompt">$</span> <span class="terminal-command">s3ctl --config ./examples/s3ctl.json \
+  --output json | jq '.resource_count'</span>
+<span class="terminal-value">2</span>
 
-$ s3ctl --provider ovh --bucket app-data \
-  --ovh-rotate-credentials
-Rotated scoped credentials for app-data</code></pre>
+<span class="terminal-prompt">$</span> <span class="terminal-command">s3ctl --provider ovh --bucket app-data \
+  --ovh-rotate-credentials</span>
+<span class="terminal-success">Rotated scoped credentials for app-data</span></code></pre>
         </aside>
       </section>
 
@@ -178,26 +178,26 @@ brew install s3ctl</code></pre></div>
               <span>Use case</span>
               <span>Package source</span>
             </div>
-            <div class="install-directory-row">
-              <strong><span class="channel-dot" data-channel="homebrew"></span>Homebrew</strong>
+            <a class="install-directory-row" data-channel="homebrew" href="https://github.com/netspeedy/homebrew-s3ctl" id="install-homebrew-link" aria-label="Homebrew tap — macOS and Linux workstations">
+              <span class="channel-chip"><span class="channel-dot"></span>Homebrew<span class="channel-tag">Recommended</span></span>
               <span>macOS and Linux workstations</span>
-              <a href="https://github.com/netspeedy/homebrew-s3ctl" id="install-homebrew-link">Homebrew tap</a>
-            </div>
-            <div class="install-directory-row">
-              <strong><span class="channel-dot" data-channel="apt"></span>Signed APT</strong>
+              <span class="source-link">Homebrew tap<span class="source-arrow" aria-hidden="true">↗</span></span>
+            </a>
+            <a class="install-directory-row" data-channel="apt" href="#" id="install-apt-link" aria-label="APT repository — Debian and Ubuntu hosts">
+              <span class="channel-chip"><span class="channel-dot"></span>Signed APT</span>
               <span>Debian and Ubuntu hosts</span>
-              <a href="#" id="install-apt-link">APT repository</a>
-            </div>
-            <div class="install-directory-row">
-              <strong><span class="channel-dot" data-channel="archives"></span>Archives</strong>
+              <span class="source-link">APT repository<span class="source-arrow" aria-hidden="true">↗</span></span>
+            </a>
+            <a class="install-directory-row" data-channel="archives" href="https://github.com/netspeedy/s3ctl/releases" id="install-release-link" aria-label="GitHub releases — direct downloads and checksums">
+              <span class="channel-chip"><span class="channel-dot"></span>Archives</span>
               <span>Direct downloads and checksums</span>
-              <a href="https://github.com/netspeedy/s3ctl/releases" id="install-release-link">GitHub releases</a>
-            </div>
-            <div class="install-directory-row">
-              <strong><span class="channel-dot" data-channel="container"></span>Container</strong>
+              <span class="source-link">GitHub releases<span class="source-arrow" aria-hidden="true">↗</span></span>
+            </a>
+            <a class="install-directory-row" data-channel="container" href="https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl" id="install-container-link" aria-label="GitHub package — Docker and CI automation">
+              <span class="channel-chip"><span class="channel-dot"></span>Container</span>
               <span>Docker and CI automation</span>
-              <a href="https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl" id="install-container-link">GitHub package</a>
-            </div>
+              <span class="source-link">GitHub package<span class="source-arrow" aria-hidden="true">↗</span></span>
+            </a>
           </div>
         </div>
       </section>
