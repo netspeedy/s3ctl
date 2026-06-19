@@ -13,8 +13,8 @@ const defaultMetadata = {
   github_repository: "netspeedy/s3ctl",
   github_url: "https://github.com/netspeedy/s3ctl",
   release_url: "https://github.com/netspeedy/s3ctl/releases",
-  container_url: "https://ghcr.io/netspeedy/s3ctl",
   homebrew_url: "https://github.com/netspeedy/homebrew-s3ctl",
+  container_url: "https://ghcr.io/netspeedy/s3ctl",
   install_script_url: `${defaultSiteURL}install.sh`,
   release_commit: "",
   latest_release: null,
@@ -37,8 +37,8 @@ function normalizeMetadata(metadata = {}) {
     site_url: `${metadata.site_url || defaultMetadata.site_url}`.replace(/\/?$/, "/"),
     github_url: metadata.github_url || defaultMetadata.github_url,
     release_url: metadata.release_url || defaultMetadata.release_url,
-    container_url: metadata.container_url || defaultMetadata.container_url,
     homebrew_url: metadata.homebrew_url || defaultMetadata.homebrew_url,
+    container_url: metadata.container_url || defaultMetadata.container_url,
     install_script_url: metadata.install_script_url || defaultMetadata.install_script_url,
     release_commit: metadata.release_commit || "",
     latest_release: metadata.latest_release || null,
@@ -177,8 +177,6 @@ function renderCommands(metadata) {
       ? `curl -fsSL ${metadata.install_script_url} | bash -s -- --version ${release.tag_name}`
       : `curl -fsSL ${metadata.install_script_url} | bash`,
   );
-  setText("container-command", `docker run --rm ${containerImage}:${releaseTag} --help`);
-
   if (metadata.apt_repository.available) {
     setText(
       "apt-command",
@@ -201,6 +199,7 @@ sudo apt update && sudo apt install s3ctl`,
   }
 
   setText("apt-fingerprint-row", metadata.apt_repository.fingerprint ? `Archive fingerprint: ${metadata.apt_repository.fingerprint}` : "");
+  setText("container-command", `docker run --rm ${containerImage}:${releaseTag} --help`);
 
   if (directDebAsset) {
     setText("deb-command", `curl -fsSLO ${directDebAsset.browser_download_url}\nsudo apt install ./${directDebAsset.name}`);
@@ -223,8 +222,8 @@ function renderMetadata(rawMetadata) {
   setHref("nav-github-link", metadata.github_url);
   setHref("nav-releases-link", metadata.release_url);
   setHref("nav-homebrew-link", metadata.homebrew_url);
-  setHref("nav-container-link", metadata.container_url);
   setHref("nav-apt-link", metadata.apt_repository.url);
+  setHref("nav-container-link", metadata.container_url);
   setHref("footer-apt-link", metadata.apt_repository.url);
   setHref("footer-release-link", release?.html_url || metadata.release_url);
 

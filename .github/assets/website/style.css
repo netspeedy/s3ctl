@@ -1,13 +1,13 @@
 :root {
   color-scheme: dark;
-  --bg: #101512;
-  --panel: #17211c;
-  --panel-strong: #203028;
-  --text: #f4f8f5;
-  --muted: #a9b7af;
-  --line: #31443a;
-  --teal: #00a896;
-  --teal-strong: #11c5ad;
+  --bg: #0f1218;
+  --panel: #171d26;
+  --panel-strong: #202a36;
+  --text: #f4f8ff;
+  --muted: #aab5c4;
+  --line: #2d3d52;
+  --blue: #18a8ff;
+  --blue-strong: #4bd8ff;
   --amber: #f5b841;
   --red: #e85d75;
   --shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
@@ -28,8 +28,8 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 12% 8%, rgba(0, 168, 150, 0.16), transparent 30rem),
-    linear-gradient(180deg, #101512 0%, #0d110f 100%);
+    radial-gradient(circle at 12% 8%, rgba(24, 168, 255, 0.18), transparent 30rem),
+    linear-gradient(180deg, #0f1218 0%, #0b0e13 100%);
   color: var(--text);
 }
 
@@ -68,7 +68,7 @@ a {
   height: 42px;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 168, 150, 0.16);
+  box-shadow: 0 10px 30px rgba(24, 168, 255, 0.18);
 }
 
 .brand-mark img {
@@ -156,9 +156,9 @@ h1 {
 }
 
 .btn-primary {
-  background: var(--teal);
-  border-color: var(--teal);
-  color: #04110f;
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #03111c;
 }
 
 .btn-secondary {
@@ -171,7 +171,7 @@ h1 {
 .capability {
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(23, 33, 28, 0.93);
+  background: rgba(23, 29, 38, 0.94);
   box-shadow: var(--shadow);
 }
 
@@ -202,7 +202,7 @@ h1 {
 }
 
 .terminal-top span:nth-child(3) {
-  background: var(--teal);
+  background: var(--blue);
 }
 
 pre {
@@ -326,7 +326,7 @@ code {
   height: 6px;
   margin-top: 0.45em;
   border-radius: 50%;
-  background: var(--teal-strong);
+  background: var(--blue-strong);
 }
 
 .capabilities {
@@ -392,7 +392,7 @@ code {
   bottom: -1px;
   left: 0;
   height: 2px;
-  background: var(--teal-strong);
+  background: var(--blue-strong);
 }
 
 .tab-panel {
@@ -424,8 +424,8 @@ code {
   width: fit-content;
   padding: 0.2rem 0.55rem;
   border-radius: 4px;
-  background: var(--teal);
-  color: #04110f;
+  background: var(--blue);
+  color: #03111c;
   font-size: 0.65rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -435,7 +435,7 @@ code {
 .code-block {
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #07100d;
+  background: #07111a;
 }
 
 .tab-note {
