@@ -1,43 +1,32 @@
-# 🪣 s3ctl
+<p align="center">
+  <img src="website/favicon.svg" width="96" height="96" alt="s3ctl">
+</p>
 
-> A single-binary CLI for creating S3-compatible buckets and issuing bucket-scoped credentials.
+<h1 align="center">s3ctl</h1>
 
-[![Validate](https://img.shields.io/github/actions/workflow/status/soakes/s3ctl/build-and-validate.yml?branch=main&style=flat-square&label=validate)](https://github.com/soakes/s3ctl/actions/workflows/build-and-validate.yml)
-[![Container](https://img.shields.io/github/actions/workflow/status/soakes/s3ctl/container-image.yml?branch=main&style=flat-square&label=container)](https://github.com/soakes/s3ctl/actions/workflows/container-image.yml)
-[![Release](https://img.shields.io/github/v/release/soakes/s3ctl?sort=semver&style=flat-square)](https://github.com/soakes/s3ctl/releases)
-[![APT Repository](https://img.shields.io/badge/APT-signed%20repo-A81D33?style=flat-square&logo=debian&logoColor=white)](https://soakes.github.io/s3ctl/)
-[![GHCR](https://img.shields.io/badge/GHCR-published-2088FF?style=flat-square&logo=github)](https://ghcr.io/soakes/s3ctl)
-[![Go](https://img.shields.io/badge/Go-1.26.3-00ADD8.svg?style=flat-square&logo=go&logoColor=white)](https://go.dev/)
+<p align="center">
+  A single-binary CLI for creating S3-compatible buckets and issuing bucket-scoped credentials.
+</p>
+
+<p align="center">
+  <a href="https://github.com/soakes/s3ctl/actions/workflows/build-and-validate.yml"><img src="https://img.shields.io/github/actions/workflow/status/soakes/s3ctl/build-and-validate.yml?branch=main&style=flat-square&label=validate" alt="Validate"></a>
+  <a href="https://github.com/soakes/s3ctl/actions/workflows/container-image.yml"><img src="https://img.shields.io/github/actions/workflow/status/soakes/s3ctl/container-image.yml?branch=main&style=flat-square&label=container" alt="Container"></a>
+  <a href="https://github.com/soakes/s3ctl/releases"><img src="https://img.shields.io/github/v/release/soakes/s3ctl?sort=semver&style=flat-square" alt="Release"></a>
+  <a href="https://soakes.github.io/s3ctl/"><img src="https://img.shields.io/badge/APT-signed%20repo-A81D33?style=flat-square&logo=debian&logoColor=white" alt="APT Repository"></a>
+  <a href="https://ghcr.io/soakes/s3ctl"><img src="https://img.shields.io/badge/GHCR-published-2088FF?style=flat-square&logo=github" alt="GHCR"></a>
+  <a href="https://go.dev/"><img src="https://img.shields.io/badge/Go-1.26.3-00ADD8.svg?style=flat-square&logo=go&logoColor=white" alt="Go"></a>
+</p>
 
 `s3ctl` is for teams that need repeatable bucket provisioning without manual
 storage and IAM setup. It creates buckets, issues scoped credentials, rotates
 OVHcloud keys, deletes empty buckets safely, and is available as release
 archives, Debian packages, an APT package, and a container image.
 
-**Links:** [📦 Releases](https://github.com/soakes/s3ctl/releases) · [🐳 GHCR](https://ghcr.io/soakes/s3ctl) · [🔐 Release Hub / APT](https://soakes.github.io/s3ctl/) · [🧰 Examples](examples)
-
-## 🧭 Table of Contents
-
-- [📖 Overview](#overview)
-- [✨ Capabilities](#capabilities)
-- [🚀 Quick Start](#quick-start)
-- [📦 Distribution](#distribution)
-- [🖥️ Website Preview](#website-preview)
-- [🗃️ Batch Provisioning](#batch-provisioning)
-- [⚙️ Configuration](#configuration)
-- [🧩 Built-In Templates](#built-in-templates)
-- [🔑 IAM Notes](#iam-notes)
-- [🧹 Deleting Buckets](#deleting-buckets)
-- [☁️ OVHcloud Notes](#ovhcloud-notes)
-- [🐳 Container](#container)
-- [🛠️ Development](#development)
-- [🚢 Release Process](#release-process)
-
----
+**Links:** [Releases](https://github.com/soakes/s3ctl/releases) | [GHCR](https://ghcr.io/soakes/s3ctl) | [Release Hub / APT](https://soakes.github.io/s3ctl/) | [Examples](examples)
 
 <a id="overview"></a>
 
-## 📖 Overview
+## Overview
 
 `s3ctl` provisions S3-compatible buckets and automatically issues
 bucket-scoped access credentials. It can work with a normal S3/IAM-compatible
@@ -68,7 +57,7 @@ flowchart LR
   output --> operator["Endpoint, region, and scoped credentials"]
 ```
 
-### ✅ First Bucket Checklist
+### First Bucket Checklist
 
 1. Put shared provider settings in `~/.config/s3ctl/config.json`.
 2. Run `s3ctl --bucket app-data --dry-run --output json`.
@@ -80,7 +69,7 @@ flowchart LR
 
 <a id="capabilities"></a>
 
-## ✨ Capabilities
+## Capabilities
 
 - **Bucket provisioning**: creates one bucket, many buckets, or CSV-driven batches
 - **Scoped credentials**: creates bucket-specific IAM-style users and access keys
@@ -96,7 +85,7 @@ flowchart LR
 
 <a id="quick-start"></a>
 
-## 🚀 Quick Start
+## Quick Start
 
 Build locally:
 
@@ -231,7 +220,7 @@ s3ctl \
 
 <a id="distribution"></a>
 
-## 📦 Distribution
+## Distribution
 
 Published artifacts cover the supported installation paths:
 
@@ -307,7 +296,7 @@ sudo apt update && sudo apt install s3ctl
 
 <a id="website-preview"></a>
 
-## 🖥️ Website Preview
+## Website Preview
 
 Render the release hub locally with real browser screenshots:
 
@@ -326,7 +315,7 @@ The website is built with Vite and the local preview flow falls back to
 
 <a id="batch-provisioning"></a>
 
-## 🗃️ Batch Provisioning
+## Batch Provisioning
 
 For bulk runs, the normal pattern is:
 
@@ -356,7 +345,7 @@ logs-archive,true,bucket-readonly,false
 
 <a id="configuration"></a>
 
-## ⚙️ Configuration
+## Configuration
 
 Configuration is resolved in this order:
 
@@ -480,7 +469,7 @@ install -m 600 ./examples/user-config.json "${XDG_CONFIG_HOME:-$HOME/.config}/s3
 
 <a id="built-in-templates"></a>
 
-## 🧩 Built-In Templates
+## Built-In Templates
 
 Bucket policy templates:
 
@@ -507,7 +496,7 @@ users should be created under an IAM path.
 
 <a id="iam-notes"></a>
 
-## 🔑 IAM Notes
+## IAM Notes
 
 Scoped credential provisioning uses the IAM API in addition to the S3 API. The principal running `s3ctl` therefore needs permission to:
 
@@ -523,7 +512,7 @@ AWS IAM is the default target. When you need an IAM-compatible alternative, use
 
 <a id="deleting-buckets"></a>
 
-## 🧹 Deleting Buckets
+## Deleting Buckets
 
 Use `--delete` with one or more `--bucket` values to remove buckets instead of
 creating them. Empty buckets can be deleted without `--force`. Non-empty
@@ -567,7 +556,7 @@ object-storage endpoints. The default timeout is `10m`.
 
 <a id="ovhcloud-notes"></a>
 
-## ☁️ OVHcloud Notes
+## OVHcloud Notes
 
 Use `--provider ovh` to create OVHcloud Object Storage through the Public Cloud
 API. OVHcloud calls buckets "containers"; `s3ctl` keeps the CLI wording as
@@ -637,7 +626,7 @@ Optional OVHcloud settings:
   profile and S3 user policy for existing bucket owners without issuing new
   credentials.
 
-### 🔐 OVHcloud OAuth2 and IAM Setup
+### OVHcloud OAuth2 and IAM Setup
 
 ```mermaid
 flowchart TD
@@ -777,7 +766,7 @@ If OVHcloud returns `This service does not exist` while the project ID is
 correct, the service account usually cannot see the project yet. Recheck the IAM
 policy identity, resource, and actions.
 
-### 🔄 OVHcloud Credential Rotation
+### OVHcloud Credential Rotation
 
 Use `--ovh-rotate-credentials` or `"ovh_rotate_credentials": true` when a bucket
 already exists and you only want a fresh S3 access key and secret:
@@ -808,7 +797,7 @@ command output securely. If an old key cannot be deleted after the new key is
 created, `s3ctl` still prints the new credentials and includes a warning so the
 stale key can be removed manually.
 
-### 🛠️ OVHcloud Policy Repair
+### OVHcloud Policy Repair
 
 Use `--ovh-repair-policies` or `"ovh_repair_policies": true` when buckets and
 keys already exist and you only need to reapply the scoped access policies:
@@ -850,7 +839,7 @@ s3ctl \
   --output json
 ```
 
-### 🗑️ OVHcloud Bucket Deletion
+### OVHcloud Bucket Deletion
 
 OVHcloud buckets are containers, but the delete command still uses the bucket
 name:
@@ -896,7 +885,7 @@ use `POST /me/api/oauth2/client` instead.
 
 <a id="container"></a>
 
-## 🐳 Container
+## Container
 
 Build locally:
 
@@ -926,7 +915,7 @@ docker run --rm \
 
 <a id="development"></a>
 
-## 🛠️ Development
+## Development
 
 Common targets:
 
@@ -980,7 +969,7 @@ The Linux binaries are built with `CGO_ENABLED=0`, so releases are architecture-
 
 <a id="release-process"></a>
 
-## 🚢 Release Process
+## Release Process
 
 Stable releases are published only after the project passes validation for
 formatting, linting, vetting, tests, build output, packaging, website assets,
@@ -998,3 +987,12 @@ Stable releases publish:
 - GHCR images for the stable version, `latest`, and semver convenience tags
 - the GitHub Pages release hub with current installer and asset metadata
 - signed APT repository metadata for the stable channel
+
+---
+
+<p align="center">
+  <a href="https://soakes.github.io/s3ctl/">Release Hub / APT</a> |
+  <a href="https://github.com/soakes/s3ctl/releases">Releases</a> |
+  <a href="https://ghcr.io/soakes/s3ctl">GHCR</a> |
+  <a href="examples">Examples</a>
+</p>
