@@ -12,6 +12,7 @@
   <a href="https://github.com/netspeedy/s3ctl/actions/workflows/build-and-validate.yml"><img src="https://img.shields.io/github/actions/workflow/status/netspeedy/s3ctl/build-and-validate.yml?branch=main&style=flat-square&label=validate" alt="Validate"></a>
   <a href="https://github.com/netspeedy/s3ctl/actions/workflows/container-image.yml"><img src="https://img.shields.io/github/actions/workflow/status/netspeedy/s3ctl/container-image.yml?branch=main&style=flat-square&label=container" alt="Container"></a>
   <a href="https://github.com/netspeedy/s3ctl/releases"><img src="https://img.shields.io/github/v/release/netspeedy/s3ctl?sort=semver&style=flat-square" alt="Release"></a>
+  <a href="https://github.com/netspeedy/homebrew-s3ctl"><img src="https://img.shields.io/badge/Homebrew-tap-FBB040?style=flat-square&logo=homebrew&logoColor=black" alt="Homebrew tap"></a>
   <a href="https://netspeedy.github.io/s3ctl/"><img src="https://img.shields.io/badge/APT-signed%20repo-A81D33?style=flat-square&logo=debian&logoColor=white" alt="APT Repository"></a>
   <a href="https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl"><img src="https://img.shields.io/badge/GHCR-published-2088FF?style=flat-square&logo=github" alt="GHCR"></a>
   <a href="https://go.dev/"><img src="https://img.shields.io/badge/Go-1.26.3-00ADD8.svg?style=flat-square&logo=go&logoColor=white" alt="Go"></a>
@@ -21,16 +22,21 @@
 
 ## Install
 
-Install the latest published binary:
+**Homebrew** (macOS and Linux — recommended):
+
+```bash
+brew tap netspeedy/s3ctl
+brew install s3ctl
+```
+
+**Direct installer** (single command, handles macOS quarantine cleanup):
 
 ```bash
 curl -fsSL https://netspeedy.github.io/s3ctl/install.sh | bash
 ```
 
-On macOS, prefer the installer over manually unpacking the release archive: the
-published macOS binaries are not Apple-notarized yet, so manual downloads may be
-blocked by Gatekeeper until the quarantine marker is removed. The installer
-handles that step after placing the binary in a user-owned bin directory.
+Debian/Ubuntu APT, pinned versions, and the GHCR container image are covered in
+[docs/installation.md](docs/installation.md).
 
 **Docs:** [Install](docs/installation.md) · [Usage](docs/usage.md) · [OVHcloud](docs/ovhcloud.md) · [Release](docs/release.md) · [Examples](examples) · [Releases](https://github.com/netspeedy/s3ctl/releases)
 
@@ -142,9 +148,7 @@ s3ctl --bucket app-data --delete --force         # non-empty bucket requires --f
 s3ctl --version
 ```
 
-For Debian packages, Homebrew, the signed APT repository, and the GHCR container
-image, see [docs/installation.md](docs/installation.md). See
-[docs/usage.md](docs/usage.md) for batch provisioning, credential rotation,
+See [docs/usage.md](docs/usage.md) for batch provisioning, credential rotation,
 policy repair, bucket deletion, JSON config, and full CLI usage examples, and
 [docs/ovhcloud.md](docs/ovhcloud.md) for OVHcloud setup and provider-specific
 behaviour.

@@ -16,6 +16,8 @@ version before it reaches the stable installer, stable APT channel, or
 
 ## Homebrew
 
+Recommended for macOS and Linux:
+
 ```bash
 brew tap netspeedy/s3ctl
 brew install s3ctl
@@ -27,7 +29,7 @@ brew install s3ctl
 
 ## Direct installer
 
-Recommended for macOS:
+Single-command install for any POSIX host; handles macOS quarantine cleanup:
 
 ```bash
 curl -fsSL https://netspeedy.github.io/s3ctl/install.sh | bash
