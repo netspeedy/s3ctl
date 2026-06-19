@@ -1,3 +1,4 @@
+import "@fontsource-variable/inter";
 import "./style.css";
 
 const defaultSiteURL = new URL("./", window.location.href).href;

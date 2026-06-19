@@ -12,5 +12,8 @@
   "devDependencies": {
     "puppeteer": "24.26.1",
     "vite": "6.2.0"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.2.8"
   }
 }
