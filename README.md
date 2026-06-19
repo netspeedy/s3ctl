@@ -1,5 +1,5 @@
 <p align="center">
-  <img src=".github/assets/website/logo.svg" width="300" alt="s3ctl">
+  <img src=".github/assets/website/readme-card.svg" width="600" alt="s3ctl">
 </p>
 
 <p align="center">
