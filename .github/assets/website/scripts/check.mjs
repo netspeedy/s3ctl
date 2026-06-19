@@ -13,38 +13,30 @@ const requiredFiles = [
   "main.js",
   "style.css",
   "vite.config.js",
-  "preview-metadata.json",
 ];
 
 const requiredDOMIDs = [
   "site-home-link",
   "nav-github-link",
   "nav-releases-link",
+  "nav-homebrew-link",
   "nav-container-link",
   "nav-apt-link",
-  "hero-release-link",
-  "hero-checksum-link",
+  "hero-docs-link",
   "release-version",
   "release-commit",
   "release-date",
   "release-fingerprint",
   "release-highlights",
+  "homebrew-command",
   "install-script-command",
-  "install-script-note",
   "apt-command",
-  "apt-copy",
   "apt-fingerprint-row",
-  "deb-command",
-  "deb-note",
   "container-command",
-  "container-note",
-  "asset-count",
-  "asset-filters",
-  "asset-release-link",
-  "asset-checksum-link",
-  "asset-key-link",
-  "asset-key-asc-link",
-  "asset-list",
+  "deb-command",
+  "checksum-note",
+  "footer-release-link",
+  "footer-apt-link",
   "footer-commit",
   "footer-version",
 ];
@@ -82,7 +74,6 @@ function findRootRelativeLocalAssets(html) {
 
 const indexHTML = load("index.html");
 const mainJS = load("main.js");
-const styleCSS = load("style.css");
 const viteConfig = load("vite.config.js");
 
 for (const relativePath of requiredFiles) {
@@ -92,33 +83,18 @@ for (const relativePath of requiredFiles) {
 checkNodeSyntax("main.js");
 checkNodeSyntax("vite.config.js");
 
-assert(
-  indexHTML.includes('<script type="module" src="./main.js"></script>'),
-  "index.html must load the Vite entrypoint via ./main.js",
-);
-
-assert(
-  indexHTML.includes('<link rel="icon" href="./favicon.svg" type="image/svg+xml" />'),
-  "index.html must declare the SVG favicon via ./favicon.svg",
-);
-
-assert(
-  mainJS.includes('import "./style.css";') || mainJS.includes("import './style.css';"),
-  "main.js must import ./style.css so Vite owns stylesheet output",
-);
-
-assert(
-  /\.asset-row\[hidden\]\s*{[^}]*display:\s*none\s*!important;[^}]*}/s.test(styleCSS),
-  "style.css must explicitly hide filtered asset rows with .asset-row[hidden]",
-);
-
-assert(
-  viteConfig.includes("base: \"./\"") || viteConfig.includes("base: './'"),
-  "vite.config.js must keep base set to ./ for GitHub Pages compatibility",
-);
+assert(indexHTML.includes('<script type="module" src="./main.js"></script>'), "index.html must load ./main.js");
+assert(indexHTML.includes('<link rel="icon" href="./favicon.svg" type="image/svg+xml" />'), "index.html must declare ./favicon.svg");
+assert(mainJS.includes('import "./style.css";') || mainJS.includes("import './style.css';"), "main.js must import ./style.css");
+assert(viteConfig.includes('base: "./"') || viteConfig.includes("base: './'"), "vite.config.js must keep base set to ./");
 
 for (const domID of requiredDOMIDs) {
   assert(indexHTML.includes(`id="${domID}"`), `index.html is missing required id="${domID}"`);
+}
+
+for (const tabID of ["homebrew", "installer", "apt", "container", "package"]) {
+  assert(indexHTML.includes(`data-tab="${tabID}"`), `index.html is missing data-tab="${tabID}"`);
+  assert(indexHTML.includes(`id="panel-${tabID}"`), `index.html is missing id="panel-${tabID}"`);
 }
 
 const rootRelativeAssets = findRootRelativeLocalAssets(indexHTML);

@@ -33,7 +33,7 @@ async function capturePage(browser, baseURL, viewport) {
   await page.goto(baseURL, { waitUntil: "networkidle0" });
   await page.waitForFunction(() => document.readyState === "complete");
   await page.waitForSelector(".hero");
-  await page.waitForSelector(".glass-card");
+  await page.waitForSelector(".install-tabs");
   await page.evaluate(async () => {
     if (document.fonts?.ready) {
       try {

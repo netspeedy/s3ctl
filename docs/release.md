@@ -30,9 +30,8 @@ make website-capture
 ```
 
 Desktop and mobile captures are written to `.github/assets/website/.captures/`. The website is
-built with Vite, and the local preview flow falls back to
-`.github/assets/website/preview-metadata.json` when generated release metadata is not present
-yet.
+built with Vite and uses generated `website-metadata.json` when the Pages workflow
+publishes the release hub.
 
 ## Dependency updates
 

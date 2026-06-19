@@ -5,276 +5,217 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="s3ctl release hub with installer commands, Debian packages, multi-arch binaries, and GitHub Pages distribution metadata."
+      content="s3ctl provisions S3-compatible buckets, scoped credentials, and release-ready install paths for operators."
     />
-    <meta name="theme-color" content="#030712" />
+    <meta name="theme-color" content="#101512" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <title>s3ctl | Release Hub</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="s3ctl" />
+    <meta property="og:title" content="s3ctl" />
+    <meta property="og:description" content="Provision S3-compatible buckets and scoped credentials from a clean CLI." />
+    <meta property="og:url" content="https://netspeedy.github.io/s3ctl/" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="s3ctl" />
+    <meta name="twitter:description" content="Provision S3-compatible buckets and scoped credentials from a clean CLI." />
+    <title>s3ctl | Bucket provisioning for operators</title>
     <script type="module" src="./main.js"></script>
   </head>
   <body>
-    <div class="glow-bg glow-bg-primary"></div>
-    <div class="glow-bg glow-bg-secondary"></div>
-
-    <header class="masthead wrapper flex j-between a-center fade-in">
+    <header class="masthead wrapper">
       <a class="brand" href="#" id="site-home-link">
-        <div class="brand-mark">S3</div>
-        <div class="brand-copy">
+        <span class="brand-mark"><img src="./favicon.svg" alt="s3ctl" /></span>
+        <span>
           <strong>s3ctl</strong>
-          <small>S3 provisioning and credential automation</small>
-        </div>
+          <small>Bucket provisioning CLI</small>
+        </span>
       </a>
-
-      <nav class="masthead-links hide-mobile">
-        <a href="https://github.com/netspeedy/s3ctl" class="nav-link" id="nav-github-link">GitHub</a>
-        <a href="https://github.com/netspeedy/s3ctl/releases" class="nav-link" id="nav-releases-link">Releases</a>
-        <a href="https://github.com/netspeedy/homebrew-s3ctl" class="nav-link" id="nav-homebrew-link">Homebrew</a>
-        <a href="https://ghcr.io/netspeedy/s3ctl" class="nav-link" id="nav-container-link">GHCR</a>
-        <a href="#" class="nav-link" id="nav-apt-link">APT</a>
+      <nav class="masthead-links">
+        <a href="https://github.com/netspeedy/s3ctl/releases" id="nav-releases-link">Releases</a>
+        <a href="https://github.com/netspeedy/homebrew-s3ctl" id="nav-homebrew-link">Homebrew</a>
+        <a href="#" id="nav-apt-link">APT</a>
+        <a href="https://ghcr.io/netspeedy/s3ctl" id="nav-container-link">GHCR</a>
+        <a href="https://github.com/netspeedy/s3ctl" id="nav-github-link">GitHub</a>
       </nav>
     </header>
 
     <main>
-      <section class="hero wrapper fade-in" style="animation-delay: 0.1s;">
-        <div class="hero-content">
-          <div class="hero-chip"><span>Release Distribution</span></div>
-          <h1 class="hero-title">
-            Ship bucket automation with<br />
-            <span class="text-gradient">a cleaner operator path</span>
-          </h1>
+      <section class="hero wrapper">
+        <div class="hero-copy">
+          <p class="eyebrow">Bucket access without hand-built IAM drift</p>
+          <h1>Provision S3 buckets with scoped credentials in one run.</h1>
           <p class="hero-lead">
-            Install `s3ctl` from a single shell command, Homebrew, a signed Debian
-            repository, direct `.deb` packages, GitHub Releases, or GHCR. The release
-            hub keeps the supported delivery paths obvious.
+            s3ctl turns bucket creation, policy defaults, OVHcloud credential rotation,
+            and batch provisioning into repeatable CLI workflows that are easy to ship
+            into automation.
           </p>
           <div class="hero-actions">
-            <a href="#install" class="btn btn-primary">Install</a>
-            <a href="https://github.com/netspeedy/s3ctl/releases" class="btn btn-secondary" id="hero-release-link">Releases</a>
-            <a href="https://github.com/netspeedy/s3ctl/releases" class="btn btn-secondary" id="hero-checksum-link">Checksums</a>
+            <a class="btn btn-primary" href="#install">Install</a>
+            <a class="btn btn-secondary" href="https://github.com/netspeedy/s3ctl#readme" id="hero-docs-link">Documentation</a>
           </div>
         </div>
 
-        <aside class="hero-rail glass-card stagger-in">
-          <h3 class="rail-title">Live Release Metadata</h3>
-          <div class="meta-grid">
-            <div class="meta-item">
-              <span class="meta-label">Latest stable</span>
-              <span class="meta-value text-gradient-alt" id="release-version">Awaiting release metadata</span>
-            </div>
-            <div class="meta-item">
-              <span class="meta-label">Release commit</span>
-              <span class="meta-value font-mono" id="release-commit">---</span>
-            </div>
-          </div>
-          <div class="meta-block">
-            <span class="meta-label">Published UTC</span>
-            <span class="meta-value text-sm" id="release-date">Not published yet</span>
-          </div>
-          <div class="meta-block">
-            <span class="meta-label">Archive key fingerprint</span>
-            <span class="meta-value font-mono text-xs text-muted" id="release-fingerprint">---</span>
-          </div>
-          <hr class="dim-divider" />
-          <ul class="bullet-list" id="release-highlights">
-            <li>Loading release highlights...</li>
-          </ul>
+        <aside class="terminal-shot" aria-label="s3ctl terminal output preview">
+          <div class="terminal-top"><span></span><span></span><span></span></div>
+          <pre><code>$ s3ctl --bucket app-data \
+  --create-scoped-credentials --dry-run
+Bucket: app-data
+  create planned: yes
+  versioning:     enabled
+  IAM user:       app-data
+  policy:         bucket-readwrite
+
+$ s3ctl --config ./examples/s3ctl.json \
+  --output json | jq '.resource_count'
+2
+
+$ s3ctl --provider ovh --bucket app-data \
+  --ovh-rotate-credentials
+Rotated scoped credentials for app-data</code></pre>
         </aside>
       </section>
 
-      <section class="highlights wrapper stagger-in">
-        <div class="glass-card flex-row">
-          <div class="highlight-item">
-            <span class="h-label">Purpose</span>
-            <strong>Bucket provisioning</strong>
-            <p>Create buckets, attach policy defaults, and issue scoped credentials cleanly.</p>
-          </div>
-          <div class="highlight-item">
-            <span class="h-label">Distribution</span>
-            <strong>Shell, Brew, APT, GHCR</strong>
-            <p>One release workflow, several operator-ready installation paths.</p>
-          </div>
-          <div class="highlight-item">
-            <span class="h-label">Coverage</span>
-            <strong>Linux and macOS</strong>
-            <p>Multi-arch release archives and Debian packages for the normal deployment targets.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="install" class="install-section wrapper fade-in">
+      <section class="metadata wrapper">
         <div class="section-heading">
-          <p class="eyebrow">Deploy Seamlessly</p>
-          <h2>Pick your delivery path.</h2>
-          <p class="section-lead">
-            The high-confidence routes stay closest to hand: a direct installer, a signed
-            APT repository, Homebrew, a direct Debian package, and a pinned GHCR runtime path.
-          </p>
+          <p class="eyebrow">Release details</p>
+          <h2>Latest stable build information.</h2>
         </div>
-
-        <div class="grid-layout">
-          <article class="install-card glass-card hover-lift install-card-featured">
-            <div class="card-head flex j-between a-center">
-              <h3>Direct installer</h3>
-              <span class="badge primary-badge">Recommended</span>
+        <div class="release-grid">
+          <div class="release-info">
+            <div class="release-stats">
+              <div class="release-stat">
+                <span class="stat-value" id="release-version">Loading...</span>
+                <span class="stat-label">Version</span>
+              </div>
+              <div class="release-stat">
+                <span class="stat-value mono" id="release-commit">---</span>
+                <span class="stat-label">Commit</span>
+              </div>
+              <div class="release-stat">
+                <span class="stat-value" id="release-date">---</span>
+                <span class="stat-label">Published</span>
+              </div>
             </div>
-            <p class="card-desc">
-              Download the right release archive for the current platform, verify checksums
-              when published, and install `s3ctl` into the target directory.
-            </p>
-            <div class="pill-list">
-              <span>Cross-platform archive selection</span>
-              <span>Checksum verification</span>
-              <span>Version and path overrides</span>
+            <div class="fingerprint-row">
+              <span class="fingerprint-label">APT signing key</span>
+              <code id="release-fingerprint">---</code>
             </div>
-            <div class="code-wrap">
-              <button class="copy-button" type="button" data-copy-target="install-script-command">Copy</button>
-              <pre class="code-block" id="install-script-command">curl -fsSL ./install.sh | bash</pre>
-            </div>
-            <p class="card-note" id="install-script-note">
-              The installer supports --version, --install-dir, and --binary-name; macOS uses a user-owned home bin dir.
-            </p>
-          </article>
-
-          <article class="install-card glass-card hover-lift">
-            <div class="card-head flex j-between a-center">
-              <h3>Homebrew tap</h3>
-              <span class="badge primary-badge">macOS and Linux</span>
-            </div>
-            <p class="card-desc">
-              Use the Netspeedy tap when you want the normal Homebrew upgrade flow on workstations and build hosts.
-            </p>
-            <div class="pill-list pill-list-muted">
-              <span>Separate tap repository</span>
-              <span>Stable formula updates</span>
-            </div>
-            <div class="code-wrap">
-              <button class="copy-button" type="button" data-copy-target="homebrew-command">Copy</button>
-              <pre class="code-block" id="homebrew-command">brew tap netspeedy/s3ctl
-brew install s3ctl</pre>
-            </div>
-            <p class="card-note" id="homebrew-note">
-              The tap is ready for the first stable formula update from the release workflow.
-            </p>
-          </article>
-
-          <article class="install-card glass-card hover-lift">
-            <div class="card-head flex j-between a-center">
-              <h3>Direct `.deb` package</h3>
-              <span class="badge secondary-badge">Binary package</span>
-            </div>
-            <p class="card-desc">
-              Use a release package directly when you want a Debian install without wiring an APT source.
-            </p>
-            <div class="code-wrap">
-              <button class="copy-button" type="button" data-copy-target="deb-command">Copy</button>
-              <pre class="code-block" id="deb-command">Release package metadata will appear here after publication.</pre>
-            </div>
-            <p class="card-note" id="deb-note">
-              The release hub will prefer the amd64 package when one is published.
-            </p>
-          </article>
-
-          <article class="install-card glass-card hover-lift">
-            <div class="card-head flex j-between a-center">
-              <h3>Signed APT repository</h3>
-              <span class="badge primary-badge">Debian</span>
-            </div>
-            <p class="card-desc" id="apt-copy">
-              When repository signing is configured, the landing page publishes a Debian
-              repository beside the release hub.
-            </p>
-            <div class="pill-list pill-list-muted">
-              <span>apt-secure metadata</span>
-              <span>Binary and ASCII key export</span>
-              <span>Stable suite publishing</span>
-            </div>
-            <div class="code-wrap">
-              <button class="copy-button" type="button" data-copy-target="apt-command">Copy</button>
-              <pre class="code-block" id="apt-command">APT repository metadata will appear here after publication.</pre>
-            </div>
-            <p class="card-note mono-note" id="apt-fingerprint-row"></p>
-          </article>
-
-          <article class="install-card glass-card hover-lift">
-            <div class="card-head flex j-between a-center">
-              <h3>GHCR runtime</h3>
-              <span class="badge secondary-badge">Container</span>
-            </div>
-            <p class="card-desc">
-              Pull the published multi-arch image when you want the release path to stay container-native.
-            </p>
-            <div class="pill-list pill-list-muted">
-              <span>Multi-arch container image</span>
-              <span>Pinned or moving tags</span>
-            </div>
-            <div class="code-wrap">
-              <button class="copy-button" type="button" data-copy-target="container-command">Copy</button>
-              <pre class="code-block" id="container-command">docker run --rm ghcr.io/netspeedy/s3ctl:latest --help</pre>
-            </div>
-            <p class="card-note" id="container-note">
-              Use the published image when you want the install path to stay container-native.
-            </p>
-          </article>
+          </div>
+          <div class="release-highlights">
+            <span class="highlights-title">Release highlights</span>
+            <ul id="release-highlights" class="highlights">
+              <li>Loading release highlights...</li>
+            </ul>
+          </div>
         </div>
       </section>
 
-      <section class="assets-section wrapper fade-in">
+      <section class="capabilities wrapper">
+        <div class="capability">
+          <span>Provision</span>
+          <strong>Buckets and defaults</strong>
+          <p>Create S3-compatible buckets, enable versioning, and apply reusable policy templates.</p>
+        </div>
+        <div class="capability">
+          <span>Scope</span>
+          <strong>One user per bucket</strong>
+          <p>Generate least-privilege credentials for app teams without sharing master keys.</p>
+        </div>
+        <div class="capability">
+          <span>Operate</span>
+          <strong>OVHcloud workflows</strong>
+          <p>Rotate credentials, repair policies, and delete empty containers with guardrails.</p>
+        </div>
+      </section>
+
+      <section id="install" class="install wrapper">
         <div class="section-heading">
-          <p class="eyebrow">Release Payload</p>
-          <h2>Latest release assets</h2>
+          <p class="eyebrow">Install paths</p>
+          <h2>Get started with your preferred install method.</h2>
         </div>
-
-        <div class="asset-panel glass-card">
-          <div class="asset-summary">
-            <div>
-              <span class="meta-label">Release assets</span>
+        <div class="install-tabs">
+          <div class="tab-bar" role="tablist" aria-label="Installation methods">
+            <button class="tab active" type="button" role="tab" data-tab="homebrew" aria-selected="true">Homebrew</button>
+            <button class="tab" type="button" role="tab" data-tab="installer" aria-selected="false">Installer</button>
+            <button class="tab" type="button" role="tab" data-tab="apt" aria-selected="false">Signed APT</button>
+            <button class="tab" type="button" role="tab" data-tab="container" aria-selected="false">Container</button>
+            <button class="tab" type="button" role="tab" data-tab="package" aria-selected="false">.deb package</button>
+          </div>
+          <div class="tab-panels">
+            <div class="tab-panel active" id="panel-homebrew" role="tabpanel">
+              <div class="tab-description">
+                <span class="install-badge">Recommended</span>
+                <p>macOS and Linux. Tracks stable releases through the Netspeedy tap.</p>
+              </div>
+              <div class="code-block"><pre><code id="homebrew-command">brew tap netspeedy/s3ctl
+brew install s3ctl</code></pre></div>
             </div>
-            <span class="asset-count" id="asset-count" aria-live="polite">No published assets yet</span>
+            <div class="tab-panel" id="panel-installer" role="tabpanel">
+              <div class="tab-description">
+                <p>Single-command install that selects the right release archive and handles macOS quarantine cleanup.</p>
+              </div>
+              <div class="code-block"><pre><code id="install-script-command">curl -fsSL https://netspeedy.github.io/s3ctl/install.sh | bash</code></pre></div>
+            </div>
+            <div class="tab-panel" id="panel-apt" role="tabpanel">
+              <div class="tab-description">
+                <p>Debian and Ubuntu hosts. Receives signed package updates from the release hub.</p>
+              </div>
+              <div class="code-block"><pre><code id="apt-command">APT repository metadata will appear here after publication.</code></pre></div>
+              <p class="tab-note mono" id="apt-fingerprint-row"></p>
+            </div>
+            <div class="tab-panel" id="panel-container" role="tabpanel">
+              <div class="tab-description">
+                <p>Use the published multi-arch GHCR image for container-native automation.</p>
+              </div>
+              <div class="code-block"><pre><code id="container-command">docker run --rm ghcr.io/netspeedy/s3ctl:latest --help</code></pre></div>
+            </div>
+            <div class="tab-panel" id="panel-package" role="tabpanel">
+              <div class="tab-description">
+                <p>Download the Debian package directly when you do not want to wire an APT source.</p>
+              </div>
+              <div class="code-block"><pre><code id="deb-command">Release package metadata will appear here after publication.</code></pre></div>
+              <p class="tab-note" id="checksum-note">Checksums are linked from the matching GitHub release.</p>
+            </div>
           </div>
-          <div class="asset-filters" id="asset-filters">
-            <button class="asset-filter is-active" type="button" data-filter="all" aria-pressed="true">All</button>
-            <button class="asset-filter" type="button" data-filter="archive" aria-pressed="false">Archives</button>
-            <button class="asset-filter" type="button" data-filter="deb" aria-pressed="false">Debian packages</button>
-            <button class="asset-filter" type="button" data-filter="checksum" aria-pressed="false">Checksums</button>
-          </div>
-          <div class="asset-list" id="asset-list">
-            <div class="asset-empty">Publish a stable release to populate download links and package metadata.</div>
-          </div>
-          <div class="asset-meta-links">
-            <a class="meta-link" id="asset-release-link" href="https://github.com/netspeedy/s3ctl/releases">Release page</a>
-            <span class="meta-link-sep">&bull;</span>
-            <a class="meta-link" id="asset-checksum-link" href="https://github.com/netspeedy/s3ctl/releases">Checksums</a>
-            <span class="meta-link-sep">&bull;</span>
-            <a class="meta-link" id="asset-key-link" href="./apt/s3ctl-archive-keyring.gpg">APT keyring</a>
-            <span class="meta-link-sep">&bull;</span>
-            <a class="meta-link" id="asset-key-asc-link" href="./apt/s3ctl-archive-keyring.asc">ASCII key</a>
-          </div>
-        </div>
-      </section>
-
-      <section class="cta wrapper fade-in">
-        <div class="glass-card cta-card text-center relative overflow-hidden">
-          <div class="cta-bg-glow"></div>
-          <h2 class="cta-title">Ready to automate bucket access?</h2>
-          <p class="cta-desc">
-            Use the release hub for installation, then drive bucket provisioning from flags,
-            environment variables, JSON config, or CSV batch input.
-          </p>
-          <a href="https://github.com/netspeedy/s3ctl#readme" class="btn btn-primary large-btn">Open Documentation</a>
         </div>
       </section>
     </main>
 
-    <footer class="footer wrapper text-center relative z-10 fade-in">
-      <hr class="dim-divider" />
-      <p><strong>s3ctl</strong> turns bucket provisioning into a releaseable, installable product.</p>
-      <p class="text-sm text-muted">Published from commit <span id="footer-commit" class="font-mono">---</span> for release <span id="footer-version">---</span></p>
+    <footer class="site-footer">
+      <div class="footer-inner wrapper">
+        <div class="footer-top">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <span class="brand-mark"><img src="./favicon.svg" alt="s3ctl" /></span>
+              <strong>s3ctl</strong>
+            </div>
+            <p>Repeatable bucket provisioning for S3-compatible storage, IAM, and OVHcloud operators.</p>
+          </div>
+          <div class="footer-columns">
+            <div class="footer-col">
+              <h4>Product</h4>
+              <a href="#install">Install</a>
+              <a href="https://github.com/netspeedy/s3ctl/releases" id="footer-release-link">Releases</a>
+              <a href="https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl">Container</a>
+            </div>
+            <div class="footer-col">
+              <h4>Resources</h4>
+              <a href="https://github.com/netspeedy/s3ctl#readme">Documentation</a>
+              <a href="https://github.com/netspeedy/s3ctl/tree/main/docs">Guides</a>
+              <a href="https://github.com/netspeedy/s3ctl/issues">Issues</a>
+            </div>
+            <div class="footer-col">
+              <h4>Install</h4>
+              <a href="https://github.com/netspeedy/homebrew-s3ctl">Homebrew tap</a>
+              <a href="#" id="footer-apt-link">APT repository</a>
+              <a href="https://github.com/netspeedy/s3ctl/releases/latest">Latest release</a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span>&copy; 2026 Simon Oakes · MIT License</span>
+          <span class="footer-build">v<span id="footer-version">---</span> · <span id="footer-commit" class="mono">---</span></span>
+        </div>
+      </div>
     </footer>
   </body>
 </html>

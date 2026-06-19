@@ -2,6 +2,12 @@ import "./style.css";
 
 const defaultSiteURL = new URL("./", window.location.href).href;
 
+const fallbackHighlights = [
+  "Provision buckets and scoped credentials from one CLI",
+  "Ship Homebrew, APT, Debian packages, archives, and GHCR images",
+  "Keep OVHcloud credential rotation and deletion guarded",
+];
+
 const defaultMetadata = {
   site_url: defaultSiteURL,
   github_repository: "netspeedy/s3ctl",
@@ -22,53 +28,6 @@ const defaultMetadata = {
   },
 };
 
-function formatDate(value) {
-  if (!value) {
-    return "Not published yet";
-  }
-
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.valueOf())) {
-    return value;
-  }
-
-  return `${new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "long",
-    timeStyle: "short",
-    timeZone: "UTC",
-  }).format(parsed)} UTC`;
-}
-
-function humanSize(bytes) {
-  if (!Number.isFinite(bytes) || bytes <= 0) {
-    return "Unknown size";
-  }
-
-  const units = ["B", "KB", "MB", "GB"];
-  let value = bytes;
-  let unitIndex = 0;
-
-  while (value >= 1024 && unitIndex < units.length - 1) {
-    value /= 1024;
-    unitIndex += 1;
-  }
-
-  return `${value.toFixed(value >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
-}
-
-function classifyAsset(name) {
-  if (name.endsWith(".deb")) {
-    return "Debian package";
-  }
-  if (name.endsWith(".tar.gz")) {
-    return "Release archive";
-  }
-  if (name.includes("SHA256SUMS")) {
-    return "Checksums";
-  }
-  return "Asset";
-}
-
 function normalizeMetadata(metadata = {}) {
   const apt = metadata.apt_repository || {};
 
@@ -76,6 +35,9 @@ function normalizeMetadata(metadata = {}) {
     ...defaultMetadata,
     ...metadata,
     site_url: `${metadata.site_url || defaultMetadata.site_url}`.replace(/\/?$/, "/"),
+    github_url: metadata.github_url || defaultMetadata.github_url,
+    release_url: metadata.release_url || defaultMetadata.release_url,
+    container_url: metadata.container_url || defaultMetadata.container_url,
     homebrew_url: metadata.homebrew_url || defaultMetadata.homebrew_url,
     install_script_url: metadata.install_script_url || defaultMetadata.install_script_url,
     release_commit: metadata.release_commit || "",
@@ -91,30 +53,21 @@ function normalizeMetadata(metadata = {}) {
   };
 }
 
-function setText(id, value) {
-  const element = document.getElementById(id);
-  if (element) {
-    element.textContent = value;
+function formatDate(value) {
+  if (!value) {
+    return "Not published yet";
   }
-}
 
-function setHref(id, value) {
-  const element = document.getElementById(id);
-  if (element && value) {
-    element.href = value;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.valueOf())) {
+    return value;
   }
-}
 
-function normalizeWhitespace(value) {
-  return value.replace(/\s+/g, " ").trim();
-}
-
-function stripMarkdown(value) {
-  return normalizeWhitespace(
-    value
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-      .replace(/`([^`]+)`/g, "$1"),
-  );
+  return `${new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "long",
+    timeStyle: "short",
+    timeZone: "UTC",
+  }).format(parsed)} UTC`;
 }
 
 function shortCommit(value) {
@@ -135,46 +88,17 @@ function releaseCommit(metadata) {
   return match ? match[1] : "";
 }
 
-function setLinkState(id, { href, text, enabled }) {
-  const element = document.getElementById(id);
-  if (!element) {
-    return;
-  }
-
-  if (text) {
-    element.textContent = text;
-  }
-
-  element.href = href || "#";
-  element.classList.toggle("is-disabled", !enabled);
-  element.setAttribute("aria-disabled", enabled ? "false" : "true");
+function stripMarkdown(value) {
+  return value
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-function chooseDirectDebAsset(assets = []) {
-  return assets.find((asset) => asset.name.endsWith("_amd64.deb")) || assets.find((asset) => asset.name.endsWith(".deb")) || null;
-}
-
-function chooseChecksumAsset(assets = []) {
-  return assets.find((asset) => asset.name.includes("SHA256SUMS")) || null;
-}
-
-function assetSummary(assets = []) {
-  const archives = assets.filter((asset) => asset.name.endsWith(".tar.gz"));
-  const debs = assets.filter((asset) => asset.name.endsWith(".deb"));
-  const checksumAsset = chooseChecksumAsset(assets);
-
-  return {
-    archiveCount: archives.length,
-    debCount: debs.length,
-    checksumAsset,
-  };
-}
-
-function changeHighlights(body) {
-  if (!body) {
-    return [];
-  }
-
+function releaseHighlights(metadata) {
+  const release = metadata.latest_release;
+  const body = release?.body || "";
   const lines = body.split("\n");
   const highlights = [];
   let inIncludedChanges = false;
@@ -196,166 +120,69 @@ function changeHighlights(body) {
     }
 
     const cleaned = stripMarkdown(line.slice(2)).replace(/\s+\([^)]*\)\s*$/, "");
-    if (!cleaned || cleaned.startsWith("Automatically merged")) {
-      continue;
+    if (cleaned && !cleaned.startsWith("Automatically merged")) {
+      highlights.push(cleaned);
     }
 
-    highlights.push(cleaned);
     if (highlights.length === 3) {
       break;
     }
   }
 
-  return highlights;
-}
-
-function releaseHighlights(metadata) {
-  const release = metadata.latest_release;
-  const assets = release?.assets || [];
-  const summary = assetSummary(assets);
-  const checksumAsset = chooseChecksumAsset(assets);
-  const noteHighlights = changeHighlights(release?.body || "");
-  const highlights = [];
+  if (highlights.length > 0) {
+    return highlights;
+  }
 
   if (release?.tag_name) {
-    highlights.push(
-      `Release ${release.tag_name} ships ${summary.archiveCount} archives, ${summary.debCount} Debian packages, and ${checksumAsset ? "attached checksums" : "pending checksums"}.`,
-    );
+    return [`Stable ${release.tag_name} release metadata is published`, ...fallbackHighlights.slice(1)];
   }
 
-  if (metadata.apt_repository.available && metadata.apt_repository.fingerprint) {
-    highlights.push(`Signed APT metadata is live with archive fingerprint ${metadata.apt_repository.fingerprint}.`);
-  } else if (metadata.apt_repository.available) {
-    highlights.push("Signed APT metadata is published for stable Debian installs.");
-  }
-
-  if (noteHighlights.length > 0) {
-    highlights.push(...noteHighlights);
-  } else if (release?.tag_name) {
-    highlights.push(`Latest release notes are published on the ${release.tag_name} GitHub release page.`);
-  }
-
-  return highlights.slice(0, 4);
+  return fallbackHighlights;
 }
 
-function sortedAssets(assets = []) {
-  const typeRank = {
-    "Release archive": 0,
-    "Debian package": 1,
-    Checksums: 2,
-    Asset: 3,
-  };
-
-  return [...assets].sort((left, right) => {
-    const leftType = classifyAsset(left.name);
-    const rightType = classifyAsset(right.name);
-    const rankDelta = typeRank[leftType] - typeRank[rightType];
-
-    if (rankDelta !== 0) {
-      return rankDelta;
-    }
-
-    return left.name.localeCompare(right.name);
-  });
+function chooseDirectDebAsset(assets = []) {
+  return assets.find((asset) => asset.name.endsWith("_amd64.deb")) || assets.find((asset) => asset.name.endsWith(".deb")) || null;
 }
 
-function aptASCIIKeyURL(metadata) {
-  return metadata.apt_repository.key_url.replace(/\.gpg$/, ".asc");
+function chooseChecksumAsset(assets = []) {
+  return assets.find((asset) => asset.name.includes("SHA256SUMS")) || null;
 }
 
-function releaseInstallCommand(metadata) {
-  const release = metadata.latest_release;
-  if (release?.tag_name) {
-    return `curl -fsSL ${metadata.install_script_url} | bash -s -- --version ${release.tag_name}`;
+function setText(id, value) {
+  const element = document.getElementById(id);
+  if (element) {
+    element.textContent = value;
   }
-
-  return `curl -fsSL ${metadata.install_script_url} | bash`;
 }
 
-function renderAssetList(release) {
-  const container = document.getElementById("asset-list");
-  const count = document.getElementById("asset-count");
-
-  if (!container || !count) {
-    return;
+function setHref(id, value) {
+  const element = document.getElementById(id);
+  if (element && value) {
+    element.href = value;
   }
-
-  const assets = sortedAssets(release?.assets || []);
-
-  if (assets.length === 0) {
-    count.textContent = "No published assets yet";
-    container.innerHTML = '<div class="asset-empty">Publish a stable release to populate download links and package metadata.</div>';
-    return;
-  }
-
-  container.replaceChildren(
-    ...assets.map((asset) => {
-      const row = document.createElement("div");
-      row.className = "asset-row";
-      row.dataset.kind = classifyAsset(asset.name);
-
-      const link = document.createElement("a");
-      link.href = asset.browser_download_url;
-      link.textContent = asset.name;
-
-      const kind = document.createElement("span");
-      kind.className = "asset-kind";
-      kind.textContent = classifyAsset(asset.name);
-
-      const size = document.createElement("span");
-      size.className = "asset-size";
-      size.textContent = humanSize(asset.size);
-
-      row.append(link, kind, size);
-      return row;
-    }),
-  );
-  applyAssetFilter();
 }
 
 function renderCommands(metadata) {
   const release = metadata.latest_release;
   const assets = release?.assets || [];
-  const checksumAsset = chooseChecksumAsset(assets);
   const directDebAsset = chooseDirectDebAsset(assets);
+  const checksumAsset = chooseChecksumAsset(assets);
+  const releaseTag = release?.tag_name || "latest";
+  const containerImage = metadata.container_url.replace(/^https?:\/\//, "");
 
-  const installScriptCommand = document.getElementById("install-script-command");
-  const installScriptNote = document.getElementById("install-script-note");
-  const containerCommand = document.getElementById("container-command");
-  const containerNote = document.getElementById("container-note");
-  const aptCommand = document.getElementById("apt-command");
-  const aptCopy = document.getElementById("apt-copy");
-  const aptFingerprint = document.getElementById("apt-fingerprint-row");
-  const homebrewCommand = document.getElementById("homebrew-command");
-  const homebrewNote = document.getElementById("homebrew-note");
-  const debCommand = document.getElementById("deb-command");
-  const debNote = document.getElementById("deb-note");
+  setText("homebrew-command", "brew tap netspeedy/s3ctl\nbrew install s3ctl");
+  setText(
+    "install-script-command",
+    release?.tag_name
+      ? `curl -fsSL ${metadata.install_script_url} | bash -s -- --version ${release.tag_name}`
+      : `curl -fsSL ${metadata.install_script_url} | bash`,
+  );
+  setText("container-command", `docker run --rm ${containerImage}:${releaseTag} --help`);
 
-  if (installScriptCommand) {
-    installScriptCommand.textContent = releaseInstallCommand(metadata);
-  }
-
-  if (installScriptNote) {
-    installScriptNote.textContent = release?.tag_name
-      ? `Pinned to ${release.tag_name}. macOS installs into a user-owned home bin dir and clears the quarantine marker.`
-      : "The installer supports --version, --install-dir, and --binary-name; macOS uses a user-owned home bin dir.";
-  }
-
-  if (containerCommand) {
-    containerCommand.textContent = release?.tag_name
-      ? `docker run --rm ghcr.io/netspeedy/s3ctl:${release.tag_name} --help`
-      : "docker run --rm ghcr.io/netspeedy/s3ctl:latest --help";
-  }
-
-  if (containerNote) {
-    containerNote.textContent = release?.tag_name
-      ? `Use ${release.tag_name} for reproducible automation or switch to :latest for the moving stable channel.`
-      : "Use the published image when you want the install path to stay container-native.";
-  }
-
-  if (aptCommand) {
-    if (metadata.apt_repository.available) {
-      aptCommand.textContent = `sudo install -d -m 0755 /etc/apt/keyrings
+  if (metadata.apt_repository.available) {
+    setText(
+      "apt-command",
+      `sudo install -d -m 0755 /etc/apt/keyrings
 curl -fsSL ${metadata.apt_repository.key_url} \\
   | sudo tee /etc/apt/keyrings/s3ctl-archive-keyring.gpg >/dev/null
 
@@ -367,110 +194,51 @@ Components: ${metadata.apt_repository.component}
 Signed-By: /etc/apt/keyrings/s3ctl-archive-keyring.gpg
 EOF
 
-sudo apt update && sudo apt install s3ctl`;
-    } else {
-      aptCommand.textContent = "APT repository metadata has not been published yet. Use the installer script or a direct .deb package in the meantime.";
-    }
+sudo apt update && sudo apt install s3ctl`,
+    );
+  } else {
+    setText("apt-command", "APT repository metadata has not been published yet. Use Homebrew, the installer, or a direct .deb package.");
   }
 
-  if (aptCopy) {
-    aptCopy.textContent = metadata.apt_repository.available
-      ? `This repository is published with signed metadata. Binary and ASCII export forms of the archive key are available from the release hub.`
-      : "The landing page is ready for a signed APT repository; until it is published, the direct installer and .deb assets remain the cleanest path.";
+  setText("apt-fingerprint-row", metadata.apt_repository.fingerprint ? `Archive fingerprint: ${metadata.apt_repository.fingerprint}` : "");
+
+  if (directDebAsset) {
+    setText("deb-command", `curl -fsSLO ${directDebAsset.browser_download_url}\nsudo apt install ./${directDebAsset.name}`);
+  } else {
+    setText("deb-command", "Linux release packages will appear here after the next published stable release.");
   }
 
-  if (aptFingerprint) {
-    aptFingerprint.textContent = metadata.apt_repository.fingerprint
-      ? `Archive fingerprint: ${metadata.apt_repository.fingerprint}`
-      : "";
-  }
-
-  if (homebrewCommand) {
-    homebrewCommand.textContent = `brew tap netspeedy/s3ctl
-brew install s3ctl`;
-  }
-
-  if (homebrewNote) {
-    homebrewNote.textContent = release?.tag_name
-      ? `The tap tracks stable releases; current formula automation targets ${release.tag_name}.`
-      : "The tap is ready for the first stable formula update from the release workflow.";
-  }
-
-  if (debCommand) {
-    if (directDebAsset) {
-      debCommand.textContent = `curl -fsSLO ${directDebAsset.browser_download_url}
-sudo apt install ./${directDebAsset.name}`;
-    } else {
-      debCommand.textContent = "Linux release packages will appear here after the next published stable release.";
-    }
-  }
-
-  if (debNote) {
-    debNote.textContent = checksumAsset
-      ? `Checksums are published as ${checksumAsset.name} so direct package installs can be verified before execution.`
-      : "The release hub will prefer the amd64 package when one is published.";
-  }
-}
-
-function renderLinks(metadata) {
-  const release = metadata.latest_release;
-  const assets = release?.assets || [];
-  const checksumAsset = chooseChecksumAsset(assets);
-  const releasePageURL = release?.html_url || metadata.release_url;
-
-  setHref("site-home-link", metadata.site_url);
-  setHref("nav-github-link", metadata.github_url);
-  setHref("nav-releases-link", metadata.release_url);
-  setHref("nav-apt-link", metadata.apt_repository.url);
-  setHref("nav-homebrew-link", metadata.homebrew_url);
-  setHref("hero-release-link", releasePageURL);
-  setHref("nav-container-link", metadata.container_url);
-  setLinkState("hero-checksum-link", {
-    href: checksumAsset?.browser_download_url || releasePageURL,
-    text: checksumAsset ? "Checksums" : "Release Page",
-    enabled: true,
-  });
-  setLinkState("asset-release-link", {
-    href: releasePageURL,
-    text: "Release page",
-    enabled: true,
-  });
-  setLinkState("asset-checksum-link", {
-    href: checksumAsset?.browser_download_url || releasePageURL,
-    text: checksumAsset ? "Checksums" : "Checksums pending",
-    enabled: Boolean(checksumAsset),
-  });
-  setLinkState("asset-key-link", {
-    href: metadata.apt_repository.key_url,
-    text: metadata.apt_repository.available ? "APT keyring" : "APT keyring pending",
-    enabled: metadata.apt_repository.available,
-  });
-  setLinkState("asset-key-asc-link", {
-    href: aptASCIIKeyURL(metadata),
-    text: metadata.apt_repository.available ? "ASCII key" : "ASCII key pending",
-    enabled: metadata.apt_repository.available,
-  });
+  setText(
+    "checksum-note",
+    checksumAsset ? `Verify direct downloads with ${checksumAsset.name} from the release page.` : "Checksums are linked from the matching GitHub release.",
+  );
 }
 
 function renderMetadata(rawMetadata) {
   const metadata = normalizeMetadata(rawMetadata);
   const release = metadata.latest_release;
   const commit = shortCommit(releaseCommit(metadata));
-  const highlights = releaseHighlights(metadata);
 
-  renderLinks(metadata);
+  setHref("site-home-link", metadata.site_url);
+  setHref("nav-github-link", metadata.github_url);
+  setHref("nav-releases-link", metadata.release_url);
+  setHref("nav-homebrew-link", metadata.homebrew_url);
+  setHref("nav-container-link", metadata.container_url);
+  setHref("nav-apt-link", metadata.apt_repository.url);
+  setHref("footer-apt-link", metadata.apt_repository.url);
+  setHref("footer-release-link", release?.html_url || metadata.release_url);
 
-  setText("release-version", release?.tag_name || "Awaiting release metadata");
+  setText("release-version", release?.tag_name || "Awaiting release");
   setText("release-commit", commit);
   setText("release-date", formatDate(release?.published_at));
   setText("release-fingerprint", metadata.apt_repository.fingerprint || "Awaiting signed APT metadata");
-  setText("footer-version", release?.tag_name || "---");
+  setText("footer-version", release?.tag_name?.replace(/^v/, "") || "---");
   setText("footer-commit", commit);
 
   const highlightsList = document.getElementById("release-highlights");
   if (highlightsList) {
     highlightsList.replaceChildren(
-      ...(highlights.length > 0 ? highlights : ["Release metadata has not been published yet."]).map((highlight) => {
+      ...releaseHighlights(metadata).map((highlight) => {
         const item = document.createElement("li");
         item.textContent = highlight;
         return item;
@@ -479,161 +247,48 @@ function renderMetadata(rawMetadata) {
   }
 
   renderCommands(metadata);
-  renderAssetList(release);
-}
-
-async function copyText(value) {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(value);
-    return;
-  }
-
-  const textarea = document.createElement("textarea");
-  textarea.value = value;
-  textarea.setAttribute("readonly", "");
-  textarea.style.position = "absolute";
-  textarea.style.left = "-9999px";
-  document.body.append(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  textarea.remove();
-}
-
-function wireCopyButtons() {
-  document.querySelectorAll("[data-copy-target]").forEach((button) => {
-    if (button.dataset.bound === "true") {
-      return;
-    }
-
-    button.dataset.bound = "true";
-    button.addEventListener("click", async () => {
-      const targetID = button.dataset.copyTarget;
-      const target = document.getElementById(targetID);
-      if (!target) {
-        return;
-      }
-
-      const originalLabel = button.textContent;
-
-      try {
-        await copyText(target.textContent || "");
-        button.textContent = "Copied";
-      } catch (error) {
-        button.textContent = "Failed";
-      }
-
-      window.setTimeout(() => {
-        button.textContent = originalLabel;
-      }, 1400);
-    });
-  });
 }
 
 async function loadMetadata() {
   renderMetadata(defaultMetadata);
 
-  for (const path of ["./website-metadata.json", "./preview-metadata.json"]) {
+  for (const path of ["./website-metadata.json"]) {
     try {
       const response = await fetch(path, { cache: "no-store" });
       if (!response.ok) {
         continue;
       }
 
-      const metadata = await response.json();
-      renderMetadata(metadata);
+      renderMetadata(await response.json());
       return;
-    } catch (error) {
+    } catch {
       // Try the next metadata source.
     }
   }
 }
 
-function wireAssetFilters() {
-  const buttons = document.querySelectorAll(".asset-filter");
+function wireTabs() {
+  document.querySelectorAll(".install-tabs").forEach((container) => {
+    container.addEventListener("click", (event) => {
+      const button = event.target.closest(".tab");
+      if (!button) {
+        return;
+      }
 
-  buttons.forEach((button) => {
-    button.addEventListener("click", () => {
-      buttons.forEach((b) => b.classList.remove("is-active"));
-      buttons.forEach((b) => b.setAttribute("aria-pressed", "false"));
-      button.classList.add("is-active");
-      button.setAttribute("aria-pressed", "true");
-
-      applyAssetFilter(button.dataset.filter);
+      const tabID = button.dataset.tab;
+      container.querySelectorAll(".tab").forEach((tab) => {
+        const active = tab === button;
+        tab.classList.toggle("active", active);
+        tab.setAttribute("aria-selected", active ? "true" : "false");
+      });
+      container.querySelectorAll(".tab-panel").forEach((panel) => {
+        panel.classList.toggle("active", panel.id === `panel-${tabID}`);
+      });
     });
   });
 }
 
-function activeAssetFilter() {
-  return document.querySelector(".asset-filter.is-active")?.dataset.filter || "all";
-}
-
-function assetCountLabel(filterType, visibleCount, totalCount) {
-  const labelByFilter = {
-    all: ["published asset", "published assets"],
-    archive: ["release archive", "release archives"],
-    checksum: ["checksum file", "checksum files"],
-    deb: ["Debian package", "Debian packages"],
-  };
-  const count = filterType === "all" ? totalCount : visibleCount;
-  const [singular, plural] = labelByFilter[filterType] || labelByFilter.all;
-
-  return `${count} ${count === 1 ? singular : plural}`;
-}
-
-function applyAssetFilter(filterType = activeAssetFilter()) {
-  const kindByFilter = {
-    archive: "Release archive",
-    checksum: "Checksums",
-    deb: "Debian package",
-  };
-  const selectedFilter = filterType === "all" || kindByFilter[filterType] ? filterType : "all";
-  const rows = [...document.querySelectorAll(".asset-row")];
-  let visibleCount = 0;
-
-  rows.forEach((row) => {
-    const expectedKind = kindByFilter[selectedFilter];
-    const show = selectedFilter === "all" || row.dataset.kind === expectedKind;
-    if (show) {
-      visibleCount += 1;
-    }
-    row.hidden = !show;
-  });
-
-  const count = document.getElementById("asset-count");
-  if (count && rows.length > 0) {
-    count.textContent = assetCountLabel(selectedFilter, visibleCount, rows.length);
-  }
-}
-
 document.addEventListener("DOMContentLoaded", () => {
-  wireCopyButtons();
-  wireAssetFilters();
+  wireTabs();
   void loadMetadata();
-
-  const observer = new IntersectionObserver(
-    (entries, instance) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) {
-          continue;
-        }
-
-        entry.target.classList.add("fade-in");
-        instance.unobserve(entry.target);
-      }
-    },
-    {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.1,
-    },
-  );
-
-  document.querySelectorAll(".glass-card").forEach((card) => {
-    if (card.closest(".stagger-in") || card.closest(".fade-in")) {
-      return;
-    }
-
-    card.style.opacity = "0";
-    observer.observe(card);
-  });
 });
