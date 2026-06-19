@@ -54,4 +54,3 @@ RUN apt-get update \
 COPY --from=build /out/s3ctl /usr/local/bin/s3ctl
 
 ENTRYPOINT ["/usr/local/bin/s3ctl"]
-CMD ["--help"]

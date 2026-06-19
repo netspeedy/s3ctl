@@ -203,7 +203,7 @@ sudo apt update && sudo apt install s3ctl`,
   }
 
   setText("apt-fingerprint-row", metadata.apt_repository.fingerprint ? `Archive fingerprint: ${metadata.apt_repository.fingerprint}` : "");
-  setText("container-command", `docker run --rm ${containerImage}:${releaseTag} --help`);
+  setText("container-command", `docker run --rm ${containerImage}:${releaseTag}`);
 
   if (directDebAsset) {
     setText("deb-command", `curl -fsSLO ${directDebAsset.browser_download_url}\nsudo apt install ./${directDebAsset.name}`);

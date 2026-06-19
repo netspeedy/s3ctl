@@ -388,7 +388,7 @@ done
   printf '```\n\n'
   printf 'Container image:\n\n'
   printf '```bash\n'
-  printf 'docker run --rm ghcr.io/netspeedy/s3ctl:%s --help\n' "${tag_name}"
+  printf 'docker run --rm ghcr.io/netspeedy/s3ctl:%s\n' "${tag_name}"
   printf '```\n\n'
   printf "Verify downloaded archives and packages with the attached \`SHA256SUMS\` file.\n\n"
 

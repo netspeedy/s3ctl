@@ -91,7 +91,7 @@ Package page: [github.com/netspeedy/s3ctl/pkgs/container/s3ctl](https://github.c
 Use the published image:
 
 ```bash
-docker run --rm ghcr.io/netspeedy/s3ctl:latest --help
+docker run --rm ghcr.io/netspeedy/s3ctl:latest
 ```
 
 Run against the bundled examples from the host:

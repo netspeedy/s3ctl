@@ -76,7 +76,7 @@ jobs:
 
       - name: Smoke test container image
         run: |
-          docker run --rm s3ctl:test --help | tee /tmp/s3ctl-help.txt
+          docker run --rm s3ctl:test | tee /tmp/s3ctl-help.txt
           grep -F 'Usage:' /tmp/s3ctl-help.txt
           grep -F 'Common workflows:' /tmp/s3ctl-help.txt
           grep -F -- '--help-full' /tmp/s3ctl-help.txt
