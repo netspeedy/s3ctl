@@ -265,6 +265,10 @@ code {
   letter-spacing: -0.02em;
 }
 
+.accent {
+  color: var(--blue-strong);
+}
+
 .release-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -363,6 +367,11 @@ code {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
   padding: 1rem 0 3rem;
+}
+
+.capabilities .section-heading {
+  grid-column: 1 / -1;
+  margin-bottom: 0.5rem;
 }
 
 .capability {
@@ -471,34 +480,6 @@ code {
   margin-top: 0.8rem;
 }
 
-.install-subsection {
-  margin-top: 1.75rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
-}
-
-.install-subsection-title {
-  margin: 0 0 0.35rem;
-  color: var(--text);
-  font-size: 0.95rem;
-  font-weight: 800;
-}
-
-.install-subsection-note {
-  margin: 0 0 0.9rem;
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-.install-subsection .code-block {
-  margin-top: 0.5rem;
-}
-
-.install-subsection .code-block + .install-subsection-title {
-  margin-top: 1.5rem;
-}
-
 .install-directory {
   border-top: 1px solid var(--line);
 }
@@ -508,18 +489,49 @@ code {
   grid-template-columns: minmax(8rem, 0.8fr) minmax(12rem, 1.4fr) minmax(9rem, 0.8fr);
   gap: 1rem;
   align-items: center;
-  padding: 0.85rem 1.75rem;
+  padding: 1rem 1.75rem;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
   color: var(--muted);
   font-size: 0.9rem;
+  transition: background-color 0.15s ease;
 }
 
 .install-directory-row:first-child {
   border-top: 0;
 }
 
+.install-directory-row:not(.install-directory-head):hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
 .install-directory-row strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   color: var(--text);
+}
+
+.channel-dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.channel-dot[data-channel="homebrew"] {
+  background: var(--amber);
+  box-shadow: 0 0 10px rgba(245, 184, 65, 0.45);
+}
+
+.channel-dot[data-channel="apt"] {
+  background: var(--blue);
+  box-shadow: 0 0 10px rgba(24, 168, 255, 0.45);
+}
+
+.channel-dot[data-channel="container"] {
+  background: var(--blue-strong);
+  box-shadow: 0 0 10px rgba(75, 216, 255, 0.45);
 }
 
 .install-directory-row a {
