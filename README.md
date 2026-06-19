@@ -19,42 +19,28 @@
 
 ---
 
-`s3ctl` is for teams that need repeatable bucket provisioning without manual
-storage and IAM setup. It creates buckets, issues scoped credentials, rotates
-OVHcloud keys, deletes empty buckets safely, and is available as release
-archives, Debian packages, a Homebrew formula, a signed APT repository, and a
-container image.
+## Install
 
-`s3ctl` is a single command driven entirely by flags, JSON config, or CSV batch
-input — there are no subcommands to memorize. Run `s3ctl --help` for a short
-operator quick reference, or `s3ctl --help-full` for the complete flag, template,
-and CSV field reference.
+Install the latest published binary:
 
-**Links:** [Releases](https://github.com/netspeedy/s3ctl/releases) | [GHCR](https://github.com/netspeedy/s3ctl/pkgs/container/s3ctl) | [Release Hub / APT](https://netspeedy.github.io/s3ctl/) | [Examples](examples) | [Docs](docs)
+```bash
+curl -fsSL https://netspeedy.github.io/s3ctl/install.sh | bash
+```
 
-## Contents
+On macOS, prefer the installer over manually unpacking the release archive: the
+published macOS binaries are not Apple-notarized yet, so manual downloads may be
+blocked by Gatekeeper until the quarantine marker is removed. The installer
+handles that step after placing the binary in a user-owned bin directory.
 
-- [Overview](#overview)
-- [Capabilities](#capabilities)
-- [Quick start](#quick-start)
-- [Installation](#installation)
-- [Usage](#usage)
-- [OVHcloud notes](#ovhcloud-notes)
-- [Container](#container)
-- [Release process](#release-process)
-- [Development](#development)
-- [Project structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
-
-<a id="overview"></a>
+**Docs:** [Install](docs/installation.md) · [Usage](docs/usage.md) · [OVHcloud](docs/ovhcloud.md) · [Release](docs/release.md) · [Examples](examples) · [Releases](https://github.com/netspeedy/s3ctl/releases)
 
 ## Overview
 
-`s3ctl` provisions S3-compatible buckets and automatically issues
-bucket-scoped access credentials. It can work with a normal S3/IAM-compatible
-provider, or with OVHcloud Public Cloud Object Storage where buckets are exposed
-as S3-compatible containers.
+`s3ctl` provisions S3-compatible buckets and automatically issues bucket-scoped
+access credentials for each one. It works with any S3/IAM-compatible provider,
+or with OVHcloud Public Cloud Object Storage, and runs the whole lifecycle —
+create, version, policy, credential rotation, and safe deletion — from a single
+command driven by flags, JSON config, or CSV batch input.
 
 It is designed for the common operational workflow:
 
@@ -90,8 +76,6 @@ flowchart LR
 
 ---
 
-<a id="capabilities"></a>
-
 ## Capabilities
 
 - **Bucket provisioning**: creates one bucket, many buckets, or CSV-driven batches
@@ -107,21 +91,11 @@ flowchart LR
 
 ---
 
-<a id="quick-start"></a>
-
 ## Quick start
 
-Install the latest published binary:
-
-```bash
-curl -fsSL https://netspeedy.github.io/s3ctl/install.sh | bash
-```
-
-On macOS, use the installer instead of manually unpacking the release archive.
-The published macOS binaries are not Apple-notarized yet, so manually extracted
-downloads may be blocked by Gatekeeper unless the quarantine marker is removed.
-The installer handles that step after placing the binary in a user-owned bin
-directory.
+`s3ctl` is a single command with no subcommands to memorize — run `s3ctl --help`
+for a short operator quick reference, or `s3ctl --help-full` for the complete
+flag, template, and CSV field reference.
 
 Plan a single bucket with generated scoped credentials:
 
@@ -168,31 +142,14 @@ s3ctl --bucket app-data --delete --force         # non-empty bucket requires --f
 s3ctl --version
 ```
 
-See [docs/usage.md](docs/usage.md) for batch provisioning, credential rotation,
-policy repair, bucket deletion, JSON config, and full CLI usage examples. See
+For Debian packages, Homebrew, the signed APT repository, and the GHCR container
+image, see [docs/installation.md](docs/installation.md). See
+[docs/usage.md](docs/usage.md) for batch provisioning, credential rotation,
+policy repair, bucket deletion, JSON config, and full CLI usage examples, and
 [docs/ovhcloud.md](docs/ovhcloud.md) for OVHcloud setup and provider-specific
 behaviour.
 
 ---
-
-<a id="installation"></a>
-
-## Installation
-
-Install the latest release with the direct installer:
-
-```bash
-curl -fsSL https://netspeedy.github.io/s3ctl/install.sh | bash
-```
-
-Other supported delivery paths include GitHub release archives, Debian packages,
-Homebrew, the signed APT repository, and the GHCR image. See
-[docs/installation.md](docs/installation.md) for pinned installs, APT setup,
-macOS quarantine notes, and container examples.
-
----
-
-<a id="usage"></a>
 
 ## Usage
 
@@ -259,8 +216,6 @@ Scoped-credential policy templates (`--credential-policy-template`, default `buc
 
 ---
 
-<a id="ovhcloud-notes"></a>
-
 ## OVHcloud notes
 
 Use `--provider ovh` to create OVHcloud Object Storage through the Public Cloud
@@ -294,8 +249,6 @@ repair, and OVHcloud bucket deletion details.
 
 ---
 
-<a id="container"></a>
-
 ## Container
 
 Build locally:
@@ -322,8 +275,6 @@ docker run --rm \
   --output json
 ```
 
-<a id="release-process"></a>
-
 ## Release process
 
 Stable releases publish Linux and macOS archives, Debian packages, signed checksums,
@@ -332,8 +283,6 @@ candidates use tags such as `v1.2.3-rc.1` while a version is being validated.
 
 See [docs/release.md](docs/release.md) for release, website preview, and
 dependency update notes.
-
-<a id="development"></a>
 
 ## Development
 
@@ -368,8 +317,6 @@ make website-capture
 `gofmt` is the baseline formatter. The pinned `golangci-lint` configuration adds
 `gofumpt`, `goimports`, `staticcheck`, `errcheck`, and `revive`.
 
-<a id="project-structure"></a>
-
 ## Project structure
 
 ```text
@@ -390,16 +337,12 @@ s3ctl/
 └── README.md                 # Project overview
 ```
 
-<a id="contributing"></a>
-
 ## Contributing
 
 Issues and pull requests are welcome at [netspeedy/s3ctl](https://github.com/netspeedy/s3ctl).
 The development commands above are the expected minimum validation before a
 change lands; see [AGENTS.md](AGENTS.md) for the full repository conventions.
 Releases are automated; see [docs/release.md](docs/release.md).
-
-<a id="license"></a>
 
 ## License
 
