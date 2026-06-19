@@ -206,13 +206,10 @@ function renderMetadata(rawMetadata) {
   setHref("nav-github-link", metadata.github_url);
   setHref("nav-releases-link", metadata.release_url);
   setHref("nav-homebrew-link", metadata.homebrew_url);
-  setHref("nav-apt-link", metadata.apt_repository.url);
   setHref("nav-container-link", metadata.container_url);
   setHref("install-homebrew-link", metadata.homebrew_url);
-  setHref("install-apt-link", metadata.apt_repository.url);
   setHref("install-container-link", metadata.container_url);
   setHref("install-release-link", metadata.release_url);
-  setHref("footer-apt-link", metadata.apt_repository.url);
   setHref("footer-container-link", metadata.container_url);
   setHref("footer-release-link", release?.html_url || metadata.release_url);
 
@@ -255,6 +252,17 @@ async function loadMetadata() {
   }
 }
 
+function selectInstallTab(container, tabID) {
+  container.querySelectorAll(".tab").forEach((tab) => {
+    const active = tab.dataset.tab === tabID;
+    tab.classList.toggle("active", active);
+    tab.setAttribute("aria-selected", active ? "true" : "false");
+  });
+  container.querySelectorAll(".tab-panel").forEach((panel) => {
+    panel.classList.toggle("active", panel.id === `panel-${tabID}`);
+  });
+}
+
 function wireTabs() {
   document.querySelectorAll(".install-tabs").forEach((container) => {
     container.addEventListener("click", (event) => {
@@ -263,15 +271,16 @@ function wireTabs() {
         return;
       }
 
-      const tabID = button.dataset.tab;
-      container.querySelectorAll(".tab").forEach((tab) => {
-        const active = tab === button;
-        tab.classList.toggle("active", active);
-        tab.setAttribute("aria-selected", active ? "true" : "false");
-      });
-      container.querySelectorAll(".tab-panel").forEach((panel) => {
-        panel.classList.toggle("active", panel.id === `panel-${tabID}`);
-      });
+      selectInstallTab(container, button.dataset.tab);
+    });
+  });
+
+  document.querySelectorAll("[data-install-tab]").forEach((link) => {
+    link.addEventListener("click", () => {
+      const container = document.querySelector(".install-tabs");
+      if (container) {
+        selectInstallTab(container, link.dataset.installTab);
+      }
     });
   });
 }
