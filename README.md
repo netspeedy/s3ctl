@@ -1,11 +1,5 @@
 <p align="center">
-  <img src=".github/assets/website/favicon.svg" width="96" height="96" alt="s3ctl">
-</p>
-
-<h1 align="center">s3ctl</h1>
-
-<p align="center">
-  Provision S3 buckets with scoped credentials in one run — no console clicking, no hand-built IAM drift.
+  <img src="assets/s3ctl-readme-hero.png" width="960" alt="s3ctl - Provision S3 buckets with scoped credentials">
 </p>
 
 <p align="center">
@@ -331,6 +325,7 @@ make website-capture
 
 ```text
 s3ctl/
+├── assets/                   # README and repository imagery
 ├── cmd/s3ctl/                # CLI entrypoint
 ├── internal/                 # CLI, provider, and build metadata packages
 ├── docs/                     # OVHcloud and release documentation
