@@ -10,7 +10,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.34
 	github.com/aws/aws-sdk-go-v2/service/iam v1.58.1
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.107.0
-	github.com/aws/smithy-go v1.27.6
+	github.com/aws/smithy-go v1.27.7
 	github.com/ovh/go-ovh v1.9.0
 	github.com/spf13/pflag v1.0.10
 )
