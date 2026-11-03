@@ -19,7 +19,7 @@ LDFLAGS ?= -s -w \
 	-X $(PKG)/internal/buildinfo.Commit=$(COMMIT) \
 	-X $(PKG)/internal/buildinfo.BuildDate=$(BUILD_DATE)
 
-.PHONY: fmt fmt-check lint lint-fix lint-install vet test build build-cross build-release package-deb docker-build website-install website-build website-check website-capture refresh-go-toolchain clean
+.PHONY: fmt fmt-check lint lint-fix lint-install vet test build build-cross build-release package-deb docker-build website-install website-build website-check website-capture readme-hero refresh-go-toolchain clean
 
 fmt:
 	gofmt -w cmd internal
@@ -112,6 +112,9 @@ website-check:
 website-capture:
 	test -d $(WEBSITE_DIR)/node_modules || (printf 'missing website dependencies; run `make website-install`\n' >&2 && exit 1)
 	npm --prefix $(WEBSITE_DIR) run capture
+
+readme-hero:
+	python3 scripts/readme/build_readme_hero.py
 
 refresh-go-toolchain:
 	GO_TOOLCHAIN_VERSION="$(GO_TOOLCHAIN_VERSION)" bash scripts/toolchain/refresh-go-toolchain.sh
