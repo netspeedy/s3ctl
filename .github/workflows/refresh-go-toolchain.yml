@@ -64,8 +64,9 @@ jobs:
             go
 
       # A pull request opened with GITHUB_TOKEN doesn't trigger pull_request workflows, so
-      # Build and Validate is dispatched on the branch instead. Automation Auto Merge picks the
-      # pull request up from that run, as it does for Dependabot.
+      # Build and Validate is dispatched on the branch instead. That run doesn't fire
+      # workflow_run either; the daily Automation Auto Merge sweep merges the pull request
+      # once it has passed.
       - name: Validate the pull request
         if: steps.pr.outputs.pull-request-operation == 'created' || steps.pr.outputs.pull-request-operation == 'updated'
         env:

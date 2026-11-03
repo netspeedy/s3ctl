@@ -2,8 +2,11 @@ name: Automation Auto Merge
 
 on:
   workflow_dispatch:
+  # Daily, after Refresh Build Tooling Pins (04:23). Its pull request is validated by a
+  # dispatched Build and Validate run, and runs started with GITHUB_TOKEN don't fire
+  # workflow_run, so this sweep is what merges it.
   schedule:
-    - cron: "0 2 * * 0"
+    - cron: "0 5 * * *"
   workflow_run:
     workflows:
       - Build and Validate
