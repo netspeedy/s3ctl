@@ -40,6 +40,13 @@ updates are grouped into one pull request so shared `go.mod` and `go.sum`
 changes do not create a queue of conflicting PRs.
 
 The automation auto-merge workflow runs after `Build and Validate` succeeds and
-on a weekly maintenance schedule. It handles Dependabot PRs and first-party
-automation PRs, then merges only open, clean PRs with successful validation for
-their current head revision.
+daily at 05:00 UTC. It handles Dependabot PRs and first-party automation PRs,
+then merges only open, clean PRs with successful validation for their current
+head revision.
+
+The toolchain refresh PR is opened with `GITHUB_TOKEN`, so its `pull_request`
+workflows don't start. The refresh dispatches `Build and Validate` and a
+validation-only `Container Image` build on its branch instead, and the daily
+run merges it once both have passed on the PR head. The daily run asks for a
+green `Container Image` run for any PR it merges, because `Build and Validate`
+doesn't build the image.
