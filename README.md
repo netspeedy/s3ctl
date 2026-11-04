@@ -292,7 +292,7 @@ The banner at the top of this page, the social cards and the site's icons are
 generated. Edit the copy, layout, timing or the mark itself in
 `scripts/readme/build_readme_hero.py` and run `make readme-hero`. That rebuilds
 `assets/s3ctl-readme-hero.svg`; the website's share card, favicon, Apple touch
-icon and `favicon.ico` in `website/public`; and `assets/s3ctl-social-preview.png`,
+icon and `favicon.ico` in `website/public`; and `assets/s3ctl-social-card.png`,
 which is the image for GitHub's social preview and is uploaded by hand in the
 repository settings. It runs the script with `uv`, which installs the pinned
 fontTools it subsets the fonts with, and renders the cards and icons with headless
