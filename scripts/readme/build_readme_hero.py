@@ -809,7 +809,7 @@ def build_svg(spec: dict = CARD) -> str:
 # Social preview, since GitHub has no API for it.
 REPO = "s3ctl"
 OG_CARD = ROOT / "website" / "public" / "og-image"
-PREVIEW_CARD = ROOT / "assets" / f"{REPO}-social-preview"
+SOCIAL_CARD = ROOT / "assets" / f"{REPO}-social-card"
 SVG_NS = "http://www.w3.org/2000/svg"
 CHROME_CANDIDATES = (
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -934,7 +934,7 @@ def render_png(
 
 
 def write_social_cards(hero: str) -> None:
-    cards = [(PREVIEW_CARD, 1280, 640, False)]
+    cards = [(SOCIAL_CARD, 1280, 640, False)]
     if (ROOT / "website").is_dir():
         cards.insert(0, (OG_CARD, 1200, 630, True))
     for base, width, height, keep_svg in cards:
