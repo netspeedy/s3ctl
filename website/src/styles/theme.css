@@ -56,6 +56,8 @@
   --s3-ok: #6fd8a5;
   --s3-ok-dot: #3cd788;
   --s3-search-bg: var(--sl-color-gray-7);
+  --s3-menu-bg: var(--sl-color-gray-7);
+  --s3-menu-shadow: 0 18px 40px -14px rgb(0 0 0 / 0.45);
   --s3-brand-bar: linear-gradient(90deg, #4bd8ff, #3b4bb8 50%, #f5b841);
   --s3-num-ink: #04121f;
 
@@ -93,11 +95,10 @@
   --sl-sidebar-width: 17.5rem;
   --sl-menu-button-size: 2.75rem;
 
-  /* The header is the brand line, then two rows: the bar and the section tabs. */
-  --s3-brand-line: 3px;
+  /* The header is two rows: the bar and the section tabs. */
   --s3-bar: 3.5rem;
   --s3-tabs: 2.75rem;
-  --sl-nav-height: calc(var(--s3-brand-line) + var(--s3-bar) + var(--s3-tabs));
+  --sl-nav-height: calc(var(--s3-bar) + var(--s3-tabs));
 }
 
 :root[data-theme="light"],
@@ -143,6 +144,8 @@
   --s3-ok: #1c7c4d;
   --s3-ok-dot: #22a06b;
   --s3-search-bg: var(--sl-color-gray-7);
+  --s3-menu-bg: #ffffff;
+  --s3-menu-shadow: 0 18px 40px -14px rgb(11 18 32 / 0.25);
   --s3-brand-bar: linear-gradient(90deg, #0b74b8, #3b4bb8 50%, #f5b841);
   --s3-num-ink: #ffffff;
 
@@ -181,24 +184,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Header: the brand line across the top, then the two rows, which fill the rest of the frame. */
+/* Header: the two rows fill the frame. */
 header.header {
-  padding-block: var(--s3-brand-line) 0;
-}
-header.header::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: var(--s3-brand-line);
-  background: var(--s3-brand-bar);
+  padding-block: 0;
 }
 
 /*
-  The mobile menu button sits in the top row and looks like the theme switch beside it: a quiet
+  The mobile menu button sits in the top row and looks like the header's other buttons: a quiet
   outlined square, filled softly while the menu is open, in place of Starlight's solid circle.
 */
 .sl-menu-button {
-  top: calc(var(--s3-brand-line) + (var(--s3-bar) - var(--sl-menu-button-size)) / 2) !important;
+  top: calc((var(--s3-bar) - var(--sl-menu-button-size)) / 2) !important;
   align-items: center;
   justify-content: center;
   padding: 0;

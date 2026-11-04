@@ -1,7 +1,8 @@
 ---
-// Every sidebar group and its pages, for the home page. It's built from the sidebar, so it can't
-// fall out of step with it.
+// Every sidebar group and its pages, as a card each, for the home page. It's built from the
+// sidebar, so it can't fall out of step with it.
 import { directory } from "../lib/sections";
+import SectionIcon from "./SectionIcon.astro";
 
 const groups = directory(Astro.locals.starlightRoute.sidebar);
 ---
@@ -9,10 +10,11 @@ const groups = directory(Astro.locals.starlightRoute.sidebar);
 <section class="s3-directory not-content" aria-labelledby="browse-the-docs">
   <h2 id="browse-the-docs">Browse the docs</h2>
   <p class="s3-directory-sub">From a first bucket to every flag.</p>
-  <div class="s3-directory-grid">
+  <div class="s3-cards">
     {
       groups.map(({ section, links }) => (
-        <section>
+        <section class="s3-card" style={`--cl: var(--s3-${section.hue}-line)`}>
+          <SectionIcon section={section} large />
           <h3>{section.label}</h3>
           <p>{section.blurb}</p>
           <ul>
@@ -38,25 +40,34 @@ const groups = directory(Astro.locals.starlightRoute.sidebar);
     color: var(--sl-color-white);
   }
   .s3-directory-sub {
-    margin: 0 0 1.75rem;
+    margin: 0 0 1.5rem;
     color: var(--sl-color-gray-3);
   }
-  .s3-directory-grid {
+  .s3-cards {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 2rem;
+    gap: 1rem;
   }
-  .s3-directory-grid section {
-    padding-top: 1rem;
-    border-top: 1px solid var(--sl-color-hairline-shade);
+  .s3-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 1.25rem 0.875rem;
+    border: 1px solid var(--sl-color-hairline-shade);
+    border-radius: 14px;
+    background-color: var(--sl-color-gray-7);
+  }
+  .s3-card:hover {
+    border-color: var(--cl);
   }
   h3 {
-    margin: 0;
+    margin: 1rem 0 0;
     font-size: var(--sl-text-base);
-    font-weight: 600;
+    font-weight: 650;
+    letter-spacing: -0.01em;
     color: var(--sl-color-white);
   }
-  .s3-directory-grid p {
+  .s3-card p {
+    min-height: 3em;
     margin: 0.25rem 0 0.875rem;
     font-size: var(--sl-text-sm);
     line-height: 1.5;
@@ -66,12 +77,14 @@ const groups = directory(Astro.locals.starlightRoute.sidebar);
     display: flex;
     flex-direction: column;
     margin: 0;
-    padding: 0;
+    padding: 0.625rem 0 0;
+    border-top: 1px solid var(--sl-color-hairline-shade);
     list-style: none;
   }
   a {
     display: block;
-    padding-block: 0.25rem;
+    padding-block: 0.3125rem;
+    font-size: var(--sl-text-sm);
     color: var(--sl-color-gray-2);
     text-decoration: none;
   }
@@ -79,9 +92,17 @@ const groups = directory(Astro.locals.starlightRoute.sidebar);
     color: var(--sl-color-white);
   }
 
-  @media (max-width: 56rem) {
-    .s3-directory-grid {
+  @media (max-width: 64rem) {
+    .s3-cards {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 36rem) {
+    .s3-cards {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .s3-card p {
+      min-height: 0;
     }
   }
 </style>

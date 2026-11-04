@@ -1,43 +1,68 @@
 ---
-import Default from "@astrojs/starlight/components/Footer.astro";
+// The end of a page: links to edit it and to report a problem with it, then previous and next,
+// then the site footer. The home page has neither an edit link nor a pager, so it gets only the
+// site footer. None of it is indexed for search, or every page would match its links.
+import Pagination from "@astrojs/starlight/components/Pagination.astro";
+import { icons } from "../lib/icons";
 import { links } from "../lib/site";
+import SiteFooter from "./SiteFooter.astro";
+
+const { editUrl, entry, pagination } = Astro.locals.starlightRoute;
+const report = new URL(`${links.repo}/issues/new`);
+report.searchParams.set("title", `Docs: ${entry.data.title}`);
+report.searchParams.set("body", `On ${new URL(Astro.url.pathname, Astro.site)}:\n\n`);
 ---
 
-<Default />
-<div class="s3-footer">
-  <span>© 2026 Simon Oakes · MIT License</span>
-  <nav aria-label="Project">
-    <a href={links.homebrew}>Homebrew tap</a>
-    <a href={links.container}>GHCR image</a>
-    <a href={links.examples}>Examples</a>
-    <a href={links.issues}>Issues</a>
-  </nav>
-</div>
+<footer class="s3-end" data-pagefind-ignore>
+  {
+    editUrl && (
+      <div class="s3-page-end print:hidden">
+        <a href={editUrl}>
+          <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons.pencil} />
+          Edit this page on GitHub
+        </a>
+        <a href={report.href}>
+          <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons.flag} />
+          Report a problem with this page
+        </a>
+      </div>
+    )
+  }
+  {(pagination.prev || pagination.next) && <Pagination />}
+  <SiteFooter />
+</footer>
 
 <style>
-  .s3-footer {
+  .s3-end {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .s3-page-end {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
     gap: 0.5rem 1.5rem;
-    margin-top: 2.5rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--sl-color-hairline-shade);
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-3);
+    margin-top: 2.75rem;
+    font-size: var(--sl-text-sm);
   }
-  nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 1.25rem;
-  }
-  a {
-    padding-block: 0.625rem;
+  .s3-page-end a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    padding-block: 0.25rem;
     color: var(--sl-color-gray-3);
     text-decoration: none;
   }
-  a:hover {
+  .s3-page-end a:hover {
     color: var(--sl-color-white);
+  }
+  svg {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 </style>

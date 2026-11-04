@@ -1,8 +1,9 @@
 ---
 import Search from "@astrojs/starlight/components/Search.astro";
+import { github, icons } from "../lib/icons";
 import { links, release } from "../lib/site";
 import SiteTitle from "./SiteTitle.astro";
-import ThemeSelect from "./ThemeSelect.astro";
+import ThemeMenu from "./ThemeMenu.astro";
 
 // Section tabs are shortcuts into the sidebar's groups, not separate sidebars. The home page is
 // the landing page and sits outside the sidebar, so no tab is current there.
@@ -26,16 +27,20 @@ const tabs = [
 <div class="s3-header">
   <div class="s3-bar">
     <div class="s3-title"><SiteTitle /></div>
+    <a class="s3-version sl-hidden md:sl-flex" href={release.url} title="Release notes">
+      <span class="s3-dot" aria-hidden="true"></span>{release.version}
+    </a>
     <div class="s3-search print:hidden"><Search /></div>
     <div class="s3-actions sl-hidden md:sl-flex print:hidden">
-      <a class="s3-version" href={release.url}>
-        <span class="s3-dot" aria-hidden="true"></span>{release.version}
+      <a class="s3-button" href={links.releases} title="Releases">
+        <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons.tag} />
+        <span class="s3-label">Releases</span>
       </a>
-      <a class="s3-link" href={links.repo}>
-        GitHub
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16L16 8M9 8h7v7"></path></svg>
+      <a class="s3-button" href={links.repo} title="s3ctl on GitHub">
+        <svg class="s3-github" viewBox="0 0 16 16" aria-hidden="true"><path d={github} /></svg>
+        <span class="s3-label">GitHub</span>
       </a>
-      <ThemeSelect />
+      <ThemeMenu />
     </div>
   </div>
   <nav class="s3-tabs print:hidden" aria-label="Sections">
@@ -46,10 +51,6 @@ const tabs = [
         </a>
       ))
     }
-    <a href={links.releases}>
-      Releases
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16L16 8M9 8h7v7"></path></svg>
-    </a>
   </nav>
 </div>
 
@@ -78,26 +79,23 @@ const tabs = [
     flex: 1 1 auto;
     justify-content: flex-end;
   }
-  .s3-actions {
-    align-items: center;
-    gap: 0.25rem;
-    font-size: var(--sl-text-sm);
-  }
-  .s3-version,
-  .s3-link {
-    display: inline-flex;
+  .s3-version {
+    flex: none;
     align-items: center;
     gap: 0.375rem;
-    padding: 0.625rem 0.625rem;
+    height: 1.5rem;
+    margin-inline-start: -0.25rem;
+    padding: 0 0.5625rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 999px;
+    font-family: var(--__sl-font-mono);
+    font-size: var(--sl-text-xs);
+    font-weight: 500;
     color: var(--sl-color-gray-2);
     text-decoration: none;
   }
-  .s3-version {
-    font-family: var(--__sl-font-mono);
-    font-size: var(--sl-text-xs);
-  }
-  .s3-version:hover,
-  .s3-link:hover {
+  .s3-version:hover {
+    border-color: var(--sl-color-gray-4);
     color: var(--sl-color-white);
   }
   .s3-dot {
@@ -106,17 +104,40 @@ const tabs = [
     border-radius: 50%;
     background-color: var(--s3-ok-dot);
   }
-  .s3-actions :global(.s3-theme) {
-    margin-inline-start: 0.5rem;
+  .s3-actions {
+    align-items: center;
+    gap: 0.625rem;
+  }
+  .s3-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    height: 2.25rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--sl-color-hairline-shade);
+    border-radius: 9px;
+    font-size: var(--sl-text-sm);
+    font-weight: 500;
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .s3-button:hover {
+    background-color: var(--s3-hover-fill);
+    color: var(--sl-color-white);
   }
   svg {
-    width: 0.75rem;
-    height: 0.75rem;
+    width: 1.0625rem;
+    height: 1.0625rem;
     fill: none;
     stroke: currentColor;
-    stroke-width: 2;
+    stroke-width: 1.9;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+  .s3-github {
+    fill: currentColor;
+    stroke: none;
   }
   .s3-tabs {
     display: flex;
@@ -132,7 +153,6 @@ const tabs = [
   .s3-tabs a {
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
     padding: 0 0.75rem;
     border-bottom: 2px solid transparent;
     color: var(--sl-color-gray-3);
@@ -147,13 +167,13 @@ const tabs = [
     color: var(--sl-color-white);
   }
 
-  /* Pages without a sidebar, like the home page, have no mobile menu, so the theme switch stays
+  /* Pages without a sidebar, like the home page, have no mobile menu, so the theme button stays
      in the bar on phones there. */
   @media (max-width: 49.99rem) {
     :global(:root:not([data-has-sidebar])) .s3-actions {
       display: flex;
     }
-    :global(:root:not([data-has-sidebar])) :is(.s3-version, .s3-link) {
+    :global(:root:not([data-has-sidebar])) .s3-button {
       display: none;
     }
   }
@@ -162,10 +182,32 @@ const tabs = [
     .s3-search {
       flex: 0 1 22rem;
       justify-content: flex-start;
-      margin-inline-start: 1.5rem;
+      margin-inline-start: 0.5rem;
+    }
+    /* The same height as the buttons beside it. */
+    .s3-search :global(button[data-open-modal]) {
+      height: 2.25rem;
     }
     .s3-actions {
       margin-inline-start: auto;
+    }
+  }
+
+  /* Tablets have no room for the labels, so Releases and GitHub become icons. Their names stay
+     for screen readers. */
+  @media (min-width: 50rem) and (max-width: 63.99rem) {
+    .s3-button {
+      justify-content: center;
+      width: 2.25rem;
+      padding: 0;
+    }
+    .s3-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
   }
 </style>

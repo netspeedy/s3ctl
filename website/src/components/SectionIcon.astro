@@ -1,15 +1,16 @@
 ---
-// A section's icon in a small tile of its colour.
+// A section's icon in a small tile of its colour. The large one heads the home page's cards.
 import type { Section } from "../lib/sections";
 
 interface Props {
   section: Section;
+  large?: boolean;
 }
 
-const { section } = Astro.props;
+const { section, large = false } = Astro.props;
 ---
 
-<span class="s3-section-icon" style={`--cc: var(--s3-${section.hue}); --cb: var(--s3-${section.hue}-bg); --cl: var(--s3-${section.hue}-line)`}>
+<span class:list={["s3-section-icon", { large }]} style={`--cc: var(--s3-${section.hue}); --cb: var(--s3-${section.hue}-bg); --cl: var(--s3-${section.hue}-line)`}>
   <svg viewBox="0 0 24 24" aria-hidden="true" set:html={section.icon} />
 </span>
 
@@ -26,6 +27,11 @@ const { section } = Astro.props;
     background-color: var(--cb);
     color: var(--cc);
   }
+  .large {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+  }
   svg {
     width: 13px;
     height: 13px;
@@ -34,5 +40,10 @@ const { section } = Astro.props;
     stroke-width: 2.1;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+  .large svg {
+    width: 17px;
+    height: 17px;
+    stroke-width: 1.9;
   }
 </style>
