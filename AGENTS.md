@@ -10,7 +10,22 @@
 - Keep first-party automation, packaging, and release assets at the root,
   under `.github/`, `scripts/`, `examples/`, and `website/`.
 - Treat `website/` as a first-party release surface, not a
-  throwaway demo.
+  throwaway demo. It is the s3ctl documentation, built with Astro and
+  Starlight; the pages are Markdown and MDX in `website/src/content/docs`.
+- User-facing documentation lives in the site, not in `docs/`. The files in
+  `docs/` other than `release.md` are pointers kept so old links still land
+  somewhere; don't add guides there.
+- When CLI behavior, flags, defaults, output or errors change, update the
+  matching site pages in the same change. `TestCLIReferenceCoversEveryFlag` in
+  `internal/cli` fails when a flag is added or removed without updating
+  `website/src/content/docs/reference/cli.mdx`.
+- The mark, the README banner, the social cards and the site's icons all come
+  from `scripts/readme/build_readme_hero.py` via `make readme-hero`. Change the
+  generator, not the generated files.
+- Each sidebar group has its own colour and icon. Their labels, colours and
+  icons are in `website/src/lib/sections.ts`, but the sidebar draws its group
+  icons from `website/src/styles/theme.css` by position. Adding, renaming or
+  reordering a group in `website/astro.config.mjs` means updating both.
 - Keep the website out of `.github/`. Dependabot stopped being able to open npm
   pull requests for manifests under `.github/` in June 2026 (its create-PR call
   is rejected as "invalid or unauthorized changes"), which is why it lives at
@@ -53,6 +68,18 @@
 - Lint shell scripts:
   ```bash
   shellcheck scripts/*.sh
+  ```
+- Build the docs site, then validate the built output (pages, search index,
+  icons, share card and every internal link). The check reads `website/dist`,
+  so it always runs after the build:
+  ```bash
+  make website-install
+  make website-build
+  make website-check
+  ```
+- Screenshot the built site in both themes at desktop and phone widths:
+  ```bash
+  make website-capture
   ```
 
 ## Go Style & Quality Rules
@@ -99,8 +126,10 @@
   bash -n scripts/*.sh
   shellcheck scripts/*.sh
   ```
-- If you change website or release automation behavior, run the matching local
-  validation that exercises those paths before considering the change complete.
+- If you change the website, run `make website-build` and `make website-check`,
+  and look at `make website-capture` output for layout changes. If you change
+  release automation, run the matching local validation that exercises those
+  paths before considering the change complete.
 - If you change release tagging, release notes, or publish workflows, also run:
   ```bash
   bash -n scripts/*.sh

@@ -26,7 +26,7 @@ changes. The same command rotates and re-scopes OVHcloud credentials and deletes
 buckets, and it won't empty a bucket unless you pass `--force`. Text output is for
 people; `--output json` gives scripts a payload for successes and errors alike.
 
-**Quick links:** [Install](#install) · [Try it](#try-it) · [Usage guide](docs/usage.md) · [OVHcloud](docs/ovhcloud.md) · [Examples](examples) · [Releases](https://github.com/netspeedy/s3ctl/releases) · [Website](https://netspeedy.github.io/s3ctl/)
+**Quick links:** [Install](#install) · [Try it](#try-it) · [Docs](https://netspeedy.github.io/s3ctl/) · [CLI reference](https://netspeedy.github.io/s3ctl/reference/cli/) · [OVHcloud](https://netspeedy.github.io/s3ctl/ovhcloud/) · [Examples](examples) · [Releases](https://github.com/netspeedy/s3ctl/releases)
 
 ---
 
@@ -47,8 +47,9 @@ over because the releases aren't notarised yet:
 curl -fsSL https://netspeedy.github.io/s3ctl/install.sh | bash
 ```
 
-[docs/installation.md](docs/installation.md) covers the signed APT repository for
-Debian and Ubuntu, pinned versions, release candidates and the GHCR image.
+[Installation](https://netspeedy.github.io/s3ctl/installation/) in the docs covers
+the signed APT repository for Debian and Ubuntu, pinned versions, release
+candidates and the GHCR image.
 
 ## Try it
 
@@ -128,8 +129,9 @@ Repeat `--bucket` to work on several buckets at once, or pass a CSV file with
 `--batch-file`. Settings resolve in this order: flags, then the JSON config, then
 the built-in defaults, so shared provider settings can live in the config while
 anything specific to one run stays on the command line.
-[docs/usage.md](docs/usage.md) covers batch files, JSON config, the IAM permissions
-s3ctl needs and the JSON error payloads.
+The [docs](https://netspeedy.github.io/s3ctl/) cover batch files, JSON config, the
+IAM permissions s3ctl needs and the JSON output, and the
+[CLI reference](https://netspeedy.github.io/s3ctl/reference/cli/) lists every flag.
 
 ## Policy templates
 
@@ -203,9 +205,9 @@ It needs these settings:
 - `region`: an OVHcloud Public Cloud/Object Storage region such as `UK`, `GRA`,
   `BHS`, `SBG`, or `EU-WEST-PAR`
 
-[docs/ovhcloud.md](docs/ovhcloud.md) covers OAuth2 service account setup, the
-least-privilege IAM actions, storage policy roles, credential rotation, policy
-repair and bucket deletion on OVHcloud.
+The [OVHcloud docs](https://netspeedy.github.io/s3ctl/ovhcloud/) cover OAuth2 service
+account setup, the least-privilege IAM actions, storage policy roles, credential
+rotation, policy repair and bucket deletion.
 
 ## Container
 
@@ -262,27 +264,41 @@ make build
 ```
 
 `gofmt` is the baseline formatter, and the pinned `golangci-lint` configuration
-adds `gofumpt`, `goimports`, `staticcheck`, `errcheck` and `revive`. To format,
-build the release artifacts and preview the website:
+adds `gofumpt`, `goimports`, `staticcheck`, `errcheck` and `revive`. To format and
+build the release artifacts:
 
 ```bash
 make fmt
 make build-release
+```
+
+The docs site is Astro and Starlight, with its pages in `website/src/content/docs`.
+`npm --prefix website run dev` serves it with live reload. Before a change lands,
+build it and validate the output, which checks every page, icon and internal link:
+
+```bash
 make website-install
 make website-build
+make website-check
 make website-capture
 ```
 
-The banner at the top of this page and the social cards are generated. Edit the
-copy, layout or timing in `scripts/readme/build_readme_hero.py` and run `make
-readme-hero`. That rebuilds `assets/s3ctl-readme-hero.svg`, the website's
-`website/public/og-image.png` and `assets/s3ctl-social-preview.png`, which is the
-image for GitHub's social preview and is uploaded by hand in the repository
-settings. It runs the script with `uv`, which installs the pinned fontTools it
-subsets the fonts with, and renders the cards with headless Chrome or Chromium. The
-fonts come from assets.netspeedy.io, so the first run needs network access. If you
-change the headline's words, measure them again with `uv run
-scripts/readme/measure_headline.py`.
+`website-capture` saves desktop and phone screenshots in both themes to
+`website/.captures/`. A Go test fails if a flag is added or removed without
+updating the CLI reference page, and [docs/release.md](docs/release.md) has more
+on how the published site gets its release details.
+
+The banner at the top of this page, the social cards and the site's icons are
+generated. Edit the copy, layout, timing or the mark itself in
+`scripts/readme/build_readme_hero.py` and run `make readme-hero`. That rebuilds
+`assets/s3ctl-readme-hero.svg`; the website's share card, favicon, Apple touch
+icon and `favicon.ico` in `website/public`; and `assets/s3ctl-social-preview.png`,
+which is the image for GitHub's social preview and is uploaded by hand in the
+repository settings. It runs the script with `uv`, which installs the pinned
+fontTools it subsets the fonts with, and renders the cards and icons with headless
+Chrome or Chromium. The fonts come from assets.netspeedy.io, so the first run
+needs network access. If you change the headline's words, measure them again with
+`uv run scripts/readme/measure_headline.py`.
 
 Issues and pull requests are welcome. [AGENTS.md](AGENTS.md) has the full
 repository conventions.

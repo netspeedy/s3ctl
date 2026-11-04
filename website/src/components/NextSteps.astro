@@ -1,0 +1,77 @@
+---
+// Link cards into the docs, each in the colour of the section it lands in.
+import { sectionOfHref } from "../lib/sections";
+import SectionIcon from "./SectionIcon.astro";
+
+interface Props {
+  links: { title: string; href: string; description: string }[];
+}
+
+const { sidebar } = Astro.locals.starlightRoute;
+const cards = Astro.props.links.map((link) => {
+  const section = sectionOfHref(sidebar, link.href);
+  if (!section) throw new Error(`NextSteps: ${link.href} isn't a page in the sidebar`);
+  return { ...link, section };
+});
+---
+
+<div class="s3-next not-content">
+  {
+    cards.map(({ title, href, description, section }) => (
+      <a href={href} style={`--cc: var(--s3-${section.hue}); --cb: var(--s3-${section.hue}-bg)`}>
+        <span class="s3-next-section">
+          <SectionIcon section={section} />
+          {section.label}
+        </span>
+        <span class="s3-next-title">{title}</span>
+        <span class="s3-next-text">{description}</span>
+      </a>
+    ))
+  }
+</div>
+
+<style>
+  .s3-next {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+    gap: 0.875rem;
+  }
+  a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem 1.125rem;
+    border: 1px solid var(--sl-color-hairline-light);
+    border-radius: 12px;
+    background:
+      linear-gradient(135deg, var(--cb), transparent 60%),
+      var(--sl-color-black);
+    text-decoration: none;
+  }
+  a:hover {
+    border-color: var(--cc);
+  }
+  .s3-next-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--sl-text-xs);
+    font-weight: 600;
+    color: var(--cc);
+  }
+  .s3-next-title {
+    margin-top: 0.375rem;
+    font-size: var(--sl-text-base);
+    font-weight: 650;
+    color: var(--sl-color-white);
+  }
+  .s3-next-title::after {
+    content: " →";
+    color: var(--cc);
+  }
+  .s3-next-text {
+    font-size: var(--sl-text-sm);
+    line-height: 1.5;
+    color: var(--sl-color-gray-3);
+  }
+</style>

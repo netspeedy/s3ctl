@@ -155,14 +155,9 @@ jobs:
       - name: Assemble site payload
         run: |
           site_url="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          # The site reads the release details at build time, so write them first.
+          metadata="${RUNNER_TEMP}/website-metadata.json"
           mkdir -p site
-          npm ci --prefix website
-          make website-check
-          make website-build
-          cp -a website/dist/. site/
-          cp scripts/install.sh site/install.sh
-          chmod 0755 site/install.sh
-          touch site/.nojekyll
 
           if [ "${{ steps.latest.outputs.available }}" = "true" ]; then
             latest_release_json="$({
@@ -214,7 +209,16 @@ jobs:
                 key_url: $apt_key_url,
                 fingerprint: $apt_fingerprint
               }
-            }' > site/website-metadata.json
+            }' > "${metadata}"
+
+          npm ci --prefix website
+          SITE_METADATA_FILE="${metadata}" make website-build
+          make website-check
+          cp -a website/dist/. site/
+          cp "${metadata}" site/website-metadata.json
+          cp scripts/install.sh site/install.sh
+          chmod 0755 site/install.sh
+          touch site/.nojekyll
 
           test -f site/index.html
           test -f site/website-metadata.json

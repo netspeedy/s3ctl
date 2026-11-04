@@ -1,0 +1,43 @@
+---
+import Default from "@astrojs/starlight/components/Footer.astro";
+import { links } from "../lib/site";
+---
+
+<Default />
+<div class="s3-footer">
+  <span>© 2026 Simon Oakes · MIT License</span>
+  <nav aria-label="Project">
+    <a href={links.homebrew}>Homebrew tap</a>
+    <a href={links.container}>GHCR image</a>
+    <a href={links.examples}>Examples</a>
+    <a href={links.issues}>Issues</a>
+  </nav>
+</div>
+
+<style>
+  .s3-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--sl-color-hairline-shade);
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+  }
+  a {
+    padding-block: 0.625rem;
+    color: var(--sl-color-gray-3);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--sl-color-white);
+  }
+</style>

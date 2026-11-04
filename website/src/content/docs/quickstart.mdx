@@ -1,0 +1,102 @@
+---
+title: Quickstart
+description: Install s3ctl, preview a bucket and its scoped credentials with --dry-run, then create them for real.
+---
+
+import { Steps } from "@astrojs/starlight/components";
+import InstallTabs from "../../components/InstallTabs.astro";
+import NextSteps from "../../components/NextSteps.astro";
+
+## Install
+
+Every channel tracks the same stable release. Pick the one that fits the machine.
+
+<InstallTabs />
+
+Check it's on your path:
+
+```bash
+s3ctl --version
+```
+
+## Preview a bucket
+
+Plan a bucket and a key scoped to it. With `--dry-run` nothing is created; s3ctl only prints what
+it would do.
+
+```bash
+s3ctl --bucket app-data --create-scoped-credentials \
+  --endpoint https://objects.example.com --dry-run
+```
+
+```text title="Output"
+S3 Provisioning Result
+======================
+Resources: 1
+Mode: dry-run
+
+Bucket: app-data
+Endpoint: https://objects.example.com
+Region: us-east-1
+Bucket create planned: yes
+Versioning requested: no
+Encryption requested: no
+Bucket policy planned: no
+Scoped credentials planned: yes
+IAM user: app-data
+Credential policy template: bucket-readwrite
+Access key ID: (generated on apply)
+Secret access key: (generated on apply)
+```
+
+:::note[Where credentials come from]
+s3ctl finds S3 credentials the same way the AWS CLI does. Pass `--profile` to pick a named profile,
+or `--access-key` and `--secret-key` to set them directly.
+:::
+
+On OVHcloud the same request goes through the Public Cloud API. There, `--region` is a Public Cloud
+region such as `UK`, `GRA` or `EU-WEST-PAR`, not an AWS-style region like `us-east-1`:
+
+```bash
+s3ctl --provider ovh --bucket app-data --region UK \
+  --ovh-service-name PUBLIC_CLOUD_PROJECT_ID --dry-run
+```
+
+## Create it
+
+When the plan looks right, run it again without `--dry-run`. For a first real bucket:
+
+<Steps>
+
+1. Put shared provider settings in `~/.config/s3ctl/config.json`. [Configuration](/s3ctl/guides/configuration/) shows what goes in it.
+
+2. Run `s3ctl --bucket app-data --dry-run --output json`.
+
+3. Check the endpoint, region and credential scope in the plan.
+
+4. Run `s3ctl --bucket app-data --output json`.
+
+5. Store the returned access key and secret somewhere safe.
+
+</Steps>
+
+:::caution[The secret is shown once]
+s3ctl prints the secret access key on the run that creates it and never again, so store it before
+you close the terminal.
+:::
+
+:::tip[Scripting it?]
+With `--output json`, s3ctl writes one JSON document to stdout whether the run succeeds or fails,
+and a failed run still exits non-zero.
+:::
+
+## Next steps
+
+<NextSteps
+  links={[
+    { title: "Configuration", href: "/s3ctl/guides/configuration/", description: "Keep provider settings in a JSON config. Flags still win over it." },
+    { title: "Batch provisioning", href: "/s3ctl/guides/batch-provisioning/", description: "Plan and create many buckets, one scoped key each, from a CSV." },
+    { title: "OVHcloud", href: "/s3ctl/ovhcloud/", description: "OAuth2 service accounts, key rotation and policy repair." },
+    { title: "CLI reference", href: "/s3ctl/reference/cli/", description: "Every flag, default, template and CSV column in one place." },
+  ]}
+/>

@@ -1,0 +1,64 @@
+---
+import { Code, TabItem, Tabs } from "@astrojs/starlight/components";
+import { links, release } from "../lib/site";
+
+const image = `${links.image}:${release.tagged ? release.version : "latest"}`;
+const apt = `sudo install -d -m 0755 /etc/apt/keyrings
+curl -fsSL ${links.aptKey} \\
+  | sudo tee /etc/apt/keyrings/s3ctl-archive-keyring.gpg >/dev/null
+
+sudo tee /etc/apt/sources.list.d/s3ctl.sources >/dev/null <<'EOF'
+Types: deb
+URIs: ${links.aptUrl}
+Suites: stable
+Components: main
+Signed-By: /etc/apt/keyrings/s3ctl-archive-keyring.gpg
+EOF
+
+sudo apt update && sudo apt install s3ctl`;
+---
+
+<Tabs syncKey="install">
+  <TabItem label="Homebrew">
+    <Code lang="bash" code={"brew tap netspeedy/s3ctl\nbrew install s3ctl"} />
+    <p class="s3-note">macOS and Linux. Upgrades arrive with <code>brew upgrade</code>.</p>
+  </TabItem>
+  <TabItem label="Install script">
+    <Code lang="bash" code={`curl -fsSL ${links.installScript} | bash`} />
+    <p class="s3-note">
+      Installs into a bin directory you own and clears the macOS quarantine flag, because releases
+      aren't notarised yet.
+    </p>
+  </TabItem>
+  <TabItem label="Debian / Ubuntu">
+    <Code lang="bash" code={apt} />
+    <p class="s3-note">
+      {
+        release.aptFingerprint ? (
+          <>
+            Packages are signed with <code>{release.aptFingerprint}</code>.
+          </>
+        ) : (
+          <>Packages come from the signed stable channel.</>
+        )
+      }
+    </p>
+  </TabItem>
+  <TabItem label="Docker">
+    <Code lang="bash" code={`docker run --rm ${image}`} />
+    <p class="s3-note">Multi-arch image on GHCR. <code>:latest</code> and semver tags are published too.</p>
+  </TabItem>
+</Tabs>
+
+<style>
+  .s3-note {
+    margin-top: 0.75rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+  .s3-note code {
+    font-size: 0.92em;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+</style>

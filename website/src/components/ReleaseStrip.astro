@@ -1,0 +1,53 @@
+---
+// The latest release, as a line across the home page.
+import { formatDate, release } from "../lib/site";
+---
+
+<div class="s3-strip not-content">
+  <span class="s3-dot" aria-hidden="true"></span>
+  <span>
+    Latest release <b>{release.version}</b>{release.published && `, published ${formatDate(release.published)}`}
+  </span>
+  <a href={release.url}>Release notes →</a>
+</div>
+
+<style>
+  .s3-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.25rem;
+    margin-top: 3.5rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--sl-color-hairline-shade);
+    border-radius: 12px;
+    background-color: var(--sl-color-gray-7);
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+  }
+  b {
+    font-family: var(--__sl-font-mono);
+    font-weight: 600;
+    color: var(--sl-color-white);
+  }
+  .s3-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--s3-ok-dot);
+  }
+  a {
+    margin-inline-start: auto;
+    font-weight: 500;
+    color: var(--sl-color-text-accent);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  @media (max-width: 56rem) {
+    a {
+      margin-inline-start: 0;
+    }
+  }
+</style>
