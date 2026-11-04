@@ -1,5 +1,5 @@
 ---
-import { release } from "../lib/site";
+import { formatDate, release } from "../lib/site";
 import { currentSection } from "../lib/sections";
 import SectionIcon from "./SectionIcon.astro";
 
@@ -29,7 +29,20 @@ const { title, description } = entry.data;
       )}
       <h1 id={PAGE_TITLE_ID}>{title}</h1>
       {description && <p class="s3-lead">{description}</p>}
-      {release.tagged && <p class="s3-applies">Applies to {release.version}</p>}
+      {/* The release, near the top of every page, so it's on screen at every width. The right
+          column's release card only shows on wide screens. */}
+      {release.tagged && (
+        <p class="s3-applies">
+          <span>
+            Applies to <span class="s3-version">{release.version}</span>
+          </span>
+          <span class="s3-stable">
+            <span class="s3-dot" aria-hidden="true" />
+            stable{release.published && `, released ${formatDate(release.published)}`}
+          </span>
+          <a href={release.url}>Release notes →</a>
+        </p>
+      )}
     </>
   )
 }
@@ -68,8 +81,38 @@ const { title, description } = entry.data;
     color: var(--sl-color-gray-2);
   }
   .s3-applies {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem 0.875rem;
     margin: 0.875rem 0 0;
     font-size: var(--sl-text-sm);
     color: var(--sl-color-gray-3);
+  }
+  .s3-version {
+    font-family: var(--__sl-font-mono);
+    font-weight: 600;
+    color: var(--sl-color-white);
+  }
+  .s3-stable {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-weight: 500;
+    color: var(--s3-ok);
+  }
+  .s3-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--s3-ok-dot);
+  }
+  .s3-applies a {
+    font-weight: 500;
+    color: var(--sl-color-text-accent);
+    text-decoration: none;
+  }
+  .s3-applies a:hover {
+    text-decoration: underline;
   }
 </style>
