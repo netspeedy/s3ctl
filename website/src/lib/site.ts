@@ -8,6 +8,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 
 export const links = {
+  org: "https://github.com/netspeedy",
   repo: "https://github.com/netspeedy/s3ctl",
   releases: "https://github.com/netspeedy/s3ctl/releases",
   issues: "https://github.com/netspeedy/s3ctl/issues",
