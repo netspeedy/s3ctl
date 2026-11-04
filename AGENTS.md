@@ -8,9 +8,13 @@
 - Keep application logic under `internal/`; avoid adding new top-level Go
   packages at the repository root.
 - Keep first-party automation, packaging, and release assets at the root,
-  under `.github/`, `scripts/`, `examples/`, and `.github/assets/website/`.
-- Treat `.github/assets/website/` as a first-party release surface, not a
+  under `.github/`, `scripts/`, `examples/`, and `website/`.
+- Treat `website/` as a first-party release surface, not a
   throwaway demo.
+- Keep the website out of `.github/`. Dependabot stopped being able to open npm
+  pull requests for manifests under `.github/` in June 2026 (its create-PR call
+  is rejected as "invalid or unauthorized changes"), which is why it lives at
+  the root.
 
 ## Build, Lint, and Test Commands
 

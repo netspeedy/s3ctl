@@ -1,7 +1,7 @@
 dist/
 bin/
 .cache/
-.github/assets/website/node_modules/
-.github/assets/website/.captures/
-.github/assets/website/dist/
+website/node_modules/
+website/.captures/
+website/dist/
 scripts/readme/inter-latin.ttf
