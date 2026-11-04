@@ -1,0 +1,504 @@
+---
+// The top of the home page: the title and lead on the left, and on the right a dark panel with
+// what s3ctl prints for a dry run, the same run as JSON, and a CSV batch. The output is the real
+// output of these commands; keep it in step with the quickstart and the JSON output reference.
+import { release } from "../lib/site";
+
+const { title } = Astro.locals.starlightRoute.entry.data;
+// "No console clicking. No IAM drift." goes on two lines.
+const lines = title.split(/(?<=\.)\s+/);
+
+const esc = (text: string) =>
+  text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const span = (cls: string, text: string) => `<span class="${cls}">${esc(text)}</span>`;
+
+/** One shell line: the command, flags, arguments and a trailing line continuation. */
+function shell(line: string, first: boolean): string {
+  let command = first;
+  const words = line.split(/( +)/).map((word) => {
+    if (!word.trim()) return word;
+    if (word === "\\") return span("m", word);
+    if (command) {
+      command = false;
+      return span("c", word);
+    }
+    return span(word.startsWith("-") ? "f" : "v", word);
+  });
+  return (first ? span("p", "$ ") : "") + words.join("");
+}
+const commandLines = (lines: string[]) => lines.map((line, i) => shell(line, i === 0));
+
+/** "Key: value" output, with the value coloured by what it says. */
+function output(line: string): string {
+  const match = line.match(/^([^:]+:) (.*)$/);
+  if (!match) return line.startsWith("=") ? span("m", line) : line ? span("h", line) : "";
+  const [, key, value] = match;
+  const names = ["Bucket:", "IAM user:", "Credential policy template:"];
+  const kind =
+    value === "yes"
+      ? "y"
+      : value === "dry-run"
+        ? "d"
+        : value.startsWith("(")
+          ? "g"
+          : value.startsWith("https://")
+            ? "u"
+            : names.includes(key)
+              ? "k"
+              : "";
+  return `${span("m", key)} ${kind ? span(kind, value) : esc(value)}`;
+}
+
+/** A line of JSON: keys, strings, literals and punctuation. */
+function json(line: string): string {
+  return line.replace(/("(?:[^"\\]|\\.)*")(\s*:)?|\b(true|false|null|\d+)\b|([{}[\],:])/g, (_, str, colon, lit, punct) => {
+    if (str) return colon ? span("jk", str) + span("jp", colon) : span("js", str);
+    if (lit) return span("jb", lit);
+    return span("jp", punct);
+  });
+}
+
+/** A CSV row: the header row's names, then values. */
+function csv(line: string, header: boolean): string {
+  return line
+    .split(",")
+    .map((cell, i) => span(header ? "jk" : i === 0 ? "k" : /^(true|false)$/.test(cell) ? "jb" : "js", cell))
+    .join(span("jp", ","));
+}
+
+const dryRun = [
+  "s3ctl --bucket app-data --create-scoped-credentials \\",
+  "    --endpoint https://objects.example.com --dry-run",
+];
+const dryRunOutput = `S3 Provisioning Result
+======================
+Resources: 1
+Mode: dry-run
+
+Bucket: app-data
+Endpoint: https://objects.example.com
+Region: us-east-1
+Bucket create planned: yes
+Versioning requested: no
+Encryption requested: no
+Bucket policy planned: no
+Scoped credentials planned: yes
+IAM user: app-data
+Credential policy template: bucket-readwrite
+Access key ID: (generated on apply)
+Secret access key: (generated on apply)`;
+const jsonOutput = `{
+  "operation": "provision",
+  "dry_run": true,
+  "resource_count": 1,
+  "resources": [{
+    "bucket_name": "app-data",
+    "endpoint": "https://objects.example.com",
+    "region": "us-east-1",
+    "created": true,
+    "versioning_enabled": false,
+    "encryption_enabled": false,
+    "scoped_credentials": {
+      "user_name": "app-data",
+      "policy_template": "bucket-readwrite",
+      "access_key_id": "(generated on apply)",
+      "secret_access_key": "(generated on apply)"
+    }
+  }]
+}`;
+const batchFile = `bucket,create_scoped_credentials,credential_policy_template,enable_versioning
+app-data,true,bucket-readwrite,true
+logs-archive,true,bucket-readonly,false`;
+const batch = [
+  "s3ctl \\",
+  "    --batch-file ./examples/aws/s3ctl-batch.csv \\",
+  "    --endpoint https://objects.example.com \\",
+  "    --region us-east-1 \\",
+  "    --create-scoped-credentials \\",
+  "    --dry-run --output json",
+];
+
+const join = (commands: string[]) => commands.map((line) => line.replace(/^ +/, "  ")).join("\n");
+const tabs = [
+  {
+    id: "dry-run",
+    label: "Dry run",
+    copy: join(dryRun),
+    lines: [...commandLines(dryRun), "", ...dryRunOutput.split("\n").map(output)],
+  },
+  {
+    id: "json",
+    label: "JSON output",
+    copy: join([dryRun[0], `${dryRun[1]} --output json`]),
+    lines: [...commandLines([dryRun[0], `${dryRun[1]} --output json`]), "", ...jsonOutput.split("\n").map(json)],
+  },
+  {
+    id: "batch",
+    label: "Batch",
+    copy: join(batch),
+    lines: [
+      span("cm", "# examples/aws/s3ctl-batch.csv"),
+      ...batchFile.split("\n").map((line, i) => csv(line, i === 0)),
+      "",
+      ...commandLines(batch),
+    ],
+  },
+];
+const install = "brew tap netspeedy/s3ctl && brew install s3ctl";
+const copyIcon =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>';
+---
+
+<section class="s3-home-top not-content">
+  <div class="s3-home-copy">
+    <p class="s3-home-label">s3ctl documentation{release.tagged && ` · ${release.version}`}</p>
+    <h1 id="_top">{lines.map((line, i) => (i ? [<br />, line] : line))}</h1>
+    <div class="s3-home-lead"><slot /></div>
+    <div class="s3-home-actions">
+      <a class="s3-button s3-button-primary" href={`${import.meta.env.BASE_URL}quickstart/`}>
+        Read the quickstart
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
+      <a class="s3-button" href={`${import.meta.env.BASE_URL}reference/cli/`}>CLI reference</a>
+    </div>
+    <s3ctl-copy class="s3-home-install" data-copy={install}>
+      <code><span class="s3-prompt">$ </span>{install}</code>
+      <button type="button" aria-label="Copy the install commands" set:html={copyIcon} />
+    </s3ctl-copy>
+  </div>
+
+  <s3ctl-code-tabs class="s3-panel">
+    <div class="s3-panel-head">
+      <div role="tablist" aria-label="Examples">
+        {
+          tabs.map((tab, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`s3-tab-${tab.id}`}
+              aria-controls={`s3-panel-${tab.id}`}
+              aria-selected={i === 0 ? "true" : "false"}
+              tabindex={i === 0 ? 0 : -1}
+            >
+              {tab.label}
+            </button>
+          ))
+        }
+      </div>
+      <button type="button" class="s3-panel-copy" aria-label="Copy the command" set:html={copyIcon} />
+    </div>
+    {
+      tabs.map((tab, i) => (
+        <div
+          class="s3-panel-body"
+          role="tabpanel"
+          id={`s3-panel-${tab.id}`}
+          aria-labelledby={`s3-tab-${tab.id}`}
+          data-copy={tab.copy}
+          hidden={i !== 0}
+          tabindex="0"
+        >
+          <pre set:html={tab.lines.join("\n")} />
+        </div>
+      ))
+    }
+  </s3ctl-code-tabs>
+</section>
+
+<script>
+  async function copy(text: string, button: HTMLElement) {
+    try {
+      await navigator.clipboard.writeText(text);
+      button.dataset.copied = "";
+      setTimeout(() => delete button.dataset.copied, 1600);
+    } catch {
+      // No clipboard access (an insecure origin or a refused permission): leave the text to select.
+    }
+  }
+
+  class CopyText extends HTMLElement {
+    connectedCallback() {
+      const button = this.querySelector("button");
+      button?.addEventListener("click", () => copy(this.dataset.copy ?? "", button));
+    }
+  }
+
+  class CodeTabs extends HTMLElement {
+    connectedCallback() {
+      const tabs = [...this.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+      const select = (chosen: HTMLButtonElement) => {
+        for (const tab of tabs) {
+          const on = tab === chosen;
+          tab.setAttribute("aria-selected", String(on));
+          tab.tabIndex = on ? 0 : -1;
+          const panel = document.getElementById(tab.getAttribute("aria-controls") ?? "");
+          if (panel) panel.hidden = !on;
+        }
+      };
+      tabs.forEach((tab, i) => {
+        tab.addEventListener("click", () => select(tab));
+        tab.addEventListener("keydown", (event) => {
+          const step = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+          if (!step) return;
+          const next = tabs[(i + step + tabs.length) % tabs.length];
+          select(next);
+          next.focus();
+        });
+      });
+      const copyButton = this.querySelector<HTMLButtonElement>(".s3-panel-copy");
+      copyButton?.addEventListener("click", () => {
+        const panel = this.querySelector<HTMLElement>('[role="tabpanel"]:not([hidden])');
+        if (panel) copy(panel.dataset.copy ?? "", copyButton);
+      });
+    }
+  }
+
+  customElements.define("s3ctl-copy", CopyText);
+  customElements.define("s3ctl-code-tabs", CodeTabs);
+</script>
+
+<style>
+  .s3-home-top {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: 3.5rem;
+    align-items: center;
+    padding: 2.5rem 0 4rem;
+  }
+  .s3-home-label {
+    margin: 0;
+    font-family: var(--__sl-font-mono);
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
+  h1 {
+    margin: 0.875rem 0 0;
+    font-size: clamp(2.375rem, 1.6rem + 2.4vw, 3.25rem);
+    line-height: 1.06;
+    font-weight: 700;
+    letter-spacing: -0.038em;
+    color: var(--sl-color-white);
+  }
+  .s3-home-lead {
+    max-width: 32.5rem;
+    margin-top: 1.25rem;
+    font-size: var(--sl-text-lg);
+    line-height: 1.65;
+    color: var(--sl-color-gray-2);
+  }
+  .s3-home-lead :global(p) {
+    margin: 0;
+  }
+  .s3-home-lead :global(code) {
+    padding: 0.0625rem 0.3125rem;
+    border: 1px solid var(--sl-color-hairline-shade);
+    border-radius: 5px;
+    background-color: var(--sl-color-gray-7);
+    font-size: 0.84em;
+    color: var(--sl-color-white);
+    white-space: nowrap;
+  }
+  .s3-home-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    margin-top: 1.875rem;
+  }
+  .s3-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 2.75rem;
+    padding: 0 1.125rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 9px;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    color: var(--sl-color-white);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .s3-button:hover {
+    border-color: var(--sl-color-gray-3);
+  }
+  .s3-button svg {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .s3-button-primary {
+    border-color: var(--sl-color-white);
+    background-color: var(--sl-color-white);
+    color: var(--sl-color-black);
+  }
+  .s3-button-primary:hover {
+    border-color: var(--sl-color-gray-1);
+    background-color: var(--sl-color-gray-1);
+  }
+  .s3-home-install {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 1.25rem;
+  }
+  .s3-home-install code {
+    font-family: var(--__sl-font-mono);
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-2);
+  }
+  .s3-prompt {
+    color: var(--sl-color-gray-3);
+  }
+  button {
+    font: inherit;
+    cursor: pointer;
+  }
+  .s3-home-install button,
+  .s3-panel-copy {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
+    background: none;
+    color: var(--sl-color-gray-3);
+  }
+  .s3-home-install button:hover {
+    color: var(--sl-color-white);
+  }
+  .s3-home-install button :global(svg),
+  .s3-panel-copy :global(svg) {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+  [data-copied] {
+    color: var(--s3-ok) !important;
+  }
+
+  /* The panel is dark in both themes, like every code block on the site. */
+  .s3-panel {
+    display: block;
+    min-width: 0;
+    border: 1px solid #1c2330;
+    border-radius: 14px;
+    background-color: #0b0f16;
+    box-shadow: 0 30px 60px -30px rgb(11 18 32 / 0.45);
+    overflow: hidden;
+    color: #dce4ee;
+  }
+  :global([data-theme="dark"]) .s3-panel {
+    box-shadow: none;
+  }
+  .s3-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    height: 2.75rem;
+    padding: 0 0.375rem;
+    border-bottom: 1px solid #1c2330;
+    background-color: #0f141d;
+  }
+  [role="tablist"] {
+    display: flex;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  [role="tab"] {
+    padding: 0.75rem 0.75rem 0.625rem;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    font-size: var(--sl-text-xs);
+    color: #8f9bab;
+    white-space: nowrap;
+  }
+  [role="tab"]:hover {
+    color: #e8ecf1;
+  }
+  [role="tab"][aria-selected="true"] {
+    border-bottom-color: #4bd8ff;
+    font-weight: 500;
+    color: #e8ecf1;
+  }
+  .s3-panel-copy {
+    flex: 0 0 auto;
+    color: #8f9bab;
+  }
+  .s3-panel-copy:hover {
+    color: #e8ecf1;
+  }
+  .s3-panel-body {
+    overflow-x: auto;
+  }
+  .s3-panel-body:focus-visible {
+    outline: 2px solid #4bd8ff;
+    outline-offset: -2px;
+  }
+  pre {
+    margin: 0;
+    padding: 1rem 1.125rem 1.25rem;
+    font-family: var(--__sl-font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.75;
+  }
+  pre :global(.p) {
+    color: #f5b841;
+  }
+  pre :global(.c),
+  pre :global(.h) {
+    color: #ffffff;
+    font-weight: 600;
+  }
+  pre :global(.f) {
+    color: #7fe3ff;
+  }
+  pre :global(.v) {
+    color: #fde1a7;
+  }
+  pre :global(.m),
+  pre :global(.jp) {
+    color: #7d8999;
+  }
+  pre :global(.k) {
+    color: #a8ecff;
+  }
+  pre :global(.y) {
+    color: #3cd788;
+  }
+  pre :global(.d),
+  pre :global(.jb) {
+    color: #f5b841;
+  }
+  pre :global(.g),
+  pre :global(.cm) {
+    color: #6b7686;
+    font-style: italic;
+  }
+  pre :global(.jk) {
+    color: #a5b1ff;
+  }
+  pre :global(.js),
+  pre :global(.u) {
+    color: #6fd8a5;
+  }
+
+  @media (max-width: 56rem) {
+    .s3-home-top {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2.25rem;
+      padding: 1rem 0 3.5rem;
+    }
+  }
+</style>

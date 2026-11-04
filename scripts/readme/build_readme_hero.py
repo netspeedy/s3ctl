@@ -3,12 +3,14 @@
 # requires-python = ">=3.11"
 # dependencies = ["fonttools==4.67.0", "brotli==1.2.0"]
 # ///
-"""Build the animated README hero, assets/s3ctl-readme-hero.svg.
+"""Build the animated README hero, assets/s3ctl-readme-hero.svg, and the icons made from its mark.
 
-The banner follows the soakes/cv README hero: the bucket mark, a two-line headline, a short body
-and a meta row on the left, and a generated scene on the right. The scene is the bucket from
-assets/logo.svg drawn large in dots, with a scan running down it and the steps s3ctl takes
-(bucket, versioning, bucket policy, scoped key) lighting up beside it in turn.
+The banner follows the soakes/cv README hero: the mark, a two-line headline, a short body and a
+meta row on the left, and a generated scene on the right. The mark is a pail seen slightly from
+above with a shell prompt cut into it (see Mark). The scene is that pail drawn large in dots,
+with the prompt lit and its cursor blinking, a scan running down it, and the steps s3ctl takes
+(bucket, versioning, bucket policy, scoped key) lighting up beside it in turn. When the repo has
+a website, the favicon, the Apple touch icon and favicon.ico are written from the same geometry.
 
 Edit the copy, layout or timing here and run `make readme-hero` rather than editing the
 generated SVG. The headline is positioned from measured advances (see ADVANCE); if you change
@@ -29,6 +31,7 @@ import math
 import os
 import random
 import shutil
+import struct
 import subprocess
 import tempfile
 import urllib.request
@@ -43,9 +46,12 @@ OUTPUT = ROOT / "assets" / "s3ctl-readme-hero.svg"
 # assets.netspeedy.io's Cloudflare zone turns away urllib's default user agent.
 USER_AGENT = "netspeedy-readme-hero"
 
-# The bucket mark's cyan and amber (assets/logo.svg), with oakes.me.uk's inks so the netspeedy
-# banners read as one family.
+# The mark's cyan on its ink tile, amber for accents, and oakes.me.uk's inks so the netspeedy
+# banners read as one family. DEEP_CYAN is the mark and link colour on light surfaces, where
+# CYAN is too pale (it's about 5:1 on white).
 BG = "#060B13"
+TILE = "#0B1220"
+DEEP_CYAN = "#0B74B8"
 INK = "#F1F5FA"
 INK_2 = "#B5C0CD"
 INK_3 = "#808D9E"
@@ -317,36 +323,137 @@ def starfield(free: list[tuple[float, float, float, float]]) -> tuple[list[str],
     return defs, body
 
 
-def bucket_symbols() -> list[str]:
-    """The bucket from assets/logo.svg: the full tile, and the outline on its own."""
-    outline = (
-        '<ellipse cx="32" cy="16" rx="14" ry="4.2" />'
-        '<path d="M18 16 L21.5 47 L42.5 47 L46 16" />'
-        '<path d="M19 25 L45 25" stroke-width="2.2" stroke-opacity="0.85" />'
-        '<path d="M20 34 L44 34" stroke-width="2.2" stroke-opacity="0.85" />'
+class Mark:
+    """The s3ctl mark on a 64-unit grid.
+
+    A pail seen slightly from above: an elliptical rim ring (each ellipse is `k` times as
+    tall as it is wide), a gap, then a body that tapers to `taper` of the rim's width, with a
+    shell prompt cut out of the body. Below 24px the mark uses SMALL, a heavier cut with a
+    thicker rim, a wider gap and the chevron alone.
+    """
+
+    def __init__(
+        self,
+        top: float = 13.5,
+        bottom: float = 52.5,
+        rx: float = 21.0,
+        taper: float = 0.8,
+        k: float = 0.28,
+        ring: float = 3.4,
+        gap: float = 3.0,
+        stroke: float = 3.6,
+        cursor: bool = True,
+        soften: float = 1.0,
+    ) -> None:
+        self.top, self.bottom, self.rx, self.rx_base = top, bottom, rx, rx * taper
+        self.k, self.ring, self.gap, self.stroke = k, ring, gap, stroke
+        self.cursor, self.soften = cursor, soften
+
+    def rx_at(self, y: float) -> float:
+        return self.rx + (self.rx_base - self.rx) * (y - self.top) / (self.bottom - self.top)
+
+    def rim(self) -> str:
+        """The rim ring: the outer ellipse with the mouth cut out (fill-rule evenodd)."""
+        rx, ry = self.rx, self.rx * self.k
+        ri, ryi = rx - self.ring, max(ry - self.ring * 0.75, 0.6)
+        return ellipse(32, self.top, rx, ry, 0) + ellipse(32, self.top, ri, ryi, 1)
+
+    def body(self) -> str:
+        """The body's front face, from the gap under the rim down to the base."""
+        y0, y1, k = self.top + self.gap, self.bottom, self.k
+        r0, r1 = self.rx_at(y0), self.rx_base
+        return (
+            f"M{n2(32 - r0)} {n2(y0)}A{n2(r0)} {n2(r0 * k)} 0 0 0 {n2(32 + r0)} {n2(y0)}"
+            f"L{n2(32 + r1)} {n2(y1)}A{n2(r1)} {n2(r1 * k)} 0 0 1 {n2(32 - r1)} {n2(y1)}Z"
+        )
+
+    def prompt(self) -> tuple[list[tuple[float, float]], list[tuple[float, float]]]:
+        """The chevron's three points and the cursor's two, optically centred on the body."""
+        mid = (self.top + self.gap + self.bottom) / 2 + 3.5
+        chevron = [(23.0, mid - 6), (29.5, mid), (23.0, mid + 6)]
+        cursor = [(33.0, mid + 6.5), (41.5, mid + 6.5)] if self.cursor else []
+        return chevron, cursor
+
+    def cut(self) -> str:
+        """Mask contents that cut the prompt out of the body."""
+        chevron, cursor = self.prompt()
+        parts = [
+            f'<path d="{polyline(chevron)}" fill="none" stroke="#000" stroke-width="{n2(self.stroke)}" '
+            'stroke-linecap="round" stroke-linejoin="round" />'
+        ]
+        if cursor:
+            parts.append(
+                f'<path d="{polyline(cursor)}" fill="none" stroke="#000" '
+                f'stroke-width="{n2(self.stroke)}" stroke-linecap="round" />'
+            )
+        return "".join(parts)
+
+    def glyph(self, colour: str, mask_id: str) -> str:
+        """The mark in one colour, referring to a mask made by mask()."""
+        soft = (
+            f' stroke="{colour}" stroke-width="{n2(self.soften)}" stroke-linejoin="round"'
+            if self.soften
+            else ""
+        )
+        return (
+            f'<path d="{self.rim()}" fill="{colour}" fill-rule="evenodd" />'
+            f'<path d="{self.body()}" fill="{colour}"{soft} mask="url(#{mask_id})" />'
+        )
+
+    def mask(self, mask_id: str) -> str:
+        return (
+            f'<mask id="{mask_id}" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">'
+            f'<rect width="64" height="64" fill="#fff" />{self.cut()}</mask>'
+        )
+
+
+MARK = Mark()
+SMALL = Mark(top=12.5, bottom=53.5, rx=22.5, ring=4.6, gap=3.8, stroke=6.4, cursor=False, soften=0)
+TILE_SCALE = {MARK: 0.78, SMALL: 0.86}  # how much of the tile the glyph fills
+
+
+def n2(value: float) -> str:
+    """Two decimal places without trailing zeros, for the 64-unit mark."""
+    return f"{value:.2f}".rstrip("0").rstrip(".")
+
+
+def ellipse(cx: float, cy: float, rx: float, ry: float, sweep: int) -> str:
+    return (
+        f"M{n2(cx - rx)} {n2(cy)}A{n2(rx)} {n2(ry)} 0 1 {sweep} {n2(cx + rx)} {n2(cy)}"
+        f"A{n2(rx)} {n2(ry)} 0 1 {sweep} {n2(cx - rx)} {n2(cy)}Z"
     )
-    keyhole = (
-        f'<g fill="{AMBER}"><circle cx="32" cy="39" r="2.8" />'
-        '<path d="M30.7 41 L33.3 41 L34.2 46.6 L29.8 46.6 Z" /></g>'
+
+
+def polyline(points: list[tuple[float, float]]) -> str:
+    return "M" + "L".join(f"{n2(x)} {n2(y)}" for x, y in points)
+
+
+def tile(mark: Mark, mask_id: str, radius: float = 14) -> str:
+    """The app icon: the cyan glyph on the ink tile, 64 units square."""
+    scale = TILE_SCALE[mark]
+    offset = 32 - 32 * scale
+    return (
+        f'<rect width="64" height="64" rx="{n2(radius)}" fill="{TILE}" />'
+        f'<g transform="translate({n2(offset)} {n2(offset)}) scale({n2(scale)})">'
+        f"{mark.glyph(CYAN, mask_id)}</g>"
     )
+
+
+def mark_symbols() -> list[str]:
+    """The mark as a symbol, for the lockup."""
     return [
-        *gradient(
-            "linearGradient",
-            'id="markStroke" x1="16" y1="14" x2="48" y2="50" gradientUnits="userSpaceOnUse"',
-            [("0", CYAN, ""), ("1", CYAN_3, "")],
-        ),
-        '    <symbol id="bucket" viewBox="0 0 64 64">',
-        '      <g fill="none" stroke="url(#markStroke)" stroke-width="3.4" stroke-linecap="round" '
-        f'stroke-linejoin="round">{outline}</g>{keyhole}',
-        "    </symbol>",
+        f"    {MARK.mask('markCut')}",
+        f'    <symbol id="mark" viewBox="0 0 64 64">{MARK.glyph(CYAN, "markCut")}</symbol>',
     ]
 
 
 def lockup() -> list[str]:
+    scale = TILE_SCALE[MARK]
     return [
-        '  <rect x="48.5" y="38.5" width="33" height="33" rx="8" fill="#0E1726" stroke="#3B4A5F" '
+        f'  <rect x="48.5" y="38.5" width="33" height="33" rx="7.5" fill="{TILE}" stroke="#22324A" '
         'stroke-width="1.2" />',
-        '  <use href="#bucket" x="49" y="39" width="32" height="32" />',
+        f'  <use href="#mark" x="{num(48.5 + 16.5 * (1 - scale))}" y="{num(38.5 + 16.5 * (1 - scale))}" '
+        f'width="{num(33 * scale)}" height="{num(33 * scale)}" />',
         f'  <text class="sans" x="94" y="52.5" font-size="15" font-weight="600" fill="{INK}">'
         "s3ctl</text>",
         f'  <text class="sans" x="94" y="69.5" font-size="12" fill="{INK_3}">'
@@ -432,22 +539,26 @@ def meta_row(labels: list[str]) -> str:
     )
 
 
-# Scene: monolith
+# Scene: the pail
 
 
-MONO_CX, MONO_TOP = 944.0, 62.0  # centre of the rim
-MONO_RX0, MONO_RX1 = 172.0, 126.0  # radius at the rim and at the base, so the bucket tapers
-MONO_DEPTH = 300.0  # rim to base
-MONO_RY = 0.22  # each ring's height as a share of its width: the view from slightly above
+# The mark scaled up PAIL_SCALE times, with its rim centred on (PAIL_CX, PAIL_TOP).
+PAIL_CX, PAIL_TOP, PAIL_SCALE = 944.0, 72.0, 7.0
 
 
-def radius(t: float) -> float:
-    return MONO_RX0 + (MONO_RX1 - MONO_RX0) * t / MONO_DEPTH
+def at(x: float, y: float) -> tuple[float, float]:
+    """A point on the mark's 64-unit grid, placed in the scene."""
+    return PAIL_CX + (x - 32) * PAIL_SCALE, PAIL_TOP + (y - MARK.top) * PAIL_SCALE
+
+
+def pail_radius(t: float) -> float:
+    """The pail's radius t px below the rim."""
+    return MARK.rx_at(MARK.top + t / PAIL_SCALE) * PAIL_SCALE
 
 
 def surface(t: float, theta: float) -> tuple[float, float]:
-    r = radius(t)
-    return MONO_CX + r * math.sin(theta), MONO_TOP + t + r * MONO_RY * math.cos(theta)
+    r = pail_radius(t)
+    return PAIL_CX + r * math.sin(theta), PAIL_TOP + t + r * MARK.k * math.cos(theta)
 
 
 def front_arc(t: float, steps: int = 48) -> str:
@@ -455,18 +566,34 @@ def front_arc(t: float, steps: int = 48) -> str:
     return "M" + "L".join(f"{num(x)} {num(y)}" for x, y in points)
 
 
-def scene_monolith() -> tuple[list[str], str, str, list[tuple[float, float, float, float]]]:
-    """The bucket mark as a dotted object, scanned top to bottom, with s3ctl's steps beside it."""
+def segment_distance(p: tuple[float, float], a: tuple[float, float], b: tuple[float, float]) -> float:
+    (px, py), (ax, ay), (bx, by) = p, a, b
+    dx, dy = bx - ax, by - ay
+    t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)))
+    return math.hypot(px - ax - t * dx, py - ay - t * dy)
+
+
+def scene_pail() -> tuple[list[str], str, str, list[tuple[float, float, float, float]]]:
+    """The mark as a dotted pail, its prompt lit, scanned top to bottom, with s3ctl's steps."""
     loop = 6.0
-    cx, top = MONO_CX, MONO_TOP
-    bottom = top + MONO_DEPTH
-    rx0, rx1 = MONO_RX0, MONO_RX1
+    s, k = PAIL_SCALE, MARK.k
+    cx, top = PAIL_CX, PAIL_TOP
+    rx0 = MARK.rx * s
+    depth = (MARK.bottom - MARK.top) * s
+    gap = MARK.gap * s
+    r_top, r_base = pail_radius(gap), MARK.rx_base * s
+
+    chevron, cursor = MARK.prompt()
+    chevron = [at(x, y) for x, y in chevron]
+    cursor = [at(x, y) for x, y in cursor]
+    strokes = list(zip(chevron, chevron[1:])) + [(cursor[0], cursor[1])]
+    clear = MARK.stroke * s / 2 + 5  # dots stay this far from the prompt's centre lines
 
     points = []
-    t = 9.0
+    t = gap + 7.0
     ring = 0
-    while t <= MONO_DEPTH:
-        r = radius(t)
+    while t <= depth:
+        r = pail_radius(t)
         count = int(2 * math.pi * r / 9.5)
         for q in range(count):
             theta = 2 * math.pi * (q + (ring & 1) * 0.5) / count
@@ -474,57 +601,77 @@ def scene_monolith() -> tuple[list[str], str, str, list[tuple[float, float, floa
             if c <= 0.03:
                 continue
             x, y = surface(t, theta)
+            if any(segment_distance((x, y), a, b) < clear for a, b in strokes):
+                continue
             band = 0 if c < 0.3 else 1 if c < 0.55 else 2 if c < 0.8 else 3
             points.append((x, y, band))
         t += 9.0
         ring += 1
     field = dot_paths(points, {0: (0.22, 1.2), 1: (0.38, 1.4), 2: (0.55, 1.55), 3: (0.72, 1.65)})
 
-    # The back half of the rim, down the right side, round the front of the base and back up.
-    rim = f"A{num(rx0)} {num(rx0 * MONO_RY)} 0 0 1 {num(cx + rx0)} {num(top)}"
-    base = f"A{num(rx1)} {num(rx1 * MONO_RY)} 0 0 1 {num(cx - rx1)} {num(bottom)}"
-    silhouette = f"M{num(cx - rx0)} {num(top)}{rim}L{num(cx + rx1)} {num(bottom)}{base}Z"
-    # The two bands across the logo's bucket.
-    bands = "".join(
-        f'<path d="{front_arc(MONO_DEPTH * f)}" fill="none" stroke="url(#bandGrad)" '
-        'stroke-width="2.4" stroke-linecap="round" />'
-        for f in (0.29, 0.58)
+    # The body's front face, as in the mark: the gap's front arc, down the right side, round
+    # the front of the base and back up.
+    y0, y1 = top + gap, top + depth
+    body = (
+        f"M{num(cx - r_top)} {num(y0)}A{num(r_top)} {num(r_top * k)} 0 0 0 {num(cx + r_top)} {num(y0)}"
+        f"L{num(cx + r_base)} {num(y1)}A{num(r_base)} {num(r_base * k)} 0 0 1 {num(cx - r_base)} {num(y1)}Z"
     )
+    ring_w = MARK.ring * s
+    rim = (
+        f'<path d="M{num(cx - rx0)} {num(top)}A{num(rx0)} {num(rx0 * k)} 0 1 0 {num(cx + rx0)} {num(top)}'
+        f"A{num(rx0)} {num(rx0 * k)} 0 1 0 {num(cx - rx0)} {num(top)}Z"
+        f"M{num(cx - rx0 + ring_w)} {num(top)}"
+        f"A{num(rx0 - ring_w)} {num(rx0 * k - ring_w * 0.75)} 0 1 1 {num(cx + rx0 - ring_w)} {num(top)}"
+        f"A{num(rx0 - ring_w)} {num(rx0 * k - ring_w * 0.75)} 0 1 1 {num(cx - rx0 + ring_w)} {num(top)}Z"
+        '" fill="url(#rimGrad)" fill-rule="evenodd" />'
+    )
+    mouth = (
+        f'<ellipse cx="{num(cx)}" cy="{num(top)}" rx="{num(rx0 - ring_w)}" '
+        f'ry="{num(rx0 * k - ring_w * 0.75)}" fill="url(#mouth)" />'
+    )
+
     scans = []
     step = 12.0
-    count = int(MONO_DEPTH / step)
+    count = int((depth - gap) / step)
     sweep = 2.6
-    for k in range(count + 1):
-        delay = k * sweep / count
+    for q in range(count + 1):
+        delay = q * sweep / count
         scans.append(
-            f'<path class="sc" d="{front_arc(k * step)}" fill="none" stroke="{CYAN_2}" '
+            f'<path class="sc" d="{front_arc(gap + q * step)}" fill="none" stroke="{CYAN_2}" '
             f'stroke-width="1.3" style="animation-delay:{delay:.2f}s" />'
         )
 
-    # Keyhole on the front, where the logo puts it.
-    kt = MONO_DEPTH * 0.74
-    kx, ky = surface(kt, 0)
-    keyhole = (
-        f'<circle class="kh" cx="{num(kx)}" cy="{num(ky - 6)}" r="34" fill="url(#keyholeGlow)" />'
-        f'<circle cx="{num(kx)}" cy="{num(ky - 12)}" r="10" fill="{AMBER}" />'
-        f'<path d="M{num(kx - 5)} {num(ky - 5)}h10l3.5 22h-17z" fill="{AMBER}" />'
+    # The prompt, lit: a soft glow under each stroke, the chevron in pale cyan and the cursor
+    # in amber, blinking.
+    width = MARK.stroke * s * 0.56
+    chevron_d = "M" + "L".join(f"{num(x)} {num(y)}" for x, y in chevron)
+    cursor_d = f"M{num(cursor[0][0])} {num(cursor[0][1])}H{num(cursor[1][0])}"
+    prompt = (
+        f'<path d="{chevron_d}" fill="none" stroke="{CYAN}" stroke-opacity="0.16" '
+        f'stroke-width="{num(width * 2.4)}" stroke-linecap="round" stroke-linejoin="round" />'
+        f'<path d="{chevron_d}" fill="none" stroke="{CYAN_2}" stroke-width="{num(width)}" '
+        'stroke-linecap="round" stroke-linejoin="round" />'
+        f'<g class="cur"><path d="{cursor_d}" fill="none" stroke="{AMBER}" stroke-opacity="0.2" '
+        f'stroke-width="{num(width * 2.4)}" stroke-linecap="round" />'
+        f'<path d="{cursor_d}" fill="none" stroke="{AMBER}" stroke-width="{num(width)}" '
+        'stroke-linecap="round" /></g>'
     )
 
     steps = [
-        ("BUCKET", 30.0, CYAN_2),
-        ("VERSIONING", 100.0, CYAN_2),
-        ("BUCKET POLICY", 170.0, CYAN_2),
-        ("SCOPED KEY", 240.0, AMBER_2),
+        ("BUCKET", 44.0, CYAN_2),
+        ("VERSIONING", 106.0, CYAN_2),
+        ("BUCKET POLICY", 168.0, CYAN_2),
+        ("SCOPED KEY", 230.0, AMBER_2),
     ]
     labels = []
-    for k, (label, at, colour) in enumerate(steps):
-        ax, ay = surface(at, -1.05)
-        width = mono_width(len(label), 10.5, 1.2) - 1.2 + 16
+    for q, (label, depth_at, colour) in enumerate(steps):
+        ax, ay = surface(depth_at, -1.05)
+        chip_w = mono_width(len(label), 10.5, 1.2) - 1.2 + 16
         bx = 600.0
         by = ay - 10
         labels.append(
-            f'<g class="st" style="animation-delay:{k * loop / len(steps) - loop:.2f}s">'
-            f'<path d="M{num(bx + width)} {num(ay)}H{num(ax - 4)}" fill="none" stroke="{colour}" '
+            f'<g class="st" style="animation-delay:{q * loop / len(steps) - loop:.2f}s">'
+            f'<path d="M{num(bx + chip_w)} {num(ay)}H{num(ax - 4)}" fill="none" stroke="{colour}" '
             'stroke-opacity="0.5" stroke-width="1" />'
             f'<circle cx="{num(ax)}" cy="{num(ay)}" r="3" fill="{colour}" />'
             f'<circle class="ping" cx="{num(ax)}" cy="{num(ay)}" r="3" fill="none" '
@@ -534,7 +681,7 @@ def scene_monolith() -> tuple[list[str], str, str, list[tuple[float, float, floa
     defs = [
         *gradient(
             "linearGradient",
-            'id="monoBody" x1="0" y1="0" x2="1" y2="0"',
+            'id="pailBody" x1="0" y1="0" x2="1" y2="0"',
             [("0", "#081322", ""), ("0.5", "#0E2036", ""), ("1", "#081322", "")],
         ),
         *gradient(
@@ -545,30 +692,20 @@ def scene_monolith() -> tuple[list[str], str, str, list[tuple[float, float, floa
         *gradient(
             "linearGradient",
             'id="rimGrad" x1="0" y1="0" x2="1" y2="1"',
-            [("0", CYAN, ""), ("1", CYAN_3, "")],
-        ),
-        *gradient(
-            "linearGradient",
-            'id="bandGrad" x1="0" y1="0" x2="1" y2="0"',
-            [("0", CYAN_3, "0.15"), ("0.5", CYAN, "0.95"), ("1", CYAN_3, "0.15")],
-        ),
-        *gradient(
-            "radialGradient",
-            'id="keyholeGlow" cx="0.5" cy="0.5" r="0.5"',
-            [("0", AMBER, "0.7"), ("0.35", AMBER, "0.22"), ("1", AMBER, "0")],
+            [("0", CYAN_2, ""), ("0.45", CYAN, ""), ("1", CYAN_3, "")],
         ),
         *gradient(
             "radialGradient",
             'id="aura" cx="0.5" cy="0.45" r="0.5"',
             [("0", CYAN_3, "0.32"), ("0.6", CYAN_3, "0.1"), ("1", CYAN_3, "0")],
         ),
-        f'    <clipPath id="monoClip"><path d="{silhouette}" /></clipPath>',
+        f'    <clipPath id="pailClip"><path d="{body}" /></clipPath>',
     ]
     css = (
         f".sc{{opacity:0;animation:sc {loop}s linear infinite}}"
         f"@keyframes sc{{0%{{opacity:0}}1.5%{{opacity:.85}}9%{{opacity:0}}100%{{opacity:0}}}}"
-        ".kh{animation:kh 3s ease-in-out infinite}"
-        "@keyframes kh{0%,100%{opacity:.6}50%{opacity:1}}"
+        ".cur{animation:cur 1.1s step-end infinite}"
+        "@keyframes cur{0%{opacity:1}50%{opacity:0}}"
         f".st{{animation:st {loop}s ease-out infinite}}"
         f"@keyframes st{{0%{{opacity:1}}20%{{opacity:1}}30%{{opacity:.45}}100%{{opacity:.45}}}}"
         ".ping{transform-box:fill-box;transform-origin:center;opacity:0;"
@@ -579,17 +716,18 @@ def scene_monolith() -> tuple[list[str], str, str, list[tuple[float, float, floa
     scene = "".join(
         [
             f'<ellipse cx="{num(cx)}" cy="{num(top + 150)}" rx="330" ry="230" fill="url(#aura)" />',
-            f'<path d="{silhouette}" fill="url(#monoBody)" />',
-            f'<path d="{silhouette}" fill="none" stroke="{CYAN}" stroke-opacity="0.35" '
+            f'<path d="{body}" fill="url(#pailBody)" />',
+            f'<path d="{body}" fill="none" stroke="{CYAN}" stroke-opacity="0.35" '
             'stroke-width="1.2" />',
-            f'<g clip-path="url(#monoClip)">{field}{bands}{"".join(scans)}</g>',
-            f'<ellipse cx="{num(cx)}" cy="{num(top)}" rx="{num(rx0)}" ry="{num(rx0 * MONO_RY)}" '
-            'fill="url(#mouth)" stroke="url(#rimGrad)" stroke-width="2.6" />',
-            keyhole,
+            f'<g clip-path="url(#pailClip)">{field}{"".join(scans)}</g>',
+            mouth,
+            rim,
+            prompt,
             "".join(labels),
         ]
     )
-    return defs, css, scene, [(cx - rx0 - 20, top - 50, cx + rx0 + 20, bottom + 40)]
+    bottom = top + depth + r_base * k
+    return defs, css, scene, [(cx - rx0 - 20, top - rx0 * k - 30, cx + rx0 + 20, bottom + 20)]
 
 
 # Copy
@@ -597,8 +735,9 @@ def scene_monolith() -> tuple[list[str], str, str, list[tuple[float, float, floa
 CARD = {
     "title": "s3ctl - no console clicking, no IAM drift",
     "desc": (
-        "The s3ctl bucket mark drawn as a large dotted bucket with an amber keyhole, scanned from "
-        "top to bottom, with the steps s3ctl runs: bucket, versioning, bucket policy, scoped key."
+        "The s3ctl mark, a pail with a shell prompt cut into it, drawn as a large dotted pail with "
+        "its prompt lit and the cursor blinking, scanned from top to bottom, with the steps s3ctl "
+        "runs: bucket, versioning, bucket policy, scoped key."
     ),
     "headline": ("No ", "console", " clicking.", "No IAM drift."),
     "body": [
@@ -610,7 +749,7 @@ CARD = {
         ],
     ],
     "meta": ["PLAN", "CREATE", "ROTATE", "DELETE"],
-    "scene": scene_monolith,
+    "scene": scene_pail,
 }
 
 
@@ -637,7 +776,7 @@ def build_svg(spec: dict = CARD) -> str:
         "      }",
         "    </style>",
         *star_defs,
-        *bucket_symbols(),
+        *mark_symbols(),
         *head_defs,
         *scene_defs,
         '    <clipPath id="frame"><rect x="1" y="1" width="1198" height="398" rx="20" />'
@@ -766,13 +905,16 @@ def build_social_svg(hero: str, width: int, height: int) -> str:
     return ET.tostring(card, encoding="unicode") + "\n"
 
 
-def render_png(svg_path: Path, png_path: Path, width: int, height: int) -> None:
-    """Screenshot the card in headless Chrome, which renders the embedded fonts exactly."""
+def render_png(
+    svg_path: Path, png_path: Path, width: int, height: int, transparent: bool = False
+) -> None:
+    """Screenshot an SVG in headless Chrome, which renders the embedded fonts exactly."""
     chrome = os.environ.get("CHROME") or next(
         (c for c in CHROME_CANDIDATES if Path(c).exists() or shutil.which(c)), None
     )
     if not chrome:
-        raise SystemExit("the social cards need Chrome or Chromium to render; set CHROME")
+        raise SystemExit("the social cards and icons need Chrome or Chromium to render; set CHROME")
+    background = ["--default-background-color=00000000"] if transparent else []
     with tempfile.TemporaryDirectory() as profile:
         subprocess.run(
             [
@@ -780,6 +922,7 @@ def render_png(svg_path: Path, png_path: Path, width: int, height: int) -> None:
                 "--headless=new",
                 "--disable-gpu",
                 "--hide-scrollbars",
+                *background,
                 f"--user-data-dir={profile}",
                 f"--window-size={width},{height}",
                 f"--screenshot={png_path}",
@@ -807,6 +950,77 @@ def write_social_cards(hero: str) -> None:
         print(f"Wrote {png.relative_to(ROOT)} ({width}x{height})")
 
 
+# Icons
+
+# Written into the website's public folder, so they're only made when the repo has a website.
+# The favicon is the 16px cut, which browsers scale up; the Apple touch icon fills its square
+# because iOS rounds the corners itself; favicon.ico carries 16, 32 and 48 px PNGs for clients
+# that ignore the SVG.
+ICON_DIR = ROOT / "website" / "public"
+SITE_MARK = ROOT / "website" / "src" / "assets" / "mark.svg"
+
+
+def icon_svg(mark: Mark, size: int | None = None, square: bool = False) -> str:
+    dims = f' width="{size}" height="{size}"' if size else ""
+    if square:
+        scale = 0.64
+        offset = 32 - 32 * scale
+        art = (
+            f'<rect width="64" height="64" fill="{TILE}" />'
+            f'<g transform="translate({n2(offset)} {n2(offset)}) scale({n2(scale)})">'
+            f'{mark.glyph(CYAN, "cut")}</g>'
+        )
+    else:
+        art = tile(mark, "cut")
+    return (
+        f'<svg xmlns="{SVG_NS}" viewBox="0 0 64 64"{dims}><title>s3ctl</title>'
+        f'<defs>{mark.mask("cut")}</defs>{art}</svg>\n'
+    )
+
+
+def ico(images: list[tuple[int, bytes]]) -> bytes:
+    """An ICO file holding PNG images, which every current client reads."""
+    header = struct.pack("<HHH", 0, 1, len(images))
+    entries, data = b"", b""
+    offset = 6 + 16 * len(images)
+    for size, png in images:
+        entries += struct.pack("<BBBBHHII", size % 256, size % 256, 0, 0, 1, 32, len(png), offset)
+        data += png
+        offset += len(png)
+    return header + entries + data
+
+
+def write_icons() -> None:
+    if not (ROOT / "website").is_dir():
+        return
+    # The site's header mark, in currentColor so the page's theme can colour it.
+    SITE_MARK.parent.mkdir(parents=True, exist_ok=True)
+    SITE_MARK.write_text(
+        f'<svg xmlns="{SVG_NS}" viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
+        f'<defs>{MARK.mask("s3-mark-cut")}</defs>{MARK.glyph("currentColor", "s3-mark-cut")}</svg>\n',
+        encoding="utf-8",
+    )
+    print(f"Wrote {SITE_MARK.relative_to(ROOT)}")
+    ICON_DIR.mkdir(parents=True, exist_ok=True)
+    favicon = ICON_DIR / "favicon.svg"
+    favicon.write_text(icon_svg(SMALL), encoding="utf-8")
+    print(f"Wrote {favicon.relative_to(ROOT)}")
+    with tempfile.TemporaryDirectory() as tmp:
+        work = Path(tmp)
+
+        def png(mark: Mark, size: int, square: bool = False) -> bytes:
+            src, out = work / f"icon-{size}.svg", work / f"icon-{size}.png"
+            src.write_text(icon_svg(mark, size, square), encoding="utf-8")
+            render_png(src, out, size, size, transparent=not square)
+            return out.read_bytes()
+
+        touch = ICON_DIR / "apple-touch-icon.png"
+        touch.write_bytes(png(MARK, 180, square=True))
+        print(f"Wrote {touch.relative_to(ROOT)} (180x180)")
+        fallback = ICON_DIR / "favicon.ico"
+        fallback.write_bytes(ico([(16, png(SMALL, 16)), (32, png(MARK, 32)), (48, png(MARK, 48))]))
+        print(f"Wrote {fallback.relative_to(ROOT)} (16, 32 and 48 px)")
+
 
 def main() -> None:
     hero = build_svg()
@@ -818,6 +1032,7 @@ def main() -> None:
     OUTPUT.write_text(svg, encoding="utf-8")
     print(f"Wrote {OUTPUT.relative_to(ROOT)} ({len(svg.encode()) / 1024:.1f} KiB)")
     write_social_cards(hero)
+    write_icons()
 
 
 if __name__ == "__main__":

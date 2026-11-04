@@ -1,0 +1,39 @@
+---
+import Mark from "./Mark.astro";
+
+const { siteTitleHref } = Astro.locals.starlightRoute;
+---
+
+<a href={siteTitleHref} class="s3-site-title">
+  <Mark size={26} />
+  <span class="s3-name" translate="no">s3ctl</span>
+  <span class="s3-divider" aria-hidden="true"></span>
+  <span class="s3-docs-label">Docs</span>
+</a>
+
+<style>
+  .s3-site-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-width: 0;
+    color: var(--sl-color-white);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .s3-name {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .s3-divider {
+    width: 1px;
+    height: 1.125rem;
+    background-color: var(--sl-color-gray-5);
+  }
+  .s3-docs-label {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--sl-color-gray-3);
+  }
+</style>

@@ -1,0 +1,126 @@
+---
+title: CLI reference
+description: Every flag s3ctl accepts, with its default, grouped by what it's for.
+---
+
+import FlagTable from "../../../components/FlagTable.astro";
+
+{/*
+  internal/cli's TestCLIReferenceCoversEveryFlag fails when a flag is missing here, so add new
+  flags to the right group below when you add them to the CLI.
+*/}
+
+export const input = [
+  { short: "-c", flag: "--config", arg: "PATH", description: "Path to a JSON config file. Flag only." },
+  { flag: "--provider", arg: "NAME", default: "s3", description: "Provisioning provider: `s3` or `ovh`." },
+  { short: "-b", flag: "--bucket", arg: "NAME", repeatable: true, description: "Bucket name to create or delete. In the config, `bucket` for one or `buckets` for a list." },
+  { flag: "--batch-file", arg: "PATH", description: "CSV file describing multiple bucket requests." },
+];
+
+export const s3 = [
+  { flag: "--endpoint", arg: "URL", description: "S3 endpoint URL for S3-compatible services." },
+  { flag: "--region", arg: "NAME", default: "us-east-1", description: "Bucket region." },
+  { flag: "--profile", arg: "NAME", description: "AWS profile name for SDK configuration." },
+  { flag: "--access-key", arg: "ID", description: "Access key for the S3 API client. Needs `--secret-key`." },
+  { flag: "--secret-key", arg: "SECRET", description: "Secret key for the S3 API client. Needs `--access-key`." },
+  { flag: "--session-token", arg: "TOKEN", description: "Session token for temporary credentials. Needs both keys." },
+  { flag: "--insecure", description: "Disable TLS certificate verification." },
+];
+
+export const bucket = [
+  { flag: "--enable-versioning", description: "Enable bucket versioning after creation." },
+  { flag: "--bucket-policy-file", arg: "PATH", description: "Path to a JSON bucket policy document." },
+  { flag: "--bucket-policy-template", arg: "NAME", description: "Built-in bucket policy template: `deny-insecure-transport` or `public-read`." },
+];
+
+export const scoped = [
+  { flag: "--create-scoped-credentials", description: "Create a scoped IAM-style user and access key for each bucket." },
+  { flag: "--credential-policy-template", arg: "NAME", default: "bucket-readwrite", description: "Policy for the scoped user: `bucket-readonly`, `bucket-readwrite` or `bucket-admin`." },
+  { flag: "--iam-endpoint", arg: "URL", description: "IAM API endpoint, when it isn't AWS IAM." },
+  { flag: "--iam-user-name", arg: "NAME", description: "Explicit IAM user name, for a run with a single bucket." },
+  { flag: "--iam-user-prefix", arg: "PREFIX", description: "Prefix for automatically generated IAM user names." },
+  { flag: "--iam-path", arg: "PATH", description: "IAM path for generated users." },
+];
+
+export const ovh = [
+  { flag: "--ovh-service-name", arg: "PROJECT_ID", description: "Public Cloud project service name, the project's long ID." },
+  { flag: "--ovh-api-endpoint", arg: "URL", description: "OVHcloud API endpoint name or URL." },
+  { flag: "--ovh-client-id", arg: "ID", description: "OAuth2 client ID." },
+  { flag: "--ovh-client-secret", arg: "SECRET", description: "OAuth2 client secret." },
+  { flag: "--ovh-access-token", arg: "TOKEN", description: "OVHcloud access token." },
+  { flag: "--ovh-application-key", arg: "KEY", description: "Application key, for classic API credentials." },
+  { flag: "--ovh-application-secret", arg: "SECRET", description: "Application secret, for classic API credentials." },
+  { flag: "--ovh-consumer-key", arg: "KEY", description: "Consumer key, for classic API credentials." },
+  { flag: "--ovh-s3-endpoint", arg: "URL", description: "Override the S3 endpoint URL OVHcloud returns." },
+  { flag: "--ovh-user-role", arg: "ROLE", default: "objectstore_operator", description: "Public Cloud user role for created object storage users." },
+  { flag: "--ovh-storage-policy-role", arg: "ROLE", default: "readWrite", description: "Access policy role: `admin`, `deny`, `readOnly`, `readWrite` or `replication`." },
+  { flag: "--ovh-encrypt-data", description: "Enable server-side encryption with OVH-managed keys." },
+  { flag: "--ovh-tag", arg: "KEY=VALUE", repeatable: true, description: "Tag to apply to OVHcloud containers. In the config, an `ovh_tags` object." },
+  { flag: "--ovh-rotate-credentials", description: "Rotate each existing bucket's S3 credentials instead of creating containers." },
+  { flag: "--ovh-repair-policies", description: "Reapply scoped S3 and container policies to existing bucket users without rotating credentials." },
+];
+
+export const lifecycle = [
+  { flag: "--dry-run", description: "Show the planned actions without making changes." },
+  { flag: "--delete", description: "Delete each bucket instead of creating it. Config key `delete_bucket`." },
+  { flag: "--force", description: "Let a delete remove bucket contents first. Without it, only empty buckets are deleted." },
+  { short: "-o", flag: "--output", arg: "FORMAT", default: "text", description: "Output format: `text` or `json`. Failures are JSON too when this is `json`." },
+  { flag: "--timeout", arg: "DURATION", default: "10m0s", description: "Overall operation timeout, such as `30s`, `5m` or `1h`." },
+  { short: "-h", flag: "--help", description: "Show the short reference. Flag only." },
+  { flag: "--help-full", description: "Show every flag, template and CSV column. Flag only." },
+  { flag: "--version", description: "Show version information. Flag only." },
+];
+
+## Usage
+
+```bash
+s3ctl [flags]
+s3ctl --help        # the commands you'll use most
+s3ctl --help-full   # every flag, template and CSV column
+```
+
+Flags win over the JSON config, and the config wins over built-in defaults. Most flags have a config
+key of the same name in snake case, so `--enable-versioning` becomes `enable_versioning`; the tables
+note the exceptions. Without `--config`, s3ctl reads `$XDG_CONFIG_HOME/s3ctl/config.json`, then
+`$HOME/.config/s3ctl/config.json`.
+
+## Input
+
+Which provider to use, which buckets to work on, and where the rest of the settings come from.
+[Batch provisioning](/s3ctl/guides/batch-provisioning/) lists the CSV columns.
+
+<FlagTable flags={input} />
+
+## S3 connection
+
+Used by the `s3` provider. When neither a profile nor explicit keys are set, the AWS SDK's standard
+credential discovery applies. Use a profile or explicit keys, not both.
+
+<FlagTable flags={s3} />
+
+## Bucket settings
+
+Use either a bucket policy file or a template, not both.
+
+<FlagTable flags={bucket} />
+
+## Scoped credentials
+
+For the `s3` provider these go through the IAM API. See
+[scoped credentials](/s3ctl/guides/scoped-credentials/).
+
+<FlagTable flags={scoped} />
+
+## OVHcloud
+
+Used with `--provider ovh`. When no OVHcloud authentication is set, go-ovh's standard discovery
+applies, including `ovh.conf`.
+
+<FlagTable flags={ovh} />
+
+## Lifecycle and output
+
+`--delete`, `--ovh-rotate-credentials` and `--ovh-repair-policies` are separate modes; use one at a
+time.
+
+<FlagTable flags={lifecycle} />

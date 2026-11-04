@@ -67,8 +67,8 @@ jobs:
       - name: Validate GitHub Pages website
         run: |
           npm ci --prefix website
-          make website-check
           make website-build
+          make website-check
 
       - name: Run vet
         run: make vet

@@ -4,4 +4,5 @@ bin/
 website/node_modules/
 website/.captures/
 website/dist/
+website/.astro/
 __pycache__/

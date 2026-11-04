@@ -1,0 +1,171 @@
+---
+import Search from "@astrojs/starlight/components/Search.astro";
+import { links, release } from "../lib/site";
+import SiteTitle from "./SiteTitle.astro";
+import ThemeSelect from "./ThemeSelect.astro";
+
+// Section tabs are shortcuts into the sidebar's groups, not separate sidebars. The home page is
+// the landing page and sits outside the sidebar, so no tab is current there.
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const path = Astro.url.pathname.slice(base.length);
+const section =
+  path === "/" || path === ""
+    ? undefined
+    : path.startsWith("/reference/")
+      ? "reference"
+      : path.startsWith("/ovhcloud/")
+        ? "ovhcloud"
+        : "guides";
+const tabs = [
+  { id: "guides", label: "Guides", href: `${base}/introduction/` },
+  { id: "reference", label: "CLI reference", href: `${base}/reference/cli/` },
+  { id: "ovhcloud", label: "OVHcloud", href: `${base}/ovhcloud/` },
+];
+---
+
+<div class="s3-header">
+  <div class="s3-bar">
+    <div class="s3-title"><SiteTitle /></div>
+    <div class="s3-search print:hidden"><Search /></div>
+    <div class="s3-actions sl-hidden md:sl-flex print:hidden">
+      <a class="s3-version" href={release.url}>
+        <span class="s3-dot" aria-hidden="true"></span>{release.version}
+      </a>
+      <a class="s3-link" href={links.repo}>
+        GitHub
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16L16 8M9 8h7v7"></path></svg>
+      </a>
+      <ThemeSelect />
+    </div>
+  </div>
+  <nav class="s3-tabs print:hidden" aria-label="Sections">
+    {
+      tabs.map(({ id, label, href }) => (
+        <a href={href} aria-current={id === section ? "page" : undefined}>
+          {label}
+        </a>
+      ))
+    }
+    <a href={links.releases}>
+      Releases
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16L16 8M9 8h7v7"></path></svg>
+    </a>
+  </nav>
+</div>
+
+<style>
+  .s3-header {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .s3-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: var(--s3-bar);
+    min-width: 0;
+  }
+  .s3-title {
+    display: flex;
+    min-width: 0;
+    overflow: clip;
+    padding: 0.25rem;
+    margin: -0.25rem;
+  }
+  .s3-search {
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: flex-end;
+  }
+  .s3-actions {
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--sl-text-sm);
+  }
+  .s3-version,
+  .s3-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.625rem 0.625rem;
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+  }
+  .s3-version {
+    font-family: var(--__sl-font-mono);
+    font-size: var(--sl-text-xs);
+  }
+  .s3-version:hover,
+  .s3-link:hover {
+    color: var(--sl-color-white);
+  }
+  .s3-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--s3-ok-dot);
+  }
+  .s3-actions :global(.s3-theme) {
+    margin-inline-start: 0.5rem;
+  }
+  svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .s3-tabs {
+    display: flex;
+    align-items: stretch;
+    gap: 0.25rem;
+    height: var(--s3-tabs);
+    margin-inline: -0.75rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    font-size: var(--sl-text-sm);
+    font-weight: 500;
+  }
+  .s3-tabs a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0 0.75rem;
+    border-bottom: 2px solid transparent;
+    color: var(--sl-color-gray-3);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .s3-tabs a:hover {
+    color: var(--sl-color-white);
+  }
+  .s3-tabs a[aria-current="page"] {
+    border-bottom-color: var(--sl-color-text-accent);
+    color: var(--sl-color-white);
+  }
+
+  /* Pages without a sidebar, like the home page, have no mobile menu, so the theme switch stays
+     in the bar on phones there. */
+  @media (max-width: 49.99rem) {
+    :global(:root:not([data-has-sidebar])) .s3-actions {
+      display: flex;
+    }
+    :global(:root:not([data-has-sidebar])) :is(.s3-version, .s3-link) {
+      display: none;
+    }
+  }
+
+  @media (min-width: 50rem) {
+    .s3-search {
+      flex: 0 1 22rem;
+      justify-content: flex-start;
+      margin-inline-start: 1.5rem;
+    }
+    .s3-actions {
+      margin-inline-start: auto;
+    }
+  }
+</style>

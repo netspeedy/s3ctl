@@ -1,0 +1,13 @@
+---
+import Default from "@astrojs/starlight/components/Head.astro";
+import { currentSection } from "../lib/sections";
+
+// The page's section colour, for everything that follows it: the breadcrumb, step numbers, list
+// markers, table of contents and pager. Pages outside the sidebar, such as the 404, use the
+// first section's.
+const hue = currentSection(Astro.locals.starlightRoute.sidebar)?.hue ?? "c1";
+const css = `:root{--s3-page:var(--s3-${hue});--s3-page-bg:var(--s3-${hue}-bg);--s3-page-line:var(--s3-${hue}-line);--s3-page-ink:var(--s3-${hue}-ink)}`;
+---
+
+<Default />
+<style is:inline set:html={css} />

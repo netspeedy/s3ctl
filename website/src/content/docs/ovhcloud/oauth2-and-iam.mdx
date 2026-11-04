@@ -1,0 +1,150 @@
+---
+title: OAuth2 and IAM setup
+description: Create an OAuth2 service account for s3ctl and grant it access to your Public Cloud project.
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+s3ctl works best with an OAuth2 service account: create it, grant it an IAM policy on the Public
+Cloud project, and put its client ID and secret in your config. When it then runs, s3ctl creates a
+bucket-dedicated Public Cloud user and the container, attaches the user with the container policy
+role, imports the bucket-scoped S3 user policy, creates the S3 key, and returns the endpoint, region
+and credentials.
+
+## Create the service account
+
+The official `ovhcloud` CLI is the cleanest route. Install it from
+[OVHcloud's getting started guide](https://help.ovhcloud.com/csm/en-cli-getting-started?id=kb_article_view&sysparm_article=KB0072704),
+with Homebrew:
+
+```bash
+brew install --cask ovh/tap/ovhcloud-cli
+```
+
+or without it:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ovh/ovhcloud-cli/main/install.sh | sh
+```
+
+Sign in, then create the credentials:
+
+```bash
+ovhcloud login
+ovhcloud account api oauth2 client create \
+  --name "s3ctl" \
+  --description "s3ctl bucket provisioning" \
+  --flow "CLIENT_CREDENTIALS"
+```
+
+OVHcloud returns a `clientId` and `clientSecret`. Use them as `ovh_client_id` and
+`ovh_client_secret` in your s3ctl config.
+
+You can also create the client in the API console for your account's region
+([EU](https://eu.api.ovh.com/console/?branch=v1&section=%2Fme),
+[CA](https://ca.api.ovh.com/console/?branch=v1&section=%2Fme),
+[US](https://api.us.ovhcloud.com/console/?branch=v1&section=%2Fme)): open `POST /me/api/oauth2/client`
+and submit:
+
+```json
+{
+  "callbackUrls": [],
+  "flow": "CLIENT_CREDENTIALS",
+  "name": "s3ctl",
+  "description": "s3ctl bucket provisioning"
+}
+```
+
+## Grant it access to the project
+
+The service account can't grant access to itself. Use the account's admin user, or another identity
+with IAM administration rights. In OVHcloud Manager:
+
+<Steps>
+
+1. Open **Identity, Security & Operations**, then **Policies**.
+
+2. Create a policy named `s3ctl-object-storage`.
+
+3. Under **Identities**, select the `s3ctl` service account.
+
+4. Under **Product types**, select **Public Cloud Project**.
+
+5. Under **Resources**, select the project's long ID, shown under its name, for example
+   `51ab2732562648349de40f72ac51c1c8`. Use the same value as `ovh_service_name`, not the display
+   name.
+
+6. For the first smoke test, allow all actions on that project. Once it works, tighten the policy to
+   the actions below.
+
+</Steps>
+
+The least-privilege actions for s3ctl are:
+
+```text
+publicCloudProject:apiovh:get
+publicCloudProject:apiovh:user/create
+publicCloudProject:apiovh:user/delete
+publicCloudProject:apiovh:user/get
+publicCloudProject:apiovh:user/policy/create
+publicCloudProject:apiovh:user/s3Credentials/create
+publicCloudProject:apiovh:user/s3Credentials/delete
+publicCloudProject:apiovh:user/s3Credentials/get
+publicCloudProject:apiovh:region/storage/create
+publicCloudProject:apiovh:region/storage/delete
+publicCloudProject:apiovh:region/storage/edit
+publicCloudProject:apiovh:region/storage/get
+publicCloudProject:apiovh:region/storage/policy/create
+```
+
+To create the policy through the API instead, start from
+[`examples/ovh/ovh-iam-policy.json`](https://github.com/netspeedy/s3ctl/blob/main/examples/ovh/ovh-iam-policy.json)
+and send it to `POST /iam/policy`. Get the service account's identity URN from
+`GET /me/api/oauth2/client/{clientId}`. OVHcloud documents its format as:
+
+```text
+urn:v1:<eu|ca>:identity:credential:<account-id>/oauth2-<clientId>
+```
+
+Get the project's resource URN from `GET /iam/resource`, picking the `publicCloudProject` resource
+that matches your project ID.
+
+## Check it before running s3ctl
+
+With the same OAuth2 credentials, `GET /cloud/project` should list the project:
+
+```bash
+token="$(curl -fsS \
+  -d grant_type=client_credentials \
+  --data-urlencode "client_id=$OVH_CLIENT_ID" \
+  --data-urlencode "client_secret=$OVH_CLIENT_SECRET" \
+  -d scope=all \
+  https://www.ovh.com/auth/oauth2/token | jq -r .access_token)"
+
+curl -fsS -H "Authorization: Bearer $token" \
+  https://eu.api.ovh.com/1.0/cloud/project | jq .
+```
+
+```json title="Output"
+[
+  "51ab2732562648349de40f72ac51c1c8"
+]
+```
+
+:::tip
+If OVHcloud answers `This service does not exist` while the project ID is right, the service account
+usually can't see the project yet. Check the policy's identity, resource and actions.
+:::
+
+## Classic API credentials
+
+The application key, application secret and consumer key flow is OVHcloud's classic API
+authentication, and s3ctl supports it directly. OVHcloud's token page for your region pre-fills the
+rights s3ctl needs for Public Cloud buckets:
+[EU](https://eu.api.ovh.com/createToken/?GET=%2Fcloud%2Fproject%2F%2A&POST=%2Fcloud%2Fproject%2F%2A&DELETE=%2Fcloud%2Fproject%2F%2A),
+[CA](https://ca.api.ovh.com/createToken/?GET=%2Fcloud%2Fproject%2F%2A&POST=%2Fcloud%2Fproject%2F%2A&DELETE=%2Fcloud%2Fproject%2F%2A),
+[US](https://api.us.ovhcloud.com/createToken/?GET=%2Fcloud%2Fproject%2F%2A&POST=%2Fcloud%2Fproject%2F%2A&DELETE=%2Fcloud%2Fproject%2F%2A).
+
+Put the returned values in `ovh_application_key`, `ovh_application_secret` and `ovh_consumer_key`.
+Those pages don't create OAuth2 credentials; for `ovh_client_id` and `ovh_client_secret`, use
+`POST /me/api/oauth2/client` as above.

@@ -1,0 +1,66 @@
+---
+title: Introduction
+description: s3ctl creates S3-compatible buckets and gives each one its own access key, from flags, a JSON config or a CSV batch.
+---
+
+import { Steps } from "@astrojs/starlight/components";
+import NextSteps from "../../components/NextSteps.astro";
+
+For every bucket, s3ctl can create the bucket, turn on versioning and apply a bucket policy, then
+create an IAM user with an access key and a policy that only allows access to that one bucket. It
+works with any S3/IAM-compatible endpoint, and with OVHcloud Public Cloud Object Storage through the
+OVHcloud API.
+
+It's a single command with no subcommands. You describe the buckets with flags, a JSON config or a
+CSV batch file, and `--dry-run` prints the plan before anything changes. The same command rotates
+and re-scopes OVHcloud credentials and deletes buckets, and it won't empty a bucket unless you pass
+`--force`. Text output is for people; `--output json` gives scripts one payload shape for successes
+and errors alike.
+
+## What it does
+
+| Step | Flag | What happens |
+| --- | --- | --- |
+| Plan | `--dry-run` | Prints what would be created or deleted. Nothing is written. |
+| Create | `--create-scoped-credentials` | Creates the bucket, then a user and a key that only reach that bucket. |
+| Rotate | `--ovh-rotate-credentials` | Issues a new OVHcloud key for an existing bucket and removes the old one. |
+| Delete | `--delete` | Deletes empty buckets. One that still holds objects needs `--force`. |
+
+## How a run works
+
+<Steps>
+
+1. **Reads its settings.** Flags win over the JSON config, and the config wins over built-in
+   defaults.
+
+2. **Plans.** With `--dry-run` it prints what it would do and stops. Nothing is created.
+
+3. **Applies.** It creates the bucket, turns on versioning and applies a bucket policy when you ask
+   for them, then creates the scoped user and key.
+
+4. **Reports.** Text for people, or with `--output json` one JSON document whether the run succeeds
+   or fails. A failed run exits non-zero.
+
+</Steps>
+
+## Providers
+
+| Provider | What it works with |
+| --- | --- |
+| `s3`, the default | Any S3-compatible endpoint. Scoped credentials go through the IAM API: AWS IAM by default, or another IAM-compatible service with `--iam-endpoint`. |
+| `ovh` | OVHcloud Public Cloud Object Storage, through the OVHcloud API. Each bucket gets a Public Cloud user and an S3 credential pair, scoped with a container profile and an S3 user policy. |
+
+The [Quickstart](/s3ctl/quickstart/) installs s3ctl and walks through a first bucket.
+[Installation](/s3ctl/installation/) covers every channel, pinned versions and checksum
+verification.
+
+## Where next
+
+<NextSteps
+  links={[
+    { title: "Quickstart", href: "/s3ctl/quickstart/", description: "Plan a bucket with --dry-run, then create it for real." },
+    { title: "Configuration", href: "/s3ctl/guides/configuration/", description: "Keep provider settings in a JSON config instead of on every command." },
+    { title: "OVHcloud overview", href: "/s3ctl/ovhcloud/", description: "Containers, OAuth2 service accounts, rotation and policy repair." },
+    { title: "CLI reference", href: "/s3ctl/reference/cli/", description: "Every flag, default, template and CSV column." },
+  ]}
+/>

@@ -18,20 +18,42 @@ Stable releases publish:
 - the GitHub Pages release hub with current installer and asset metadata
 - signed APT repository metadata for the stable channel
 
-## Website preview
+## Website
 
-Render the release hub locally with real browser screenshots:
+The site at https://netspeedy.github.io/s3ctl/ is the s3ctl documentation, built
+with Astro and Starlight from `website/`. The pages are Markdown and MDX in
+`website/src/content/docs`. Run it locally with live reload:
 
 ```bash
 make website-install
-make website-check
+npm --prefix website run dev
+```
+
+Build it, validate the output, and take desktop and phone screenshots in both
+themes:
+
+```bash
 make website-build
+make website-check
 make website-capture
 ```
 
-Desktop and mobile captures are written to `website/.captures/`. The website is
-built with Vite and uses generated `website-metadata.json` when the Pages workflow
-publishes the release hub.
+`website-check` validates `website/dist`, so it runs after the build. Captures
+are written to `website/.captures/`. Search only works in a build, because
+Pagefind indexes the finished pages.
+
+The Pages workflow resolves the latest release and the APT signing key before it
+builds, and passes them to the site in `SITE_METADATA_FILE`, so the published
+pages carry the real version, date and fingerprint. Local and pull request builds
+fall back to the newest local tag and leave the rest out. The same JSON is still
+published as `website-metadata.json`.
+
+`TestCLIReferenceCoversEveryFlag` in `internal/cli` fails when a flag is added
+to or removed from the CLI without updating
+`website/src/content/docs/reference/cli.mdx`.
+
+The favicon, Apple touch icon, `favicon.ico` and share card in `website/public`
+come from `make readme-hero`, along with the README banner.
 
 ## Dependency updates
 
