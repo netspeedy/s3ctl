@@ -183,9 +183,26 @@ header.header::before {
   background: var(--s3-brand-bar);
 }
 
-/* Keep the mobile menu button in the top row. */
+/*
+  The mobile menu button sits in the top row and looks like the theme switch beside it: a quiet
+  outlined square, filled softly while the menu is open, in place of Starlight's solid circle.
+*/
 .sl-menu-button {
   top: calc(var(--s3-brand-line) + (var(--s3-bar) - var(--sl-menu-button-size)) / 2) !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: 10px;
+  background-color: var(--sl-color-black);
+  font-size: 1.125rem;
+  color: var(--sl-color-gray-2);
+  box-shadow: none;
+}
+.sl-menu-button:has(~ :popover-open) {
+  border-color: transparent;
+  background-color: var(--s3-current-bg);
+  color: var(--s3-current-ink);
 }
 
 /*
@@ -252,43 +269,76 @@ header.header::before {
   font-weight: 600;
   color: var(--sl-color-white);
 }
+/*
+  A group's pages hang off a hairline that runs down from the middle of its icon tile, and the
+  current page is a dot on that line in the group's colour, ringed in a softer tint: the same
+  shape as the numbered steps on the guide pages. Hovering a link puts a grey dot on the line. The
+  table of contents marks its current section the same way. Each dot is cut out of the line by a
+  ring of the background behind it.
+*/
 .sidebar-content ul ul li {
-  margin-inline-start: 0;
-  border-inline-start: 0;
+  margin-inline-start: 17px;
+  border-inline-start: 1px solid var(--sl-color-hairline-light);
   padding-inline-start: 0;
 }
 .sidebar-content a {
   padding-block: 0.375rem;
-  border-radius: 6px;
   font-size: var(--sl-text-sm);
 }
 .sidebar-content ul ul a {
-  padding-inline-start: 2.375rem;
+  position: relative;
+  padding-inline-start: calc(2.375rem - 18px);
+  border-radius: 0;
 }
 .sidebar-content a:hover {
   color: var(--sl-color-white);
 }
+.sidebar-content ul ul a::before,
+starlight-toc a::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: -4px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+}
+.sidebar-content ul ul a:hover::before {
+  background-color: var(--sl-color-gray-4);
+  box-shadow: 0 0 0 3px var(--sl-color-bg-sidebar);
+}
 .sidebar-content a[aria-current="page"],
 .sidebar-content a[aria-current="page"]:hover,
 .sidebar-content a[aria-current="page"]:focus {
-  background-color: var(--cb, var(--s3-current-bg));
-  box-shadow: inset 2px 0 0 var(--cc, var(--sl-color-accent));
-  color: var(--ci, var(--s3-current-ink));
+  background-color: transparent;
+  color: var(--sl-color-white);
   font-weight: 600;
 }
+.sidebar-content ul ul a[aria-current="page"]::before {
+  background-color: var(--cc, var(--sl-color-accent));
+  box-shadow:
+    0 0 0 3px var(--sl-color-bg-sidebar),
+    0 0 0 6px var(--cb, var(--sl-color-accent-low));
+}
 
-/* On this page: a rail with the current section marked in the page's colour. */
+/* On this page: the same line, with the current section marked by a dot in the page's colour. */
 starlight-toc nav > ul {
-  border-inline-start: 1px solid var(--sl-color-hairline-shade);
+  border-inline-start: 1px solid var(--sl-color-hairline-light);
 }
 starlight-toc a {
-  margin-inline-start: -1px;
+  position: relative;
   padding-inline-start: 0.875rem;
-  border-inline-start: 2px solid transparent;
+  border-radius: 0;
 }
 starlight-toc a[aria-current="true"] {
-  border-inline-start-color: var(--s3-page);
   color: var(--sl-color-white);
+}
+starlight-toc a[aria-current="true"]::before {
+  background-color: var(--s3-page);
+  box-shadow:
+    0 0 0 3px var(--sl-color-bg),
+    0 0 0 6px var(--s3-page-bg);
 }
 starlight-toc ul ul a {
   padding-inline-start: 1.625rem;
@@ -330,12 +380,13 @@ starlight-toc ul ul a {
 
 /*
   Asides keep their meaning whatever page they're on: notes are cyan, tips green, cautions
-  amber. A tinted panel with a solid edge, the title and icon in the variant's colour.
+  amber. A tinted panel with a hairline border in the variant's colour, and its icon in a small
+  tile like the sidebar's section icons. No coloured edge, because a side border on a rounded
+  box bends.
 */
 .starlight-aside {
   border: 1px solid var(--cl);
-  border-inline-start: 3px solid var(--cc);
-  border-radius: 10px;
+  border-radius: 12px;
   background-color: var(--cb);
   color: var(--sl-color-gray-2);
 }
@@ -364,9 +415,30 @@ starlight-toc ul ul a {
   --sl-color-asides-text-accent: var(--sl-color-red-high);
 }
 .starlight-aside__title {
+  position: relative;
+  gap: 0.75rem;
   font-size: var(--sl-text-base);
 }
+/* The tile is drawn behind the icon, so the icon keeps Starlight's markup. */
+.starlight-aside__title::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  margin-top: -13px;
+  box-sizing: border-box;
+  border: 1px solid var(--cl);
+  border-radius: 7px;
+  background-color: color-mix(in srgb, var(--cc) 10%, transparent);
+}
 .starlight-aside__icon {
+  position: relative;
+  width: 15px;
+  height: 15px;
+  margin-inline: 5.5px;
+  font-size: 15px;
   color: var(--cc);
 }
 .starlight-aside code {
