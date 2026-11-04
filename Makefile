@@ -114,7 +114,7 @@ website-capture:
 	npm --prefix $(WEBSITE_DIR) run capture
 
 readme-hero:
-	python3 scripts/readme/build_readme_hero.py
+	uv run scripts/readme/build_readme_hero.py
 
 refresh-go-toolchain:
 	GO_TOOLCHAIN_VERSION="$(GO_TOOLCHAIN_VERSION)" bash scripts/toolchain/refresh-go-toolchain.sh
