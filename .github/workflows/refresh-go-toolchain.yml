@@ -64,12 +64,16 @@ jobs:
             go
 
       # A pull request opened with GITHUB_TOKEN doesn't trigger pull_request workflows, so
-      # Build and Validate is dispatched on the branch instead. That run doesn't fire
-      # workflow_run either; the daily Automation Auto Merge sweep merges the pull request
-      # once it has passed.
+      # Build and Validate and Container Image are dispatched on the branch instead. Without a
+      # release_ref, Container Image only builds and smoke tests the image, which matters here
+      # because the refresh changes the Dockerfile and Build and Validate doesn't build it.
+      # Neither run fires workflow_run; the daily Automation Auto Merge sweep merges the pull
+      # request once both have passed.
       - name: Validate the pull request
         if: steps.pr.outputs.pull-request-operation == 'created' || steps.pr.outputs.pull-request-operation == 'updated'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: gh workflow run build-and-validate.yml --ref automation/refresh-go-toolchain
+        run: |
+          gh workflow run build-and-validate.yml --ref automation/refresh-go-toolchain
+          gh workflow run container-image.yml --ref automation/refresh-go-toolchain

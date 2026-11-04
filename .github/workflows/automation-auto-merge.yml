@@ -161,11 +161,12 @@ jobs:
             fi
           }
 
-          latest_build_validate_run() {
-            local head_sha="$1"
+          latest_successful_run() {
+            local workflow="$1"
+            local head_sha="$2"
 
             gh run list \
-              --workflow "Build and Validate" \
+              --workflow "${workflow}" \
               --limit 100 \
               --json databaseId,headSha,event,conclusion,url \
               --jq '.[] | select((.event == "pull_request" or .event == "workflow_dispatch") and .headSha == "'"${head_sha}"'" and .conclusion == "success") | @base64' \
@@ -245,10 +246,17 @@ jobs:
               fi
               validation_detail=' Build and Validate succeeded for the current PR head revision via the triggering workflow run.'
             else
-              validation_run="$(latest_build_validate_run "${head_sha}")"
+              validation_run="$(latest_successful_run "Build and Validate" "${head_sha}")"
               if [ -z "${validation_run}" ]; then
                 skipped=$((skipped + 1))
                 printf '| [#%s](%s) | skipped | No successful Build and Validate run was found for the current PR head revision. |\n' "${pr_number}" "${url}" >> "${GITHUB_STEP_SUMMARY}"
+                continue
+              fi
+              # Build and Validate doesn't build the image, and the toolchain refresh changes the
+              # Dockerfile, so a sweep also wants a green Container Image run.
+              if [ -z "$(latest_successful_run "Container Image" "${head_sha}")" ]; then
+                skipped=$((skipped + 1))
+                printf '| [#%s](%s) | skipped | No successful Container Image run was found for the current PR head revision. |\n' "${pr_number}" "${url}" >> "${GITHUB_STEP_SUMMARY}"
                 continue
               fi
 
