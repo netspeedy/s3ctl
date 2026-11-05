@@ -18,7 +18,9 @@ workflows, the Automated Release Candidate workflow then promotes the same
 commit to a stable tag. If any came from a person, it stops at the candidate,
 and someone promotes it with the `Promote Release Candidate` workflow when it's
 ready. `scripts/release/automated-only.sh` makes that call, by author email,
-since a squash merge's author name comes from a profile anyone can edit. While
+since a squash merge's author name comes from a profile anyone can edit. The
+toolchain refresh is rebase-merged rather than squashed, so its commit keeps
+the `netspeedybot` author the gate recognises. While
 a candidate waits, each further validated push to `main` tags the next one,
 docs-only pushes included.
 

@@ -63,6 +63,10 @@ jobs:
             .golangci-lint-version
             go.mod
           branch: automation/refresh-go-toolchain
+          # The sweep rebase-merges this, so main keeps netspeedybot as the author and
+          # the bots-only release check recognises it.
+          author: netspeedybot <45371234+netspeedybot@users.noreply.github.com>
+          committer: netspeedybot <45371234+netspeedybot@users.noreply.github.com>
           commit-message: "${{ steps.kind.outputs.type }}: refresh build tooling pins"
           title: "${{ steps.kind.outputs.type }}: refresh build tooling pins"
           body: |
