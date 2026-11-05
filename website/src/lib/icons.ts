@@ -10,6 +10,9 @@ export const icons = {
   pencil: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
   flag: '<path d="M5 21V4h11l-2 4 2 4H5"/>',
   scale: '<path d="M12 3v18M5 21h14M6 7h12M6 7l-3 7a3 3 0 0 0 6 0zM18 7l-3 7a3 3 0 0 0 6 0z"/>',
+  chevron: '<path d="M6 9l6 6 6-6"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  external: '<path d="M8 16L16 8M9 8h7v7"/>',
 };
 
 /** GitHub's mark, a filled 16x16 path. */

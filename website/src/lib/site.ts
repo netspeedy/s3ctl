@@ -4,6 +4,11 @@
 // site, writes them to a JSON file and passes its path in SITE_METADATA_FILE. Local and pull
 // request builds don't have that file, so they fall back to the newest local tag and leave the
 // date, commit and fingerprint out rather than guess them.
+//
+// The docs are versioned by release line (v0.8, v0.9 and so on). The latest line is built at the
+// site root. When a newer line ships, the release workflow builds the old one again with
+// SITE_ARCHIVE set to its line, which moves it under the root as /s3ctl/v0.8/, and the Pages
+// workflow puts each archived line back beside the latest one and lists them in docs_versions.
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 
@@ -41,6 +46,8 @@ interface Metadata {
   release_commit?: string;
   latest_release?: { tag_name?: string; published_at?: string; html_url?: string } | null;
   apt_repository?: { available?: boolean; fingerprint?: string };
+  /** The archived release lines published beside this build, each with its newest release. */
+  docs_versions?: { version: string; release: string }[];
 }
 
 function readMetadata(): Metadata | undefined {
@@ -62,8 +69,9 @@ function latestTag(): string | undefined {
   }
 }
 
+const metadata = readMetadata();
+
 function resolveRelease(): Release {
-  const metadata = readMetadata();
   const latest = metadata?.latest_release ?? undefined;
   const tag = latest?.tag_name || latestTag();
   const published = latest?.published_at ? new Date(latest.published_at) : undefined;
@@ -84,3 +92,64 @@ export const release = resolveRelease();
 export function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("en-GB", { dateStyle: "long", timeZone: "UTC" }).format(date);
 }
+
+/** The release line a version belongs to: v0.8.38 is in v0.8. */
+export const lineOf = (version: string) => /^v\d+\.\d+/.exec(version)?.[0];
+
+export interface DocsVersion {
+  /** The release line, such as v0.8, or "dev" for an untagged build. */
+  version: string;
+  /** The line's newest release, such as v0.8.38. */
+  release: string;
+  /** Where the line's docs start, such as /s3ctl/v0.8/. */
+  url: string;
+  /** The newest release's notes. */
+  notes: string;
+  latest: boolean;
+}
+
+const archive = process.env.SITE_ARCHIVE || undefined;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+
+/** The site root every line lives under, /s3ctl/, also in an archived build. */
+export const siteRoot = archive ? base.slice(0, base.length - archive.length - 1) : base;
+
+/**
+ * A link from the root, such as /s3ctl/quickstart/, as a link to that page in the line being
+ * built. In the latest line it's unchanged. rehype-archive-links.mjs does the same for the pages.
+ */
+export const docsHref = (href: string) =>
+  archive && href.startsWith(siteRoot) && !/^v\d+\.\d+\//.test(href.slice(siteRoot.length))
+    ? base + href.slice(siteRoot.length)
+    : href;
+
+function resolveDocs() {
+  const current = archive ?? lineOf(release.version) ?? "dev";
+  const self: DocsVersion = {
+    version: current,
+    release: release.version,
+    url: base,
+    notes: release.url,
+    latest: !archive,
+  };
+  // An archived build only knows itself. Its version menu fetches the full list from the root's
+  // versions.json, and this link to the latest docs stands in until it does.
+  if (archive) {
+    const latest: DocsVersion = { version: "Latest", release: "", url: siteRoot, notes: links.releases, latest: true };
+    return { current, archived: true, versions: [latest, self] };
+  }
+  const older = (metadata?.docs_versions ?? [])
+    .filter(({ version }) => version !== current)
+    .sort((a, b) => b.version.localeCompare(a.version, "en", { numeric: true }))
+    .map(({ version, release: tag }) => ({
+      version,
+      release: tag,
+      url: `${siteRoot}${version}/`,
+      notes: `${links.releases}/tag/${tag}`,
+      latest: false,
+    }));
+  return { current, archived: false, versions: [self, ...older] };
+}
+
+/** Which line these docs are, whether it's an archived one, and every line published. */
+export const docs = resolveDocs();

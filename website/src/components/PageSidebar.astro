@@ -1,25 +1,24 @@
 ---
 import Default from "@astrojs/starlight/components/PageSidebar.astro";
-import { formatDate, links, release } from "../lib/site";
+import { docs, formatDate, release } from "../lib/site";
 ---
 
 <Default />
 <div class="s3-release sl-hidden lg:sl-block print:hidden">
-  <h2>Latest release</h2>
+  <h2>{docs.archived ? `Last ${docs.current} release` : "Latest release"}</h2>
   <p class="s3-version">
     <span>{release.version}</span>
     {
       release.tagged && (
-        <span class="s3-stable">
+        <span class:list={["s3-stable", { archived: docs.archived }]}>
           <span class="s3-dot" aria-hidden="true" />
-          stable
+          {docs.archived ? "archived" : "stable"}
         </span>
       )
     }
   </p>
   {release.published && <p class="s3-date">{formatDate(release.published)}</p>}
   <a href={release.url}>Release notes</a>
-  <a href={links.issues}>Report an issue</a>
 </div>
 
 <style>
@@ -70,6 +69,12 @@ import { formatDate, links, release } from "../lib/site";
     height: 6px;
     border-radius: 50%;
     background-color: var(--s3-ok-dot);
+  }
+  .s3-stable.archived {
+    color: var(--s3-c3-ink);
+  }
+  .archived .s3-dot {
+    background-color: var(--s3-c3);
   }
   .s3-date {
     color: var(--sl-color-gray-3);

@@ -2,15 +2,24 @@ import starlight from "@astrojs/starlight";
 import { defineConfig, passthroughImageService } from "astro/config";
 
 import { codeTheme } from "./src/lib/code-theme.mjs";
+import rehypeArchiveLinks from "./src/lib/rehype-archive-links.mjs";
 import rehypeCodeWords from "./src/lib/rehype-code-words.mjs";
 
 const site = "https://netspeedy.github.io";
-const base = "/s3ctl";
+const root = "/s3ctl";
 const repo = "https://github.com/netspeedy/s3ctl";
 
+// The latest docs are built at the root. An archived release line is built with SITE_ARCHIVE set
+// to the line, such as v0.8, which puts it at /s3ctl/v0.8/ (see src/lib/site.ts).
+const archive = process.env.SITE_ARCHIVE || undefined;
+if (archive && !/^v\d+\.\d+$/.test(archive)) {
+  throw new Error(`SITE_ARCHIVE must be a release line such as v0.8, not ${archive}`);
+}
+const base = archive ? `${root}/${archive}` : root;
+
 // The share card is written by scripts/readme/build_readme_hero.py. Bump ?v= whenever it
-// changes so link previews fetch the new one.
-const card = `${site}${base}/og-image.png?v=3`;
+// changes so link previews fetch the new one. Archived lines share the root's card.
+const card = `${site}${root}/og-image.png?v=3`;
 const cardAlt =
   "The s3ctl card: No console clicking. No IAM drift. Beside it, the s3ctl pail drawn in dots " +
   "with its shell prompt lit and the four provisioning steps.";
@@ -19,7 +28,12 @@ export default defineConfig({
   site,
   base,
   trailingSlash: "always",
-  markdown: { rehypePlugins: [rehypeCodeWords] },
+  markdown: {
+    rehypePlugins: [
+      rehypeCodeWords,
+      ...(archive ? [[rehypeArchiveLinks, { root: `${root}/`, base: `${base}/` }]] : []),
+    ],
+  },
   // No page uses Astro's image pipeline, so skip sharp.
   image: { service: passthroughImageService() },
   integrations: [
@@ -28,7 +42,8 @@ export default defineConfig({
       description:
         "A single-binary CLI for creating S3-compatible buckets and issuing bucket-scoped credentials.",
       favicon: "/favicon.svg",
-      editLink: { baseUrl: `${repo}/edit/main/website/` },
+      // An archived line's pages are copies of an older main, so there's nothing to edit.
+      editLink: archive ? {} : { baseUrl: `${repo}/edit/main/website/` },
       // Pages build from a shallow clone, where every file would show the same commit date.
       lastUpdated: false,
       credits: false,
@@ -37,12 +52,15 @@ export default defineConfig({
         "@fontsource-variable/jetbrains-mono",
         "./src/styles/theme.css",
       ],
+      routeMiddleware: "./src/routeData.ts",
       components: {
+        Banner: "./src/components/Banner.astro",
         Footer: "./src/components/Footer.astro",
         Head: "./src/components/Head.astro",
         Header: "./src/components/Header.astro",
         PageSidebar: "./src/components/PageSidebar.astro",
         PageTitle: "./src/components/PageTitle.astro",
+        Sidebar: "./src/components/Sidebar.astro",
         SiteTitle: "./src/components/SiteTitle.astro",
         ThemeProvider: "./src/components/ThemeProvider.astro",
         ThemeSelect: "./src/components/ThemeSelect.astro",

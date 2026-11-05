@@ -4,6 +4,10 @@
 // icons and share card are the sizes link previews and browsers expect, that every page carries
 // the share and icon tags, and that every link into the site resolves under the /s3ctl/ base
 // GitHub Pages serves it from.
+//
+// With SITE_ARCHIVE set, dist/ is an archived release line built for /s3ctl/<line>/, and its links
+// to the root (the latest docs and the other lines) can't be checked from here. Without it, any
+// archived lines the Pages workflow has unpacked into dist/<line>/ are checked with the rest.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,7 +15,9 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
 const docs = path.join(root, "src", "content", "docs");
-const base = "/s3ctl/";
+const siteRoot = "/s3ctl/";
+const archive = process.env.SITE_ARCHIVE || undefined;
+const base = archive ? `${siteRoot}${archive}/` : siteRoot;
 const errors = [];
 
 const fail = (message) => errors.push(message);
@@ -77,11 +83,24 @@ checkAsset("og-image.png", (file) => {
   if (size?.join("x") !== "1200x630") fail(`dist/og-image.png is ${size?.join("x")}, not 1200x630`);
 });
 
-// Every page's head, and every link into the site.
-const required = [
-  ['<link rel="shortcut icon" href="/s3ctl/favicon.svg" type="image/svg+xml"', "the SVG favicon"],
-  ['<link rel="icon" href="/s3ctl/favicon.ico" sizes="32x32"', "the favicon.ico fallback"],
-  ['<link rel="apple-touch-icon" href="/s3ctl/apple-touch-icon.png"', "the Apple touch icon"],
+// Every published line, and that each one the root lists is there.
+checkAsset("versions.json", (file) => {
+  const { versions } = JSON.parse(readFileSync(file, "utf8"));
+  if (!Array.isArray(versions) || versions.length === 0) return fail("dist/versions.json lists no versions");
+  for (const { version, url } of versions) {
+    if (archive || typeof url !== "string" || !url.startsWith(siteRoot)) continue;
+    if (!existsSync(path.join(dist, url.slice(siteRoot.length), "index.html"))) {
+      fail(`dist/versions.json lists ${version} at ${url}, which wasn't published`);
+    }
+  }
+});
+
+// Every page's head, and every link into the site. A page in an unpacked archived line has that
+// line's base.
+const required = (pageBase) => [
+  [`<link rel="shortcut icon" href="${pageBase}favicon.svg" type="image/svg+xml"`, "the SVG favicon"],
+  [`<link rel="icon" href="${pageBase}favicon.ico" sizes="32x32"`, "the favicon.ico fallback"],
+  [`<link rel="apple-touch-icon" href="${pageBase}apple-touch-icon.png"`, "the Apple touch icon"],
   ['<meta property="og:image" content="https://netspeedy.github.io/s3ctl/og-image.png?v=', "og:image with a ?v= cache key"],
   ['<meta property="og:image:type" content="image/png"', "og:image:type"],
   ['<meta property="og:image:width" content="1200"', "og:image:width"],
@@ -94,12 +113,14 @@ const required = [
 for (const file of walk(dist, (f) => f.endsWith(".html"))) {
   const page = path.relative(dist, file);
   const html = readFileSync(file, "utf8");
-  for (const [needle, what] of required) {
+  const line = !archive && /^(v\d+\.\d+)\//.exec(page)?.[1];
+  for (const [needle, what] of required(line ? `${siteRoot}${line}/` : base)) {
     if (!html.includes(needle)) fail(`${page} is missing ${what}`);
   }
   for (const [, url] of html.matchAll(/\s(?:href|src)="([^"]+)"/g)) {
     if (!url.startsWith("/") || url.startsWith("//")) continue;
     if (!url.startsWith(base)) {
+      if (archive && url.startsWith(siteRoot)) continue;
       fail(`${page} links to ${url}, which skips the ${base} base`);
       continue;
     }

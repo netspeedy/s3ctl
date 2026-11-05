@@ -1,35 +1,21 @@
 ---
 import Search from "@astrojs/starlight/components/Search.astro";
 import { github, icons } from "../lib/icons";
-import { links, release } from "../lib/site";
+import { tabsFor } from "../lib/sections";
+import { links } from "../lib/site";
 import SiteTitle from "./SiteTitle.astro";
 import ThemeMenu from "./ThemeMenu.astro";
+import VersionMenu from "./VersionMenu.astro";
 
-// Section tabs are shortcuts into the sidebar's groups, not separate sidebars. The home page is
-// the landing page and sits outside the sidebar, so no tab is current there.
-const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-const path = Astro.url.pathname.slice(base.length);
-const section =
-  path === "/" || path === ""
-    ? undefined
-    : path.startsWith("/reference/")
-      ? "reference"
-      : path.startsWith("/ovhcloud/")
-        ? "ovhcloud"
-        : "guides";
-const tabs = [
-  { id: "guides", label: "Guides", href: `${base}/introduction/` },
-  { id: "reference", label: "CLI reference", href: `${base}/reference/cli/` },
-  { id: "ovhcloud", label: "OVHcloud", href: `${base}/ovhcloud/` },
-];
+// Each tab has its own sidebar (routeData.ts narrows it), and the tab whose groups hold the current
+// page is current. The home page sits outside every tab.
+const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
 ---
 
 <div class="s3-header">
   <div class="s3-bar">
     <div class="s3-title"><SiteTitle /></div>
-    <a class="s3-version sl-hidden md:sl-flex" href={release.url} title="Release notes">
-      <span class="s3-dot" aria-hidden="true"></span>{release.version}
-    </a>
+    <VersionMenu />
     <div class="s3-search print:hidden"><Search /></div>
     <div class="s3-actions sl-hidden md:sl-flex print:hidden">
       <a class="s3-button" href={links.releases} title="Releases">
@@ -45,8 +31,8 @@ const tabs = [
   </div>
   <nav class="s3-tabs print:hidden" aria-label="Sections">
     {
-      tabs.map(({ id, label, href }) => (
-        <a href={href} aria-current={id === section ? "page" : undefined}>
+      tabs.map(({ label, href, current }) => (
+        <a href={href} aria-current={current ? "page" : undefined}>
           {label}
         </a>
       ))
@@ -78,31 +64,6 @@ const tabs = [
     display: flex;
     flex: 1 1 auto;
     justify-content: flex-end;
-  }
-  .s3-version {
-    flex: none;
-    align-items: center;
-    gap: 0.375rem;
-    height: 1.5rem;
-    margin-inline-start: -0.25rem;
-    padding: 0 0.5625rem;
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 999px;
-    font-family: var(--__sl-font-mono);
-    font-size: var(--sl-text-xs);
-    font-weight: 500;
-    color: var(--sl-color-gray-2);
-    text-decoration: none;
-  }
-  .s3-version:hover {
-    border-color: var(--sl-color-gray-4);
-    color: var(--sl-color-white);
-  }
-  .s3-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: var(--s3-ok-dot);
   }
   .s3-actions {
     align-items: center;
@@ -165,6 +126,12 @@ const tabs = [
   .s3-tabs a[aria-current="page"] {
     border-bottom-color: var(--sl-color-text-accent);
     color: var(--sl-color-white);
+  }
+
+  @media (max-width: 23.99rem) {
+    .s3-tabs a {
+      padding: 0 0.5rem;
+    }
   }
 
   /* Pages without a sidebar, like the home page, have no mobile menu, so the theme button stays

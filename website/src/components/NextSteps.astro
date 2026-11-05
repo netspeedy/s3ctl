@@ -1,17 +1,19 @@
 ---
 // Link cards into the docs, each in the colour of the section it lands in.
 import { sectionOfHref } from "../lib/sections";
+import { docsHref } from "../lib/site";
 import SectionIcon from "./SectionIcon.astro";
 
 interface Props {
   links: { title: string; href: string; description: string }[];
 }
 
-const { sidebar } = Astro.locals.starlightRoute;
+const sidebar = Astro.locals.fullSidebar;
 const cards = Astro.props.links.map((link) => {
-  const section = sectionOfHref(sidebar, link.href);
+  const href = docsHref(link.href);
+  const section = sectionOfHref(sidebar, href);
   if (!section) throw new Error(`NextSteps: ${link.href} isn't a page in the sidebar`);
-  return { ...link, section };
+  return { ...link, href, section };
 });
 ---
 
