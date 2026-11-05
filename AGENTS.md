@@ -82,7 +82,7 @@
   ```
 - Lint shell scripts:
   ```bash
-  shellcheck scripts/*.sh
+  shellcheck scripts/*.sh scripts/*/*.sh
   ```
 - Build the docs site, then validate the built output (pages, search index,
   icons, share card and every internal link). The check reads `website/dist`,
@@ -149,8 +149,8 @@
   ```
 - If you change shell scripts, also run:
   ```bash
-  bash -n scripts/*.sh
-  shellcheck scripts/*.sh
+  bash -n scripts/*.sh scripts/*/*.sh
+  shellcheck scripts/*.sh scripts/*/*.sh
   ```
 - If you change the website, run `make website-build`, `make website-check` and
   `make website-test`, and look at `make website-capture` output for layout
@@ -159,7 +159,7 @@
   paths before considering the change complete.
 - If you change release tagging, release notes, or publish workflows, also run:
   ```bash
-  bash -n scripts/*.sh
+  bash -n scripts/*.sh scripts/*/*.sh
   bash scripts/release/next-release.sh
   bash scripts/release/generate-release-notes.sh "$(git describe --tags --abbrev=0 2>/dev/null || true)" HEAD /tmp/s3ctl-release-notes.md
   ```
@@ -170,6 +170,16 @@
   current turn.
 - Prefer conventional commit subjects such as `feat:`, `fix:`, `docs:`, `ci:`,
   `deps:`, `chore:`, or `test:`.
+- `feat:`, `fix:`, `perf:`, `revert:`, `deps:`, `container:`, `build:`,
+  `packaging:` and `release:` commits cut releases
+  (`scripts/release/next-release.sh` decides); `docs:`, `ci:`, `chore:` and
+  `test:` don't. Every release-bearing push to `main` cuts a release candidate.
+  Updates from Dependabot, Renovate and this repository's workflows are then
+  promoted to stable on their own; a release-bearing change a person merged
+  waits at the candidate until someone runs `Promote Release Candidate`
+  (`scripts/release/automated-only.sh` decides). While that's waiting, every
+  validated push to `main` tags the next candidate, docs-only pushes included.
+  That's expected. `docs/release.md` describes the release flow.
 - Keep changes focused by concern when practical: runtime logic, automation,
   docs, packaging, and website work should not be bundled casually.
 - PR descriptions should explain the operational reason for the change, the
