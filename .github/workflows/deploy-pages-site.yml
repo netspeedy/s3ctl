@@ -75,6 +75,43 @@ jobs:
             } >> "$GITHUB_OUTPUT"
           fi
 
+      # Each older line whose last release carries a docs archive (Release Assets attaches one when
+      # the next line ships) is published beside the latest, under /<repo>/vX.Y/.
+      - name: Download archived docs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LATEST_TAG: ${{ steps.latest.outputs.tag }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          set -euo pipefail
+
+          archives="${RUNNER_TEMP}/docs-archives"
+          mkdir -p "${archives}"
+          echo '[]' > "${RUNNER_TEMP}/docs-versions.json"
+          if [ "${{ steps.latest.outputs.available }}" != "true" ]; then
+            exit 0
+          fi
+
+          current_line="$(sed -E 's/^(v[0-9]+\.[0-9]+)\..*/\1/' <<<"${LATEST_TAG}")"
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+            --jq '.[] | select(.draft == false and .prerelease == false) | [.tag_name, ([.assets[].name] | join(" "))] | @tsv' \
+            | sort -t "$(printf '\t')" -k1,1 -rV \
+            | awk -F '\t' '{ line = $1; sub(/\.[0-9]+$/, "", line); if (!(line in seen)) { seen[line] = 1; print line "\t" $1 "\t" $2 } }' \
+            > "${RUNNER_TEMP}/release-lines.tsv"
+
+          versions='[]'
+          while IFS="$(printf '\t')" read -r line tag assets; do
+            asset="${REPO_NAME}-docs-${line}.tar.gz"
+            if [ "${line}" = "${current_line}" ] || [[ " ${assets} " != *" ${asset} "* ]]; then
+              continue
+            fi
+            mkdir -p "${archives}/${line}"
+            gh release download "${tag}" --pattern "${asset}" --output - | tar -xz --no-same-owner -C "${archives}/${line}"
+            versions="$(jq -c --arg version "${line}" --arg release "${tag}" '. + [{version: $version, release: $release}]' <<<"${versions}")"
+          done < "${RUNNER_TEMP}/release-lines.tsv"
+          printf '%s\n' "${versions}" > "${RUNNER_TEMP}/docs-versions.json"
+          printf 'Archived docs published: %s\n' "$(jq -r 'map(.version) | join(", ") | if . == "" then "none" else . end' <<<"${versions}")" >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Build signed APT repository
         id: apt
         env:
@@ -190,6 +227,7 @@ jobs:
             --arg apt_fingerprint "${{ steps.apt.outputs.fingerprint }}" \
             --argjson latest_release "${latest_release_json}" \
             --arg apt_available "${{ steps.apt.outputs.available }}" \
+            --slurpfile docs_versions "${RUNNER_TEMP}/docs-versions.json" \
             '{
               site_url: $site_url,
               github_repository: $github_repository,
@@ -201,6 +239,7 @@ jobs:
               install_script_url: $install_script_url,
               release_commit: $release_commit,
               latest_release: $latest_release,
+              docs_versions: $docs_versions[0],
               apt_repository: {
                 available: ($apt_available == "true"),
                 url: $apt_url,
@@ -213,6 +252,11 @@ jobs:
 
           npm ci --prefix website
           SITE_METADATA_FILE="${metadata}" make website-build
+          # The archived lines go in before the check, so it follows the version menu's links into them.
+          for archive in "${RUNNER_TEMP}"/docs-archives/*/; do
+            [ -d "${archive}" ] || continue
+            cp -a "${archive%/}" website/dist/
+          done
           make website-check
           cp -a website/dist/. site/
           cp "${metadata}" site/website-metadata.json

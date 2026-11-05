@@ -27,6 +27,12 @@
   `website/src/lib/sections.ts`, matched to the sidebar in
   `website/astro.config.mjs` by label, so adding or renaming a group means
   updating `sections` and `tabs` there.
+- The docs are versioned by release line. Only the latest line lives in
+  `website/src/content/docs`; never copy pages into per-version folders. When a
+  new minor ships, the release workflow rebuilds the outgoing line from git with
+  `SITE_ARCHIVE=vX.Y`, which serves it under `/s3ctl/vX.Y/`, and the Pages
+  workflow publishes it beside the latest. Keep page links root-relative
+  (`/s3ctl/...`): archived builds rewrite them into their own line.
 - Keep the website out of `.github/`. Dependabot stopped being able to open npm
   pull requests for manifests under `.github/` in June 2026 (its create-PR call
   is rejected as "invalid or unauthorized changes"), which is why it lives at
