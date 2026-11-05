@@ -42,6 +42,18 @@ jobs:
           latest="$(curl -fsSL https://api.github.com/repos/golangci/golangci-lint/releases/latest | jq -r '.tag_name')"
           printf '%s\n' "${latest}" > .golangci-lint-version
 
+      # A new Go toolchain or build image changes the binary and the image, so the refresh is
+      # titled build:, which cuts a release. A golangci-lint bump on its own changes neither and
+      # stays chore:.
+      - name: Choose the commit type
+        id: kind
+        run: |
+          if git diff --quiet -- go.mod Dockerfile; then
+            echo "type=chore" >> "${GITHUB_OUTPUT}"
+          else
+            echo "type=build" >> "${GITHUB_OUTPUT}"
+          fi
+
       - name: Create pull request
         id: pr
         uses: peter-evans/create-pull-request@v8
@@ -51,8 +63,8 @@ jobs:
             .golangci-lint-version
             go.mod
           branch: automation/refresh-go-toolchain
-          commit-message: "chore: refresh build tooling pins"
-          title: "chore: refresh build tooling pins"
+          commit-message: "${{ steps.kind.outputs.type }}: refresh build tooling pins"
+          title: "${{ steps.kind.outputs.type }}: refresh build tooling pins"
           body: |
             Refreshes the preferred Go toolchain version in `go.mod` to the
             latest stable Go release published on `go.dev`, aligns the Docker
