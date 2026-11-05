@@ -1,0 +1,38 @@
+---
+// The page GitHub Pages serves for any address that isn't on the site. It's built here with
+// Starlight's layout rather than from a 404.md in the docs collection, because Starlight also
+// builds every collection entry as an ordinary page, and its /404/ would collide with this route.
+// astro.config.mjs turns off Starlight's own 404 route for the same reason.
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const page = (path: string) => `${base}${path}`;
+---
+
+<StarlightPage
+  frontmatter={{
+    title: "Page not found",
+    description: "There's no page at this address. It may have moved when the docs were reorganised.",
+    editUrl: false,
+    pagefind: false,
+    tableOfContents: false,
+    prev: false,
+    next: false,
+  }}
+>
+  <p>
+    The guides that used to live in the repository’s <code>docs/</code> folder are now split across this site.
+    Try one of these:
+  </p>
+  <ul>
+    <li><a href={page("quickstart/")}>Quickstart</a> to install s3ctl and plan a first bucket</li>
+    <li><a href={page("installation/")}>Installation</a> for every install channel</li>
+    <li>
+      <a href={page("guides/configuration/")}>Configuration</a> and{" "}
+      <a href={page("guides/batch-provisioning/")}>batch provisioning</a>
+    </li>
+    <li><a href={page("ovhcloud/")}>OVHcloud</a> for containers, OAuth2, rotation and policy repair</li>
+    <li>the <a href={page("reference/cli/")}>CLI reference</a> for every flag</li>
+  </ul>
+  <p>Or search with the box at the top of the page.</p>
+</StarlightPage>

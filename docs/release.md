@@ -41,8 +41,14 @@ make website-capture
 ```
 
 `website-check` validates `website/dist`, so it runs after the build. Captures
-are written to `website/.captures/`. Search only works in a build, because
-Pagefind indexes the finished pages.
+are written to `website/.captures/`; the first one downloads the Chrome build
+Puppeteer pins, since installing the site's dependencies never does. Search only
+works in a build, because Pagefind indexes the finished pages.
+
+The build always starts with a fresh content cache (`astro build --force`, which
+logs "data store cleared"). Astro notices changes to its config, but not edits
+to the Markdown plugins in `website/src/lib`, so without it a plugin change
+could leave pages rendered by the old code.
 
 The Pages workflow resolves the latest release and the APT signing key before it
 builds, and passes them to the site in `SITE_METADATA_FILE`, so the published
