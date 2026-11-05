@@ -84,6 +84,12 @@
   make website-build
   make website-check
   ```
+- Drive the site in headless Chrome: the theme controls, the header and its
+  tabs, the version menu and an archived line. It builds its own latest and
+  archived copies under `website/.test/`, so it needs no release metadata:
+  ```bash
+  make website-test
+  ```
 - Screenshot the built site in both themes at desktop and phone widths:
   ```bash
   make website-capture
@@ -138,8 +144,9 @@
   bash -n scripts/*.sh
   shellcheck scripts/*.sh
   ```
-- If you change the website, run `make website-build` and `make website-check`,
-  and look at `make website-capture` output for layout changes. If you change
+- If you change the website, run `make website-build`, `make website-check` and
+  `make website-test`, and look at `make website-capture` output for layout
+  changes. If you change
   release automation, run the matching local validation that exercises those
   paths before considering the change complete.
 - If you change release tagging, release notes, or publish workflows, also run:

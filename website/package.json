@@ -10,6 +10,7 @@
     "build": "astro build --force",
     "preview": "astro preview",
     "check": "node ./scripts/check.mjs",
+    "test": "puppeteer browsers install chrome && node ./scripts/browser-test.mjs",
     "capture": "puppeteer browsers install chrome && node ./capture.mjs"
   },
   "dependencies": {

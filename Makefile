@@ -19,7 +19,7 @@ LDFLAGS ?= -s -w \
 	-X $(PKG)/internal/buildinfo.Commit=$(COMMIT) \
 	-X $(PKG)/internal/buildinfo.BuildDate=$(BUILD_DATE)
 
-.PHONY: fmt fmt-check lint lint-fix lint-install vet test build build-cross build-release package-deb docker-build website-install website-dev website-build website-check website-capture readme-hero refresh-go-toolchain clean
+.PHONY: fmt fmt-check lint lint-fix lint-install vet test build build-cross build-release package-deb docker-build website-install website-dev website-build website-check website-test website-capture readme-hero refresh-go-toolchain clean
 
 fmt:
 	gofmt -w cmd internal
@@ -112,6 +112,10 @@ website-build:
 website-check:
 	test -d $(WEBSITE_DIR)/node_modules || (printf 'missing website dependencies; run `make website-install`\n' >&2 && exit 1)
 	npm --prefix $(WEBSITE_DIR) run check
+
+website-test:
+	test -d $(WEBSITE_DIR)/node_modules || (printf 'missing website dependencies; run `make website-install`\n' >&2 && exit 1)
+	npm --prefix $(WEBSITE_DIR) run test
 
 website-capture:
 	test -d $(WEBSITE_DIR)/node_modules || (printf 'missing website dependencies; run `make website-install`\n' >&2 && exit 1)
