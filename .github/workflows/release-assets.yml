@@ -381,6 +381,7 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: 22
+          check-latest: true
           cache: npm
           cache-dependency-path: archive-src/${{ steps.line.outputs.site_dir }}/package-lock.json
 
