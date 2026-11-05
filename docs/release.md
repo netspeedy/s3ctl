@@ -31,14 +31,23 @@ make website-install
 npm --prefix website run dev
 ```
 
-Build it, validate the output, and take desktop and phone screenshots in both
-themes:
+Build it, validate the output, drive it in a browser, and take desktop and phone
+screenshots in both themes:
 
 ```bash
 make website-build
 make website-check
+make website-test
 make website-capture
 ```
+
+`website-test` runs `website/scripts/browser-test.mjs` in headless Chrome. It
+builds the site twice into `website/.test/`, as an archived line and as the
+latest with that line listed, unpacks the archive the way the Pages workflow
+does, and checks the theme controls, the header, each tab's sidebar, the version
+menu (including a long list of lines) and the archived notice. It reads the site
+root, the tabs and the pages from the build, so it works on any project's site,
+and exits non-zero if a check fails.
 
 `website-check` validates `website/dist`, so it runs after the build. Captures
 are written to `website/.captures/`; the first one downloads the Chrome build
