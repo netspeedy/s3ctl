@@ -2,7 +2,7 @@
 import Search from "@astrojs/starlight/components/Search.astro";
 import { github } from "../lib/icons";
 import { tabsFor } from "../lib/sections";
-import { links } from "../lib/site";
+import { links, product } from "../lib/site";
 import SiteTitle from "./SiteTitle.astro";
 import ThemeMenu from "./ThemeMenu.astro";
 import VersionMenu from "./VersionMenu.astro";
@@ -12,12 +12,12 @@ import VersionMenu from "./VersionMenu.astro";
 const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
 ---
 
-<div class="s3-header">
-  <div class="s3-brand">
+<div class="ns-header">
+  <div class="ns-brand">
     <SiteTitle />
     <VersionMenu />
   </div>
-  <nav class="s3-tabs print:hidden" aria-label="Sections">
+  <nav class="ns-tabs print:hidden" aria-label="Sections">
     {
       tabs.map(({ label, href, current }) => (
         <a href={href} aria-current={current ? "page" : undefined}>
@@ -26,9 +26,9 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
       ))
     }
   </nav>
-  <div class="s3-search print:hidden"><Search /></div>
-  <div class="s3-actions sl-hidden md:sl-flex print:hidden">
-    <a class="s3-icon" href={links.repo} aria-label="s3ctl on GitHub" title="s3ctl on GitHub">
+  <div class="ns-search print:hidden"><Search /></div>
+  <div class="ns-actions sl-hidden md:sl-flex print:hidden">
+    <a class="ns-icon" href={links.repo} aria-label={`${product.name} on GitHub`} title={`${product.name} on GitHub`}>
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d={github} /></svg>
     </a>
     <ThemeMenu />
@@ -37,10 +37,10 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
 
 <style>
   /* Phones: the name, search and the menu in the bar, and the sections in a row under it. */
-  .s3-header {
+  .ns-header {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
-    grid-template-rows: var(--s3-bar) var(--s3-tabs);
+    grid-template-rows: var(--ns-bar) var(--ns-tabs);
     grid-template-areas:
       "brand search actions"
       "tabs tabs tabs";
@@ -49,7 +49,7 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
     height: 100%;
   }
   /* The full height of the bar, so the version list opens just below it. */
-  .s3-brand {
+  .ns-brand {
     grid-area: brand;
     position: relative;
     display: flex;
@@ -58,7 +58,7 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
     gap: 0.25rem;
     min-width: 0;
   }
-  .s3-tabs {
+  .ns-tabs {
     grid-area: tabs;
     display: flex;
     align-self: stretch;
@@ -69,7 +69,7 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
     font-size: var(--sl-text-sm);
     font-weight: 500;
   }
-  .s3-tabs a {
+  .ns-tabs a {
     display: inline-flex;
     align-items: center;
     padding: 0 0.75rem;
@@ -78,23 +78,23 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
     text-decoration: none;
     white-space: nowrap;
   }
-  .s3-tabs a:hover {
+  .ns-tabs a:hover {
     color: var(--sl-color-white);
   }
-  .s3-tabs a[aria-current="page"] {
+  .ns-tabs a[aria-current="page"] {
     border-bottom-color: var(--sl-color-text-accent);
     color: var(--sl-color-white);
   }
-  .s3-search {
+  .ns-search {
     grid-area: search;
     display: flex;
   }
-  .s3-actions {
+  .ns-actions {
     grid-area: actions;
     align-items: center;
     gap: 0.25rem;
   }
-  .s3-icon {
+  .ns-icon {
     display: grid;
     place-items: center;
     width: 2.25rem;
@@ -102,18 +102,18 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
     border-radius: 9px;
     color: var(--sl-color-gray-2);
   }
-  .s3-icon:hover {
-    background-color: var(--s3-hover-fill);
+  .ns-icon:hover {
+    background-color: var(--ns-hover-fill);
     color: var(--sl-color-white);
   }
-  .s3-icon svg {
+  .ns-icon svg {
     width: 1.125rem;
     height: 1.125rem;
     fill: currentColor;
   }
 
   @media (max-width: 23.99rem) {
-    .s3-tabs a {
+    .ns-tabs a {
       padding: 0 0.5rem;
     }
   }
@@ -121,10 +121,10 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
   /* Pages without a sidebar, like the home page, have no mobile menu, so the theme button stays
      in the bar on phones there. */
   @media (max-width: 49.99rem) {
-    :global(:root:not([data-has-sidebar])) .s3-actions {
+    :global(:root:not([data-has-sidebar])) .ns-actions {
       display: flex;
     }
-    :global(:root:not([data-has-sidebar])) .s3-icon {
+    :global(:root:not([data-has-sidebar])) .ns-icon {
       display: none;
     }
   }
@@ -133,20 +133,20 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
      sections start exactly at the sidebar's edge, and the current one is underlined along the bar's
      bottom. */
   @media (min-width: 50rem) {
-    .s3-header {
+    .ns-header {
       grid-template-columns: calc(var(--sl-sidebar-width) - var(--sl-nav-pad-x)) minmax(0, 1fr) auto auto;
-      grid-template-rows: var(--s3-bar);
+      grid-template-rows: var(--ns-bar);
       grid-template-areas: "brand tabs search actions";
       column-gap: 0;
     }
-    .s3-tabs {
+    .ns-tabs {
       margin-inline: 0;
       overflow: visible;
     }
-    .s3-search {
+    .ns-search {
       margin-inline-end: 0.5rem;
     }
-    .s3-search :global(button[data-open-modal]) {
+    .ns-search :global(button[data-open-modal]) {
       width: 13.75rem;
       height: 2.25rem;
     }
@@ -154,14 +154,14 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
 
   /* Tablets: the search becomes its icon, so the sections keep their place. */
   @media (min-width: 50rem) and (max-width: 63.99rem) {
-    .s3-search :global(button[data-open-modal]) {
+    .ns-search :global(button[data-open-modal]) {
       justify-content: center;
       width: 2.25rem;
       padding: 0;
       border-color: transparent;
       background: transparent;
     }
-    .s3-search :global(button[data-open-modal] > :not(svg)) {
+    .ns-search :global(button[data-open-modal] > :not(svg)) {
       display: none;
     }
   }

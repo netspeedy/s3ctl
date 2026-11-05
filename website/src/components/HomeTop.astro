@@ -149,34 +149,34 @@ const copyIcon =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>';
 ---
 
-<section class="s3-home-top not-content">
-  <div class="s3-home-copy">
-    <p class="s3-home-label">s3ctl documentation{release.tagged && ` · ${release.version}`}</p>
+<section class="ns-home-top not-content">
+  <div class="ns-home-copy">
+    <p class="ns-home-label">s3ctl documentation{release.tagged && ` · ${release.version}`}</p>
     <h1 id="_top">{lines.map((line, i) => (i ? [<br />, line] : line))}</h1>
-    <div class="s3-home-lead"><slot /></div>
-    <div class="s3-home-actions">
-      <a class="s3-button s3-button-primary" href={`${import.meta.env.BASE_URL}quickstart/`}>
+    <div class="ns-home-lead"><slot /></div>
+    <div class="ns-home-actions">
+      <a class="ns-button ns-button-primary" href={`${import.meta.env.BASE_URL}quickstart/`}>
         Read the quickstart
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
       </a>
-      <a class="s3-button" href={`${import.meta.env.BASE_URL}reference/cli/`}>CLI reference</a>
+      <a class="ns-button" href={`${import.meta.env.BASE_URL}reference/cli/`}>CLI reference</a>
     </div>
-    <s3ctl-copy class="s3-home-install" data-copy={install}>
-      <code><span class="s3-prompt">$ </span>{install}</code>
+    <ns-copy class="ns-home-install" data-copy={install}>
+      <code><span class="ns-prompt">$ </span>{install}</code>
       <button type="button" aria-label="Copy the install commands" set:html={copyIcon} />
-    </s3ctl-copy>
+    </ns-copy>
   </div>
 
-  <s3ctl-code-tabs class="s3-panel">
-    <div class="s3-panel-head">
+  <ns-code-tabs class="ns-panel">
+    <div class="ns-panel-head">
       <div role="tablist" aria-label="Examples">
         {
           tabs.map((tab, i) => (
             <button
               type="button"
               role="tab"
-              id={`s3-tab-${tab.id}`}
-              aria-controls={`s3-panel-${tab.id}`}
+              id={`ns-tab-${tab.id}`}
+              aria-controls={`ns-panel-${tab.id}`}
               aria-selected={i === 0 ? "true" : "false"}
               tabindex={i === 0 ? 0 : -1}
             >
@@ -185,15 +185,15 @@ const copyIcon =
           ))
         }
       </div>
-      <button type="button" class="s3-panel-copy" aria-label="Copy the command" set:html={copyIcon} />
+      <button type="button" class="ns-panel-copy" aria-label="Copy the command" set:html={copyIcon} />
     </div>
     {
       tabs.map((tab, i) => (
         <div
-          class="s3-panel-body"
+          class="ns-panel-body"
           role="tabpanel"
-          id={`s3-panel-${tab.id}`}
-          aria-labelledby={`s3-tab-${tab.id}`}
+          id={`ns-panel-${tab.id}`}
+          aria-labelledby={`ns-tab-${tab.id}`}
           data-copy={tab.copy}
           hidden={i !== 0}
           tabindex="0"
@@ -202,7 +202,7 @@ const copyIcon =
         </div>
       ))
     }
-  </s3ctl-code-tabs>
+  </ns-code-tabs>
 </section>
 
 <script>
@@ -245,7 +245,7 @@ const copyIcon =
           next.focus();
         });
       });
-      const copyButton = this.querySelector<HTMLButtonElement>(".s3-panel-copy");
+      const copyButton = this.querySelector<HTMLButtonElement>(".ns-panel-copy");
       copyButton?.addEventListener("click", () => {
         const panel = this.querySelector<HTMLElement>('[role="tabpanel"]:not([hidden])');
         if (panel) copy(panel.dataset.copy ?? "", copyButton);
@@ -253,19 +253,19 @@ const copyIcon =
     }
   }
 
-  customElements.define("s3ctl-copy", CopyText);
-  customElements.define("s3ctl-code-tabs", CodeTabs);
+  customElements.define("ns-copy", CopyText);
+  customElements.define("ns-code-tabs", CodeTabs);
 </script>
 
 <style>
-  .s3-home-top {
+  .ns-home-top {
     display: grid;
     grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
     gap: 3.5rem;
     align-items: center;
     padding: 2.5rem 0 4rem;
   }
-  .s3-home-label {
+  .ns-home-label {
     margin: 0;
     font-family: var(--__sl-font-mono);
     font-size: var(--sl-text-xs);
@@ -279,17 +279,17 @@ const copyIcon =
     letter-spacing: -0.038em;
     color: var(--sl-color-white);
   }
-  .s3-home-lead {
+  .ns-home-lead {
     max-width: 32.5rem;
     margin-top: 1.25rem;
     font-size: var(--sl-text-lg);
     line-height: 1.65;
     color: var(--sl-color-gray-2);
   }
-  .s3-home-lead :global(p) {
+  .ns-home-lead :global(p) {
     margin: 0;
   }
-  .s3-home-lead :global(code) {
+  .ns-home-lead :global(code) {
     padding: 0.0625rem 0.3125rem;
     border: 1px solid var(--sl-color-hairline-shade);
     border-radius: 5px;
@@ -298,13 +298,13 @@ const copyIcon =
     color: var(--sl-color-white);
     white-space: nowrap;
   }
-  .s3-home-actions {
+  .ns-home-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.625rem;
     margin-top: 1.875rem;
   }
-  .s3-button {
+  .ns-button {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -318,10 +318,10 @@ const copyIcon =
     text-decoration: none;
     white-space: nowrap;
   }
-  .s3-button:hover {
+  .ns-button:hover {
     border-color: var(--sl-color-gray-3);
   }
-  .s3-button svg {
+  .ns-button svg {
     width: 1rem;
     height: 1rem;
     fill: none;
@@ -330,35 +330,35 @@ const copyIcon =
     stroke-linecap: round;
     stroke-linejoin: round;
   }
-  .s3-button-primary {
+  .ns-button-primary {
     border-color: var(--sl-color-white);
     background-color: var(--sl-color-white);
     color: var(--sl-color-black);
   }
-  .s3-button-primary:hover {
+  .ns-button-primary:hover {
     border-color: var(--sl-color-gray-1);
     background-color: var(--sl-color-gray-1);
   }
-  .s3-home-install {
+  .ns-home-install {
     display: flex;
     align-items: center;
     gap: 0.375rem;
     margin-top: 1.25rem;
   }
-  .s3-home-install code {
+  .ns-home-install code {
     font-family: var(--__sl-font-mono);
     font-size: var(--sl-text-xs);
     color: var(--sl-color-gray-2);
   }
-  .s3-prompt {
+  .ns-prompt {
     color: var(--sl-color-gray-3);
   }
   button {
     font: inherit;
     cursor: pointer;
   }
-  .s3-home-install button,
-  .s3-panel-copy {
+  .ns-home-install button,
+  .ns-panel-copy {
     display: grid;
     place-items: center;
     width: 2.25rem;
@@ -369,11 +369,11 @@ const copyIcon =
     background: none;
     color: var(--sl-color-gray-3);
   }
-  .s3-home-install button:hover {
+  .ns-home-install button:hover {
     color: var(--sl-color-white);
   }
-  .s3-home-install button :global(svg),
-  .s3-panel-copy :global(svg) {
+  .ns-home-install button :global(svg),
+  .ns-panel-copy :global(svg) {
     width: 0.9375rem;
     height: 0.9375rem;
     fill: none;
@@ -382,11 +382,11 @@ const copyIcon =
     stroke-linejoin: round;
   }
   [data-copied] {
-    color: var(--s3-ok) !important;
+    color: var(--ns-ok) !important;
   }
 
   /* The panel is dark in both themes, like every code block on the site. */
-  .s3-panel {
+  .ns-panel {
     display: block;
     min-width: 0;
     border: 1px solid #1c2330;
@@ -396,10 +396,10 @@ const copyIcon =
     overflow: hidden;
     color: #dce4ee;
   }
-  :global([data-theme="dark"]) .s3-panel {
+  :global([data-theme="dark"]) .ns-panel {
     box-shadow: none;
   }
-  .s3-panel-head {
+  .ns-panel-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -432,17 +432,17 @@ const copyIcon =
     font-weight: 500;
     color: #e8ecf1;
   }
-  .s3-panel-copy {
+  .ns-panel-copy {
     flex: 0 0 auto;
     color: #8f9bab;
   }
-  .s3-panel-copy:hover {
+  .ns-panel-copy:hover {
     color: #e8ecf1;
   }
-  .s3-panel-body {
+  .ns-panel-body {
     overflow-x: auto;
   }
-  .s3-panel-body:focus-visible {
+  .ns-panel-body:focus-visible {
     outline: 2px solid #4bd8ff;
     outline-offset: -2px;
   }
@@ -495,7 +495,7 @@ const copyIcon =
   }
 
   @media (max-width: 56rem) {
-    .s3-home-top {
+    .ns-home-top {
       grid-template-columns: minmax(0, 1fr);
       gap: 2.25rem;
       padding: 1rem 0 3.5rem;

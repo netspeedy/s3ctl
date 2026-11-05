@@ -1,7 +1,7 @@
 // In an archived line, keep the pages' links inside that line.
 //
-// The pages link to each other from the site root, as /s3ctl/guides/configuration/. When a line is
-// built under /s3ctl/v0.8/, those would jump to the latest docs, so this points them at the same
+// The pages link to each other from the site root, as <root>guides/configuration/. When a line is
+// built under <root>v0.8/, those would jump to the latest docs, so this points them at the same
 // page in the line being built. Links that already name a line, and links off the site, are left.
 export default function rehypeArchiveLinks({ root, base }) {
   const walk = (node) => {

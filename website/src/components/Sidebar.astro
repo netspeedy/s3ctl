@@ -11,7 +11,7 @@ const { sidebar } = Astro.locals.starlightRoute;
 const style = (label: string) => {
   const section = sections.find((candidate) => candidate.label === label);
   if (!section) return undefined;
-  const hue = `--s3-${section.hue}`;
+  const hue = `--ns-${section.hue}`;
   return `--cc: var(${hue}); --cb: var(${hue}-bg); --cl: var(${hue}-line); --ci: var(${hue}-ink); --cf: var(${hue}-fill); --icon: ${iconMask(section)}`;
 };
 ---
@@ -19,7 +19,7 @@ const style = (label: string) => {
 <SidebarPersister>
   {
     sidebar.map((entry) => (
-      <div class="s3-group" style={entry.type === "group" ? style(entry.label) : undefined}>
+      <div class="ns-group" style={entry.type === "group" ? style(entry.label) : undefined}>
         <SidebarSublist sublist={[entry]} />
       </div>
     ))

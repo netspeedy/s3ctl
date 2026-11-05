@@ -11,19 +11,19 @@ const options = [
 ] as const;
 ---
 
-<s3ctl-theme-menu class="s3-theme-menu" data-pref="auto">
+<ns-theme-menu class="ns-theme-menu" data-pref="auto">
   <button
-    class="s3-theme-button"
+    class="ns-theme-button"
     type="button"
     aria-label="Colour theme"
     title="Colour theme"
     aria-haspopup="menu"
     aria-expanded="false"
-    aria-controls="s3-theme-menu"
+    aria-controls="ns-theme-menu"
   >
     {options.map(({ value }) => <svg class={value} viewBox="0 0 24 24" aria-hidden="true" set:html={icons[value]} />)}
   </button>
-  <div id="s3-theme-menu" class="s3-menu" role="menu" aria-label="Colour theme" hidden>
+  <div id="ns-theme-menu" class="ns-menu" role="menu" aria-label="Colour theme" hidden>
     {
       options.map(({ value, label }) => (
         <button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" data-value={value}>
@@ -34,7 +34,7 @@ const options = [
       ))
     }
   </div>
-</s3ctl-theme-menu>
+</ns-theme-menu>
 
 {/* Inlined so the button shows the right theme on first paint. */}
 <script is:inline>
@@ -44,7 +44,7 @@ const options = [
       stored = localStorage.getItem("starlight-theme");
     } catch {}
     const value = stored === "light" || stored === "dark" ? stored : "auto";
-    document.querySelectorAll("s3ctl-theme-menu").forEach((menu) => {
+    document.querySelectorAll("ns-theme-menu").forEach((menu) => {
       menu.dataset.pref = value;
       menu.querySelectorAll("[data-value]").forEach((item) => {
         item.setAttribute("aria-checked", String(item.dataset.value === value));
@@ -61,7 +61,7 @@ const options = [
   // button. Choosing an item, clicking outside or tabbing away closes it too.
   class ThemeMenu extends HTMLElement {
     connectedCallback() {
-      const button = this.querySelector<HTMLButtonElement>(".s3-theme-button")!;
+      const button = this.querySelector<HTMLButtonElement>(".ns-theme-button")!;
       const menu = this.querySelector<HTMLElement>('[role="menu"]')!;
       const items = [...menu.querySelectorAll<HTMLButtonElement>("[data-value]")];
 
@@ -118,15 +118,15 @@ const options = [
     }
   }
 
-  customElements.define("s3ctl-theme-menu", ThemeMenu);
+  customElements.define("ns-theme-menu", ThemeMenu);
 </script>
 
 <style>
-  .s3-theme-menu {
+  .ns-theme-menu {
     position: relative;
     display: flex;
   }
-  .s3-theme-button {
+  .ns-theme-button {
     display: grid;
     place-items: center;
     width: 2.25rem;
@@ -138,21 +138,21 @@ const options = [
     color: var(--sl-color-gray-2);
     cursor: pointer;
   }
-  .s3-theme-button:hover {
-    background-color: var(--s3-hover-fill);
+  .ns-theme-button:hover {
+    background-color: var(--ns-hover-fill);
     color: var(--sl-color-white);
   }
-  .s3-theme-button[aria-expanded="true"] {
-    background-color: var(--s3-current-bg);
-    color: var(--s3-current-ink);
+  .ns-theme-button[aria-expanded="true"] {
+    background-color: var(--ns-current-bg);
+    color: var(--ns-current-ink);
   }
-  .s3-theme-button svg {
+  .ns-theme-button svg {
     display: none;
     grid-area: 1 / 1;
   }
-  [data-pref="light"] .s3-theme-button .light,
-  [data-pref="dark"] .s3-theme-button .dark,
-  [data-pref="auto"] .s3-theme-button .auto {
+  [data-pref="light"] .ns-theme-button .light,
+  [data-pref="dark"] .ns-theme-button .dark,
+  [data-pref="auto"] .ns-theme-button .auto {
     display: block;
   }
   svg {
@@ -165,7 +165,7 @@ const options = [
     stroke-linejoin: round;
   }
 
-  .s3-menu {
+  .ns-menu {
     position: absolute;
     inset-inline-end: 0;
     top: calc(100% + 0.5rem);
@@ -174,10 +174,10 @@ const options = [
     padding: 6px;
     border: 1px solid var(--sl-color-gray-5);
     border-radius: 12px;
-    background-color: var(--s3-menu-bg);
-    box-shadow: var(--s3-menu-shadow);
+    background-color: var(--ns-menu-bg);
+    box-shadow: var(--ns-menu-shadow);
   }
-  .s3-menu button {
+  .ns-menu button {
     display: flex;
     align-items: center;
     gap: 0.625rem;
@@ -192,21 +192,21 @@ const options = [
     text-align: start;
     cursor: pointer;
   }
-  .s3-menu button:hover,
-  .s3-menu button:focus-visible {
-    background-color: var(--s3-hover-fill);
+  .ns-menu button:hover,
+  .ns-menu button:focus-visible {
+    background-color: var(--ns-hover-fill);
     color: var(--sl-color-white);
   }
-  .s3-menu button[aria-checked="true"] {
+  .ns-menu button[aria-checked="true"] {
     font-weight: 500;
     color: var(--sl-color-white);
   }
-  .s3-menu svg {
+  .ns-menu svg {
     width: 1rem;
     height: 1rem;
     stroke-width: 2;
   }
-  .s3-menu .check {
+  .ns-menu .check {
     margin-inline-start: auto;
     color: var(--sl-color-text-accent);
     visibility: hidden;

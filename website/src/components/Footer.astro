@@ -15,10 +15,10 @@ report.searchParams.set("title", `Docs${docs.archived ? ` (${docs.current})` : "
 report.searchParams.set("body", `On ${new URL(Astro.url.pathname, Astro.site)}:\n\n`);
 ---
 
-<footer class="s3-end" data-pagefind-ignore>
+<footer class="ns-end" data-pagefind-ignore>
   {
     docPage && (
-      <div class="s3-page-end print:hidden">
+      <div class="ns-page-end print:hidden">
         {editUrl && (
           <a href={editUrl}>
             <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons.pencil} />
@@ -37,19 +37,19 @@ report.searchParams.set("body", `On ${new URL(Astro.url.pathname, Astro.site)}:\
 </footer>
 
 <style>
-  .s3-end {
+  .ns-end {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
   }
-  .s3-page-end {
+  .ns-page-end {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem 1.5rem;
     margin-top: 2.75rem;
     font-size: var(--sl-text-sm);
   }
-  .s3-page-end a {
+  .ns-page-end a {
     display: inline-flex;
     align-items: center;
     gap: 0.4375rem;
@@ -57,7 +57,7 @@ report.searchParams.set("body", `On ${new URL(Astro.url.pathname, Astro.site)}:\
     color: var(--sl-color-gray-3);
     text-decoration: none;
   }
-  .s3-page-end a:hover {
+  .ns-page-end a:hover {
     color: var(--sl-color-white);
   }
   svg {

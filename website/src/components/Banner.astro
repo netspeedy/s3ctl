@@ -17,8 +17,8 @@ const storageKey = `archived-notice:${siteRoot}${docs.current}`;
 {
   docs.archived && (
     <>
-      <s3ctl-archived-notice
-        class="s3-archived"
+      <ns-archived-notice
+        class="ns-archived"
         data-root={siteRoot}
         data-base={base}
         data-key={storageKey}
@@ -32,7 +32,7 @@ const storageKey = `archived-notice:${siteRoot}${docs.current}`;
             <a href={siteRoot} data-latest-link>Read the latest docs</a>
           </p>
           <button
-            class="s3-close"
+            class="ns-close"
             type="button"
             aria-label={`Hide this notice for ${docs.current}`}
             title={`Hide for ${docs.current}`}
@@ -41,11 +41,11 @@ const storageKey = `archived-notice:${siteRoot}${docs.current}`;
             <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons.close} />
           </button>
         </div>
-      </s3ctl-archived-notice>
+      </ns-archived-notice>
       {/* Inlined so a closed notice never flashes up before the page's script runs. */}
       <script is:inline define:vars={{ storageKey }}>
         try {
-          if (localStorage.getItem(storageKey)) document.querySelector("s3ctl-archived-notice").hidden = true;
+          if (localStorage.getItem(storageKey)) document.querySelector("ns-archived-notice").hidden = true;
         } catch {}
       </script>
     </>
@@ -77,7 +77,7 @@ const storageKey = `archived-notice:${siteRoot}${docs.current}`;
       const { root = "/", base = "", key = "" } = this.dataset;
       let latestRelease: string | undefined;
 
-      const close = this.querySelector<HTMLButtonElement>(".s3-close")!;
+      const close = this.querySelector<HTMLButtonElement>(".ns-close")!;
       close.hidden = false;
       close.addEventListener("click", () => {
         write(key, latestRelease ?? "unknown");
@@ -107,15 +107,15 @@ const storageKey = `archived-notice:${siteRoot}${docs.current}`;
     }
   }
 
-  customElements.define("s3ctl-archived-notice", ArchivedNotice);
+  customElements.define("ns-archived-notice", ArchivedNotice);
 </script>
 
 <style>
-  .s3-archived {
+  .ns-archived {
     display: block;
     padding: 1.5rem var(--sl-content-pad-x) 0;
   }
-  .s3-archived[hidden] {
+  .ns-archived[hidden] {
     display: none;
   }
   div {
@@ -124,9 +124,9 @@ const storageKey = `archived-notice:${siteRoot}${docs.current}`;
     gap: 0.625rem;
     max-width: var(--sl-content-width);
     padding: 0.5625rem 0.5rem 0.5625rem 0.875rem;
-    border: 1px solid var(--s3-c3-line);
+    border: 1px solid var(--ns-c3-line);
     border-radius: 12px;
-    background-color: var(--s3-c3-bg);
+    background-color: var(--ns-c3-bg);
   }
   svg {
     flex: none;
@@ -134,7 +134,7 @@ const storageKey = `archived-notice:${siteRoot}${docs.current}`;
     height: 1.125rem;
     margin-top: 0.1875rem;
     fill: none;
-    stroke: var(--s3-c3);
+    stroke: var(--ns-c3);
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -149,15 +149,15 @@ const storageKey = `archived-notice:${siteRoot}${docs.current}`;
   }
   b {
     font-weight: 600;
-    color: var(--s3-c3-ink);
+    color: var(--ns-c3-ink);
   }
   a {
     font-weight: 600;
-    color: var(--s3-c3-ink);
+    color: var(--ns-c3-ink);
     text-underline-offset: 3px;
     white-space: nowrap;
   }
-  .s3-close {
+  .ns-close {
     display: grid;
     flex: none;
     place-items: center;
@@ -170,14 +170,14 @@ const storageKey = `archived-notice:${siteRoot}${docs.current}`;
     color: var(--sl-color-gray-3);
     cursor: pointer;
   }
-  .s3-close[hidden] {
+  .ns-close[hidden] {
     display: none;
   }
-  .s3-close:hover {
-    background-color: color-mix(in srgb, var(--s3-c3) 16%, transparent);
-    color: var(--s3-c3-ink);
+  .ns-close:hover {
+    background-color: color-mix(in srgb, var(--ns-c3) 16%, transparent);
+    color: var(--ns-c3-ink);
   }
-  .s3-close svg {
+  .ns-close svg {
     width: 0.9375rem;
     height: 0.9375rem;
     margin: 0;

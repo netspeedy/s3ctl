@@ -16,7 +16,7 @@ const key = "#a5b1ff";
 const literal = "#f5b841";
 
 export const codeTheme = {
-  name: "s3ctl-code",
+  name: "ns-code",
   type: "dark",
   colors: {
     "editor.background": "#0b0f16",

@@ -10,12 +10,12 @@ interface Props {
 const { section, large = false } = Astro.props;
 ---
 
-<span class:list={["s3-section-icon", { large }]} style={`--cc: var(--s3-${section.hue}); --cb: var(--s3-${section.hue}-bg); --cl: var(--s3-${section.hue}-line)`}>
+<span class:list={["ns-section-icon", { large }]} style={`--cc: var(--ns-${section.hue}); --cb: var(--ns-${section.hue}-bg); --cl: var(--ns-${section.hue}-line)`}>
   <svg viewBox="0 0 24 24" aria-hidden="true" set:html={section.icon} />
 </span>
 
 <style>
-  .s3-section-icon {
+  .ns-section-icon {
     display: inline-grid;
     flex: 0 0 auto;
     place-items: center;

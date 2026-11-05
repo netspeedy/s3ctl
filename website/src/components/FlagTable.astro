@@ -20,7 +20,7 @@ const runs = (text: string) =>
   text.split("`").map((part, index) => ({ code: index % 2 === 1, part }));
 ---
 
-<div class="s3-table">
+<div class="ns-table">
   <table>
     <thead>
       <tr>
@@ -34,12 +34,12 @@ const runs = (text: string) =>
         flags.map((row) => (
           <tr>
             <td>
-              {row.short && <code class="s3-short">{row.short}</code>}
-              <code class="s3-flag">{row.flag}</code>
-              {row.arg && <code class="s3-arg"> {row.arg}</code>}
-              {row.repeatable && <span class="s3-tag">repeatable</span>}
+              {row.short && <code class="ns-short">{row.short}</code>}
+              <code class="ns-flag">{row.flag}</code>
+              {row.arg && <code class="ns-arg"> {row.arg}</code>}
+              {row.repeatable && <span class="ns-tag">repeatable</span>}
             </td>
-            <td>{row.default ? <code>{row.default}</code> : <span class="s3-none">None</span>}</td>
+            <td>{row.default ? <code>{row.default}</code> : <span class="ns-none">None</span>}</td>
             <td>{runs(row.description).map(({ code, part }) => (code ? <code>{part}</code> : part))}</td>
           </tr>
         ))
@@ -49,18 +49,18 @@ const runs = (text: string) =>
 </div>
 
 <style>
-  .s3-table td code {
+  .ns-table td code {
     padding: 0;
     background: none;
   }
-  .s3-flag {
+  .ns-flag {
     font-weight: 600;
     color: var(--sl-color-white);
   }
-  .s3-arg {
+  .ns-arg {
     color: var(--sl-color-gray-3);
   }
-  .s3-short {
+  .ns-short {
     margin-inline-end: 0.375rem;
     padding: 0 0.3125rem !important;
     border: 1px solid var(--sl-color-hairline-light);
@@ -68,20 +68,20 @@ const runs = (text: string) =>
     font-size: 0.75rem;
     color: var(--sl-color-gray-2);
   }
-  .s3-tag {
+  .ns-tag {
     display: inline-block;
     margin-inline-start: 0.5rem;
     padding: 0 0.4375rem;
-    border: 1px solid var(--s3-page-line);
+    border: 1px solid var(--ns-page-line);
     border-radius: 999px;
-    background-color: var(--s3-page-bg);
+    background-color: var(--ns-page-bg);
     font-size: 0.6875rem;
     font-weight: 600;
     line-height: 1.6;
-    color: var(--s3-page-ink);
+    color: var(--ns-page-ink);
     white-space: nowrap;
   }
-  .s3-none {
+  .ns-none {
     color: var(--sl-color-gray-3);
   }
 </style>

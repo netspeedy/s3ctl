@@ -10,7 +10,7 @@ const options = [
 ] as const;
 ---
 
-<s3ctl-theme-switch class="s3-theme" role="group" aria-label="Colour theme">
+<ns-theme-switch class="ns-theme" role="group" aria-label="Colour theme">
   {
     options.map(({ value, label }) => (
       <button type="button" data-value={value} aria-pressed="false" aria-label={label} title={label}>
@@ -18,7 +18,7 @@ const options = [
       </button>
     ))
   }
-</s3ctl-theme-switch>
+</ns-theme-switch>
 
 {/* Inlined so the pressed state is right on first paint. */}
 <script is:inline>
@@ -28,7 +28,7 @@ const options = [
       stored = localStorage.getItem("starlight-theme");
     } catch {}
     const value = stored === "light" || stored === "dark" ? stored : "auto";
-    document.querySelectorAll("s3ctl-theme-switch button").forEach((button) => {
+    document.querySelectorAll("ns-theme-switch button").forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.value === value));
     });
   })();
@@ -38,7 +38,7 @@ const options = [
   import { applyTheme, onThemeChange, parseTheme } from "../lib/theme";
 
   onThemeChange((theme) => {
-    document.querySelectorAll<HTMLButtonElement>("s3ctl-theme-switch button").forEach((button) => {
+    document.querySelectorAll<HTMLButtonElement>("ns-theme-switch button").forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.value === theme));
     });
   });
@@ -52,11 +52,11 @@ const options = [
     }
   }
 
-  customElements.define("s3ctl-theme-switch", ThemeSwitch);
+  customElements.define("ns-theme-switch", ThemeSwitch);
 </script>
 
 <style>
-  .s3-theme {
+  .ns-theme {
     display: inline-flex;
     gap: 2px;
     padding: 2px;
@@ -80,8 +80,8 @@ const options = [
     color: var(--sl-color-white);
   }
   button[aria-pressed="true"] {
-    background-color: var(--s3-current-bg);
-    color: var(--s3-current-ink);
+    background-color: var(--ns-current-bg);
+    color: var(--ns-current-ink);
   }
   svg {
     width: 1.0625rem;

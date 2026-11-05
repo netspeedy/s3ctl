@@ -1,9 +1,9 @@
 // Screenshot the built site in both themes at desktop and phone widths.
 //
-// Run `npm run build` first. This serves dist/ under /s3ctl/, the path GitHub Pages uses, and
+// Run `npm run build` first. This serves dist/ under the site root GitHub Pages uses, and
 // writes the PNGs to .captures/. Pass page paths to capture something other than the defaults,
 // for example `npm run capture -- reference/cli/`.
-import { createReadStream, existsSync, statSync } from "node:fs";
+import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import path from "node:path";
@@ -14,7 +14,12 @@ import puppeteer from "puppeteer";
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.join(root, "dist");
 const outputDir = path.join(root, ".captures");
-const base = "/s3ctl/";
+if (!existsSync(path.join(dist, "versions.json"))) {
+  console.error("dist/versions.json is missing; run `npm run build` first.");
+  process.exit(1);
+}
+// The latest line is listed at the site root.
+const base = JSON.parse(readFileSync(path.join(dist, "versions.json"), "utf8")).versions.find((version) => version.latest).url;
 
 const pages = process.argv.slice(2).length ? process.argv.slice(2) : ["", "quickstart/", "reference/cli/"];
 const themes = ["light", "dark"];

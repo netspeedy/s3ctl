@@ -125,18 +125,18 @@ const themeState = (page) =>
     } catch {
       stored = "<storage refused>";
     }
-    const pressed = [...document.querySelectorAll("s3ctl-theme-switch")].map((group) =>
+    const pressed = [...document.querySelectorAll("ns-theme-switch")].map((group) =>
       [...group.querySelectorAll("button")].filter((b) => b.getAttribute("aria-pressed") === "true").map((b) => b.dataset.value).join(","),
     );
-    const menu = document.querySelector("s3ctl-theme-menu");
-    const button = menu.querySelector(".s3-theme-button");
+    const menu = document.querySelector("ns-theme-menu");
+    const button = menu.querySelector(".ns-theme-button");
     return {
       theme: document.documentElement.dataset.theme,
       stored,
       pressed,
       pref: menu.dataset.pref,
       checked: [...menu.querySelectorAll('[role="menuitemradio"]')].filter((i) => i.getAttribute("aria-checked") === "true").map((i) => i.dataset.value).join(","),
-      icon: [...menu.querySelectorAll(".s3-theme-button svg")].filter((svg) => getComputedStyle(svg).display !== "none").map((svg) => svg.classList[0]).join(","),
+      icon: [...menu.querySelectorAll(".ns-theme-button svg")].filter((svg) => getComputedStyle(svg).display !== "none").map((svg) => svg.classList[0]).join(","),
       expanded: button.getAttribute("aria-expanded"),
       open: !menu.querySelector('[role="menu"]').hidden,
       focus: document.activeElement === button ? "button" : (document.activeElement?.dataset?.value ?? document.activeElement?.tagName),
@@ -144,7 +144,7 @@ const themeState = (page) =>
   });
 const shows = (s, value) => s.pref === value && s.checked === value && s.icon === value && s.pressed.every((p) => p === value);
 async function choose(page, value) {
-  await page.click(".s3-theme-button");
+  await page.click(".ns-theme-button");
   await wait();
   await page.click(`[role="menuitemradio"][data-value="${value}"]`);
   await wait();
@@ -160,7 +160,7 @@ async function themeRun(label, { storage = true, scheme = "dark" } = {}) {
   const page = await open(at(testPage), { storage, scheme });
   const first = await themeState(page);
   check(`theme, ${label}: the first load follows the system (${scheme})`, first.theme === scheme && shows(first, "auto") && !first.open, JSON.stringify(first));
-  await page.click(".s3-theme-button");
+  await page.click(".ns-theme-button");
   await wait();
   let s = await themeState(page);
   check(`theme, ${label}: the button opens the menu on the chosen item`, s.open && s.expanded === "true" && s.focus === "auto", JSON.stringify(s));
@@ -177,7 +177,7 @@ async function themeRun(label, { storage = true, scheme = "dark" } = {}) {
   }
   s = await choose(page, "auto");
   check(`theme, ${label}: System`, s.theme === scheme && shows(s, "auto") && (!storage || s.stored === ""), JSON.stringify(s));
-  await page.evaluate(() => document.querySelector('s3ctl-theme-switch [data-value="dark"]').click());
+  await page.evaluate(() => document.querySelector('ns-theme-switch [data-value="dark"]').click());
   await wait();
   s = await themeState(page);
   check(`theme, ${label}: the phone menu's switch updates the header menu`, s.theme === "dark" && shows(s, "dark"), JSON.stringify(s));
@@ -204,7 +204,7 @@ await themeRun("storage refused, light system", { storage: false, scheme: "light
 
 {
   const page = await open(at(testPage));
-  await page.focus(".s3-theme-button");
+  await page.focus(".ns-theme-button");
   await page.keyboard.press("ArrowDown");
   let s = await themeState(page);
   check("theme menu: ArrowDown opens it on the first item", s.open && s.focus === "light", JSON.stringify(s));
@@ -230,7 +230,7 @@ await themeRun("storage refused, light system", { storage: false, scheme: "light
   await page.keyboard.press("Tab");
   s = await themeState(page);
   check("theme menu: Tab closes it", !s.open && s.expanded === "false", JSON.stringify(s));
-  await page.click(".s3-theme-button");
+  await page.click(".ns-theme-button");
   await wait();
   await page.mouse.click(700, 500);
   await wait();
@@ -241,14 +241,14 @@ await themeRun("storage refused, light system", { storage: false, scheme: "light
 
 {
   const page = await open(at(testPage), { width: 390, height: 844, mobile: true, scheme: "light" });
-  const inBar = await page.evaluate(() => document.querySelector(".s3-theme-button").getBoundingClientRect().width);
+  const inBar = await page.evaluate(() => document.querySelector(".ns-theme-button").getBoundingClientRect().width);
   check("phone, doc page: no theme button in the bar", inBar === 0, `width ${inBar}`);
   await page.click(".sl-menu-button");
   await wait(300);
-  const visible = await page.evaluate(() => [...document.querySelectorAll("s3ctl-theme-switch")].filter((el) => el.getBoundingClientRect().width > 0).length);
+  const visible = await page.evaluate(() => [...document.querySelectorAll("ns-theme-switch")].filter((el) => el.getBoundingClientRect().width > 0).length);
   check("phone, doc page: the theme switch shows in the open menu", visible === 1, `visible switches: ${visible}`);
   await page.goto(at(), { waitUntil: "networkidle0" });
-  const home = await page.evaluate(() => [...document.querySelectorAll(".s3-theme-button")].filter((el) => el.getBoundingClientRect().width > 0).length);
+  const home = await page.evaluate(() => [...document.querySelectorAll(".ns-theme-button")].filter((el) => el.getBoundingClientRect().width > 0).length);
   check("phone, home page: the theme button shows in the bar", home === 1, `visible buttons: ${home}`);
   await page.close();
 }
@@ -257,23 +257,23 @@ await themeRun("storage refused, light system", { storage: false, scheme: "light
 
 const versionMenu = (page) =>
   page.evaluate(() => {
-    const menu = document.querySelector("s3ctl-version-menu");
-    const button = menu.querySelector(".s3-version");
+    const menu = document.querySelector("ns-version-menu");
+    const button = menu.querySelector(".ns-version");
     const rows = [...menu.querySelectorAll("li a")].map((a) => ({
-      version: a.querySelector(".s3-line")?.textContent,
-      release: a.querySelector(".s3-release")?.textContent,
-      latest: a.querySelector(".s3-latest")?.textContent,
+      version: a.querySelector(".ns-line")?.textContent,
+      release: a.querySelector(".ns-release")?.textContent,
+      latest: a.querySelector(".ns-latest")?.textContent,
       current: a.getAttribute("aria-current") === "true",
       href: a.getAttribute("href"),
-      columns: [".s3-line", ".s3-release", ".s3-tick"].map((cell) => Math.round(a.querySelector(cell)?.getBoundingClientRect().left ?? -1)),
+      columns: [".ns-line", ".ns-release", ".ns-tick"].map((cell) => Math.round(a.querySelector(cell)?.getBoundingClientRect().left ?? -1)),
     }));
-    return { label: button.getAttribute("aria-label"), open: !menu.querySelector(".s3-versions").hidden, rows, focus: document.activeElement === button };
+    return { label: button.getAttribute("aria-label"), open: !menu.querySelector(".ns-versions").hidden, rows, focus: document.activeElement === button };
   });
 
 {
   const page = await open(at(testPage));
   const layout = await page.evaluate(() => ({
-    tab: Math.round(document.querySelector(".s3-tabs a").getBoundingClientRect().left),
+    tab: Math.round(document.querySelector(".ns-tabs a").getBoundingClientRect().left),
     sidebar: Math.round(document.querySelector(".sidebar-pane").getBoundingClientRect().right),
     bar: Math.round(document.querySelector("header.header").getBoundingClientRect().height),
   }));
@@ -281,7 +281,7 @@ const versionMenu = (page) =>
 
   let m = await versionMenu(page);
   check("version menu: the chevron is named for the line", m.label === `Documentation version, ${LATEST.version}`, m.label);
-  await page.click(".s3-version");
+  await page.click(".ns-version");
   await wait();
   m = await versionMenu(page);
   const [newest, older] = m.rows;
@@ -294,7 +294,7 @@ const versionMenu = (page) =>
   await page.keyboard.press("Escape");
   m = await versionMenu(page);
   check("version menu: Escape closes it and returns to the chevron", !m.open && m.focus, JSON.stringify(m));
-  await page.click(".s3-version");
+  await page.click(".ns-version");
   await wait();
   await Promise.all([page.waitForNavigation({ waitUntil: "networkidle0" }), page.click(`li a[data-version="${ARCHIVED.version}"]`)]);
   check("version menu: switching opens the same page in the other line", new URL(page.url()).pathname === `${root}${ARCHIVED.version}/${testPage}`, page.url());
@@ -304,14 +304,14 @@ const versionMenu = (page) =>
 
 {
   const page = await open(at());
-  const tabs = await page.evaluate(() => [...document.querySelectorAll(".s3-tabs a")].map((a) => ({ label: a.textContent.trim(), href: a.getAttribute("href"), current: a.hasAttribute("aria-current") })));
+  const tabs = await page.evaluate(() => [...document.querySelectorAll(".ns-tabs a")].map((a) => ({ label: a.textContent.trim(), href: a.getAttribute("href"), current: a.hasAttribute("aria-current") })));
   check("tabs: the home page sits outside every tab", tabs.length > 0 && tabs.every((tab) => !tab.current), JSON.stringify(tabs));
   const owned = [];
   for (const tab of tabs) {
     await page.goto(origin + tab.href, { waitUntil: "networkidle0" });
     const seen = await page.evaluate(() => ({
-      current: document.querySelector('.s3-tabs a[aria-current="page"]')?.textContent.trim(),
-      groups: [...document.querySelectorAll(".sidebar-content .s3-group .group-label .large")].map((label) => label.textContent.trim()),
+      current: document.querySelector('.ns-tabs a[aria-current="page"]')?.textContent.trim(),
+      groups: [...document.querySelectorAll(".sidebar-content .ns-group .group-label .large")].map((label) => label.textContent.trim()),
     }));
     owned.push(...seen.groups);
     check(`tabs: ${tab.label} is current on its own page and has a sidebar of its own`, seen.current === tab.label && seen.groups.length > 0, JSON.stringify(seen));
@@ -319,10 +319,10 @@ const versionMenu = (page) =>
   check("tabs: no sidebar group appears under two tabs", new Set(owned).size === owned.length, JSON.stringify(owned));
   if (tabs.length > 1) {
     await page.goto(origin + tabs[0].href, { waitUntil: "networkidle0" });
-    await page.evaluate(() => document.querySelector(".sidebar-content .s3-group summary").click());
+    await page.evaluate(() => document.querySelector(".sidebar-content .ns-group summary").click());
     await wait();
     await page.goto(origin + tabs[1].href, { waitUntil: "networkidle0" });
-    const open = await page.evaluate(() => document.querySelector(".sidebar-content .s3-group details").open);
+    const open = await page.evaluate(() => document.querySelector(".sidebar-content .ns-group details").open);
     check("tabs: closing a group in one tab leaves the next tab's groups open", open === true, String(open));
   }
   await page.close();
@@ -333,20 +333,20 @@ const versionMenu = (page) =>
 {
   const page = await open(at(testPage), { height: 600 });
   await page.evaluate(() => {
-    const list = document.querySelector("s3ctl-version-menu ul");
+    const list = document.querySelector("ns-version-menu ul");
     const row = list.querySelector("li");
     for (let i = 0; i < 28; i++) list.append(row.cloneNode(true));
     list.querySelectorAll("a").forEach((a, i, all) => a.toggleAttribute("aria-current", i === all.length - 1));
     list.querySelector("li:last-child a").setAttribute("aria-current", "true");
   });
-  await page.click(".s3-version");
+  await page.click(".ns-version");
   await wait();
   const fit = await page.evaluate(() => {
-    const panel = document.querySelector(".s3-versions");
+    const panel = document.querySelector(".ns-versions");
     const list = panel.querySelector("ul");
     const current = list.querySelector('[aria-current="true"]').getBoundingClientRect();
     const box = list.getBoundingClientRect();
-    const last = [...panel.querySelectorAll(".s3-out")].at(-1).getBoundingClientRect();
+    const last = [...panel.querySelectorAll(".ns-out")].at(-1).getBoundingClientRect();
     return {
       rows: list.querySelectorAll("li").length,
       scrolls: list.scrollHeight > list.clientHeight,
@@ -371,7 +371,7 @@ const versionMenu = (page) =>
   await wait(300);
   let m = await versionMenu(page);
   check("archived line: the chevron is named for it", m.label === `Documentation version, ${ARCHIVED.version}`, m.label);
-  await page.click(".s3-version");
+  await page.click(".ns-version");
   await wait();
   m = await versionMenu(page);
   check(
@@ -383,12 +383,12 @@ const versionMenu = (page) =>
 
   const notice = () =>
     page.evaluate(() => {
-      const element = document.querySelector("s3ctl-archived-notice");
+      const element = document.querySelector("ns-archived-notice");
       return element && {
         text: element.querySelector("p").textContent.replace(/\s+/g, " ").trim(),
         href: element.querySelector("p a").getAttribute("href"),
         shown: !element.hidden && getComputedStyle(element).display !== "none",
-        close: !element.querySelector(".s3-close").hidden,
+        close: !element.querySelector(".ns-close").hidden,
       };
     });
   let n = await notice();
@@ -399,10 +399,10 @@ const versionMenu = (page) =>
   );
   const links = await page.evaluate((base) => [...document.querySelectorAll(`.sl-markdown-content a[href^="${base}"]`)].map((a) => a.getAttribute("href")), root);
   check("archived line: the page's links stay in the line", links.every((href) => href.startsWith(`${root}${ARCHIVED.version}/`)), links.join(" "));
-  const pageEnd = await page.evaluate(() => [...document.querySelectorAll(".s3-page-end a")].map((a) => a.textContent.trim()));
+  const pageEnd = await page.evaluate(() => [...document.querySelectorAll(".ns-page-end a")].map((a) => a.textContent.trim()));
   check("archived line: no edit link, but the report link stays", pageEnd.length === 1 && /report/i.test(pageEnd[0]), JSON.stringify(pageEnd));
 
-  await page.click("s3ctl-archived-notice .s3-close");
+  await page.click("ns-archived-notice .ns-close");
   await wait();
   n = await notice();
   const focus = await page.evaluate(() => document.activeElement?.id);
@@ -419,7 +419,7 @@ const versionMenu = (page) =>
   check("archived line: a newer release than the one it was closed at brings it back", n.shown, JSON.stringify(n));
 
   await page.goto(at(missingPage), { waitUntil: "networkidle0" });
-  await page.click(".s3-version");
+  await page.click(".ns-version");
   await wait();
   await Promise.all([page.waitForNavigation({ waitUntil: "networkidle0" }), page.click(`li a[data-version="${ARCHIVED.version}"]`)]);
   check("archived line: switching to it from a page it doesn't have lands on its first page", new URL(page.url()).pathname === `${root}${ARCHIVED.version}/`, page.url());
