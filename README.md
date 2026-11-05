@@ -273,7 +273,8 @@ make build-release
 ```
 
 The docs site is Astro and Starlight, with its pages in `website/src/content/docs`.
-`npm --prefix website run dev` serves it with live reload. Before a change lands,
+`make website-dev` serves it with live reload, and
+[website/README.md](website/README.md) explains the folder. Before a change lands,
 build it and validate the output, which checks every page, icon and internal link:
 
 ```bash

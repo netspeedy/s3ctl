@@ -88,6 +88,11 @@
   ```bash
   make website-capture
   ```
+- Serve the site with live reload while editing pages with `make website-dev`.
+  When Astro detects an agent it starts the server in the background and returns,
+  so stop it afterwards with `cd website && npx astro dev stop`.
+  `website/README.md` summarises the folder, its targets and how it's published;
+  keep it in step when any of those change.
 
 ## Go Style & Quality Rules
 
