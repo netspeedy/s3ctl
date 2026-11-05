@@ -1,3 +1,4 @@
+import { unified } from "@astrojs/markdown-remark";
 import starlight from "@astrojs/starlight";
 import { defineConfig, passthroughImageService } from "astro/config";
 
@@ -29,10 +30,12 @@ export default defineConfig({
   base,
   trailingSlash: "always",
   markdown: {
-    rehypePlugins: [
-      rehypeCodeWords,
-      ...(archive ? [[rehypeArchiveLinks, { root: `${root}/`, base: `${base}/` }]] : []),
-    ],
+    processor: unified({
+      rehypePlugins: [
+        rehypeCodeWords,
+        ...(archive ? [[rehypeArchiveLinks, { root: `${root}/`, base: `${base}/` }]] : []),
+      ],
+    }),
   },
   // No page uses Astro's image pipeline, so skip sharp.
   image: { service: passthroughImageService() },
@@ -46,6 +49,8 @@ export default defineConfig({
       editLink: archive ? {} : { baseUrl: `${repo}/edit/main/website/` },
       // Pages build from a shallow clone, where every file would show the same commit date.
       lastUpdated: false,
+      // The 404 page is src/pages/404.astro; see there for why it isn't a 404.md.
+      disable404Route: true,
       credits: false,
       customCss: [
         "@fontsource-variable/inter",

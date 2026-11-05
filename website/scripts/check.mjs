@@ -57,11 +57,16 @@ if (!existsSync(path.join(dist, "index.html"))) {
 // Every content page has a built route.
 const pages = walk(docs, (file) => /\.mdx?$/.test(file)).map((file) => {
   const slug = path.relative(docs, file).replace(/\.mdx?$/, "").replace(/(^|\/)index$/, "");
-  return slug === "404" ? "404.html" : slug ? `${slug}/index.html` : "index.html";
+  return slug ? `${slug}/index.html` : "index.html";
 });
 for (const page of pages) {
   if (!existsSync(path.join(dist, page))) fail(`dist/${page} wasn't built`);
 }
+
+// The page GitHub Pages serves for missing addresses, from src/pages/404.astro.
+checkAsset("404.html", (file) => {
+  if (!readFileSync(file, "utf8").includes("Page not found")) fail("dist/404.html isn't the not-found page");
+});
 
 // Search, icons and the share card.
 checkAsset("pagefind/pagefind.js", () => {});
