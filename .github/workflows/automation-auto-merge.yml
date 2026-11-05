@@ -147,8 +147,9 @@ jobs:
             local validation_detail="$3"
             local approval_detail="$4"
 
+            # The commit types scripts/release/next-release.sh counts as release-bearing.
             # shellcheck disable=SC2016
-            if printf '%s' "${title}" | grep -Eq '^(deps|build|ci|release)(\([^)]+\))?:'; then
+            if printf '%s' "${title}" | grep -Eq '^((feat|fix|perf|revert|container|build|deps|packaging|release)(\([^)]+\))?!?|[[:alnum:]][[:alnum:]-]*(\([^)]+\))?!):'; then
               printf '%s%s%s' \
                 "${action} and left release-bearing conventional commit metadata intact for the automated release flow." \
                 "${validation_detail}" \
