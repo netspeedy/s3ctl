@@ -1,9 +1,9 @@
 // Release details for the pages, read once at build time.
 //
-// The Pages workflow resolves the latest release and the APT signing key before it builds the
-// site, writes them to a JSON file and passes its path in SITE_METADATA_FILE. Local and pull
-// request builds don't have that file, so they fall back to the newest local tag and leave the
-// date, commit and fingerprint out rather than guess them.
+// The Pages workflow resolves the latest release (and the APT signing key, for a project that
+// publishes an APT repository) before it builds the site, writes them to a JSON file and passes
+// its path in SITE_METADATA_FILE. Local and pull request builds don't have that file, so they fall
+// back to the newest local tag and leave the fingerprint out rather than guess it.
 //
 // The docs are versioned by release line (v0.8, v0.9 and so on). The latest line is built at the
 // site root. When a newer line ships, the release workflow builds the old one again with
@@ -32,10 +32,6 @@ export interface Release {
   version: string;
   /** True when version is a real tag rather than the "dev" placeholder. */
   tagged: boolean;
-  /** Publication date, only when the workflow supplied it. */
-  published?: Date;
-  /** Full commit SHA the tag points at, only when the workflow supplied it. */
-  commit?: string;
   /** The APT signing key's fingerprint in groups of four, only when the repository is published. */
   aptFingerprint?: string;
   /** The release page, or the releases list when there's no tag. */
@@ -43,8 +39,7 @@ export interface Release {
 }
 
 interface Metadata {
-  release_commit?: string;
-  latest_release?: { tag_name?: string; published_at?: string; html_url?: string } | null;
+  latest_release?: { tag_name?: string; html_url?: string } | null;
   apt_repository?: { available?: boolean; fingerprint?: string };
   /** The archived release lines published beside this build, each with its newest release. */
   docs_versions?: { version: string; release: string }[];
@@ -74,24 +69,16 @@ const metadata = readMetadata();
 function resolveRelease(): Release {
   const latest = metadata?.latest_release ?? undefined;
   const tag = latest?.tag_name || latestTag();
-  const published = latest?.published_at ? new Date(latest.published_at) : undefined;
   const apt = metadata?.apt_repository;
   return {
     version: tag ?? "dev",
     tagged: Boolean(tag),
-    published: published && !Number.isNaN(published.valueOf()) ? published : undefined,
-    commit: metadata?.release_commit || undefined,
     aptFingerprint: apt?.available && apt.fingerprint ? apt.fingerprint : undefined,
     url: latest?.html_url || (tag ? `${links.releases}/tag/${tag}` : links.releases),
   };
 }
 
 export const release = resolveRelease();
-
-/** A date as "4 November 2026", in UTC so the build machine's zone doesn't matter. */
-export function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en-GB", { dateStyle: "long", timeZone: "UTC" }).format(date);
-}
 
 /** The release line a version belongs to: v0.8.38 is in v0.8. */
 export const lineOf = (version: string) => /^v\d+\.\d+/.exec(version)?.[0];

@@ -397,11 +397,9 @@ jobs:
           gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" > archive-release.json
           fingerprint="$(curl -fsSL "${site_url}apt/${{ github.event.repository.name }}-archive-keyring.fingerprint.txt" 2>/dev/null | tr -d '\n' || true)"
           jq -n \
-            --arg release_commit "$(git rev-list -n 1 "${TAG}")" \
             --arg fingerprint "${fingerprint}" \
             --slurpfile latest_release archive-release.json \
             '{
-              release_commit: $release_commit,
               latest_release: $latest_release[0],
               apt_repository: { available: ($fingerprint != ""), fingerprint: $fingerprint }
             }' > "${RUNNER_TEMP}/archive-metadata.json"
