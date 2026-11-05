@@ -17,6 +17,8 @@ Stable releases publish:
 - GHCR images for the stable version, `latest`, and semver convenience tags
 - the GitHub Pages release hub with current installer and asset metadata
 - signed APT repository metadata for the stable channel
+- when a release starts a new line, such as `v0.9.0`, an `s3ctl-docs-v0.8.tar.gz`
+  archive of the previous line's docs, attached to that line's last release
 
 ## Website
 
@@ -47,6 +49,40 @@ builds, and passes them to the site in `SITE_METADATA_FILE`, so the published
 pages carry the real version, date and fingerprint. Local and pull request builds
 fall back to the newest local tag and leave the rest out. The same JSON is still
 published as `website-metadata.json`.
+
+### Versioned docs
+
+The docs are versioned by release line. The latest line is built at the site
+root, and each older line is served under its own path, such as
+`https://netspeedy.github.io/s3ctl/v0.8/`. The version menu in the header lists
+them, and an older line's pages open with a notice that links to the same page
+in the latest docs.
+
+Only the latest line is kept in the repository. When the first release of a new
+line is published, the Release Assets workflow finds the commit just before the
+new line started (`scripts/release/docs-archive-commit.sh`), builds the site from
+it with `SITE_ARCHIVE` set to the old line, and attaches the result to the old
+line's last release as `s3ctl-docs-<line>.tar.gz`. The Pages workflow unpacks
+every such archive into the site before `make website-check`, lists them in
+`versions.json` at the root, and archived lines read that file when they load,
+so their menus include lines released after them.
+
+v0.8 is the first line that gets an archive. Earlier lines were replaced before
+the docs were versioned, and their commits can't build under a line's own path.
+
+To build an archived line by hand, for example to replace a lost archive, check
+out the commit the script prints and build it with the line set. Without
+`SITE_METADATA_FILE` the pages leave out the release date and APT fingerprint;
+the docs-archive job in `.github/workflows/release-assets.yml` shows how it writes
+that file.
+
+```bash
+git checkout "$(bash scripts/release/docs-archive-commit.sh v0.8.38 v0.9.0)"
+SITE_ARCHIVE=v0.8 make website-build
+SITE_ARCHIVE=v0.8 make website-check
+tar -C website/dist -czf s3ctl-docs-v0.8.tar.gz .
+gh release upload v0.8.38 s3ctl-docs-v0.8.tar.gz --clobber
+```
 
 `TestCLIReferenceCoversEveryFlag` in `internal/cli` fails when a flag is added
 to or removed from the CLI without updating
