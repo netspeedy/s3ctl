@@ -1,6 +1,6 @@
 ---
 import Search from "@astrojs/starlight/components/Search.astro";
-import { github, icons } from "../lib/icons";
+import { github } from "../lib/icons";
 import { tabsFor } from "../lib/sections";
 import { links } from "../lib/site";
 import SiteTitle from "./SiteTitle.astro";
@@ -13,21 +13,9 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
 ---
 
 <div class="s3-header">
-  <div class="s3-bar">
-    <div class="s3-title"><SiteTitle /></div>
+  <div class="s3-brand">
+    <SiteTitle />
     <VersionMenu />
-    <div class="s3-search print:hidden"><Search /></div>
-    <div class="s3-actions sl-hidden md:sl-flex print:hidden">
-      <a class="s3-button" href={links.releases} title="Releases">
-        <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons.tag} />
-        <span class="s3-label">Releases</span>
-      </a>
-      <a class="s3-button" href={links.repo} title="s3ctl on GitHub">
-        <svg class="s3-github" viewBox="0 0 16 16" aria-hidden="true"><path d={github} /></svg>
-        <span class="s3-label">GitHub</span>
-      </a>
-      <ThemeMenu />
-    </div>
   </div>
   <nav class="s3-tabs print:hidden" aria-label="Sections">
     {
@@ -38,73 +26,43 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
       ))
     }
   </nav>
+  <div class="s3-search print:hidden"><Search /></div>
+  <div class="s3-actions sl-hidden md:sl-flex print:hidden">
+    <a class="s3-icon" href={links.repo} aria-label="s3ctl on GitHub" title="s3ctl on GitHub">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d={github} /></svg>
+    </a>
+    <ThemeMenu />
+  </div>
 </div>
 
 <style>
+  /* Phones: the name, search and the menu in the bar, and the sections in a row under it. */
   .s3-header {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-rows: var(--s3-bar) var(--s3-tabs);
+    grid-template-areas:
+      "brand search actions"
+      "tabs tabs tabs";
+    align-items: center;
+    column-gap: 0.25rem;
     height: 100%;
   }
-  .s3-bar {
+  /* The full height of the bar, so the version list opens just below it. */
+  .s3-brand {
+    grid-area: brand;
+    position: relative;
     display: flex;
+    align-self: stretch;
     align-items: center;
-    gap: 1rem;
-    height: var(--s3-bar);
+    gap: 0.25rem;
     min-width: 0;
-  }
-  .s3-title {
-    display: flex;
-    min-width: 0;
-    overflow: clip;
-    padding: 0.25rem;
-    margin: -0.25rem;
-  }
-  .s3-search {
-    display: flex;
-    flex: 1 1 auto;
-    justify-content: flex-end;
-  }
-  .s3-actions {
-    align-items: center;
-    gap: 0.625rem;
-  }
-  .s3-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4375rem;
-    height: 2.25rem;
-    padding: 0 0.75rem;
-    border: 1px solid var(--sl-color-hairline-shade);
-    border-radius: 9px;
-    font-size: var(--sl-text-sm);
-    font-weight: 500;
-    color: var(--sl-color-gray-2);
-    text-decoration: none;
-    white-space: nowrap;
-  }
-  .s3-button:hover {
-    background-color: var(--s3-hover-fill);
-    color: var(--sl-color-white);
-  }
-  svg {
-    width: 1.0625rem;
-    height: 1.0625rem;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.9;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .s3-github {
-    fill: currentColor;
-    stroke: none;
   }
   .s3-tabs {
+    grid-area: tabs;
     display: flex;
-    align-items: stretch;
+    align-self: stretch;
     gap: 0.25rem;
-    height: var(--s3-tabs);
     margin-inline: -0.75rem;
     overflow-x: auto;
     scrollbar-width: none;
@@ -127,6 +85,32 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
     border-bottom-color: var(--sl-color-text-accent);
     color: var(--sl-color-white);
   }
+  .s3-search {
+    grid-area: search;
+    display: flex;
+  }
+  .s3-actions {
+    grid-area: actions;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .s3-icon {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9px;
+    color: var(--sl-color-gray-2);
+  }
+  .s3-icon:hover {
+    background-color: var(--s3-hover-fill);
+    color: var(--sl-color-white);
+  }
+  .s3-icon svg {
+    width: 1.125rem;
+    height: 1.125rem;
+    fill: currentColor;
+  }
 
   @media (max-width: 23.99rem) {
     .s3-tabs a {
@@ -140,41 +124,45 @@ const tabs = tabsFor(Astro.locals.fullSidebar).filter((tab) => tab.href);
     :global(:root:not([data-has-sidebar])) .s3-actions {
       display: flex;
     }
-    :global(:root:not([data-has-sidebar])) .s3-button {
+    :global(:root:not([data-has-sidebar])) .s3-icon {
       display: none;
     }
   }
 
+  /* One row. The name's column is as wide as the sidebar, less the header's padding, so the
+     sections start exactly at the sidebar's edge, and the current one is underlined along the bar's
+     bottom. */
   @media (min-width: 50rem) {
+    .s3-header {
+      grid-template-columns: calc(var(--sl-sidebar-width) - var(--sl-nav-pad-x)) minmax(0, 1fr) auto auto;
+      grid-template-rows: var(--s3-bar);
+      grid-template-areas: "brand tabs search actions";
+      column-gap: 0;
+    }
+    .s3-tabs {
+      margin-inline: 0;
+      overflow: visible;
+    }
     .s3-search {
-      flex: 0 1 22rem;
-      justify-content: flex-start;
-      margin-inline-start: 0.5rem;
+      margin-inline-end: 0.5rem;
     }
-    /* The same height as the buttons beside it. */
     .s3-search :global(button[data-open-modal]) {
+      width: 13.75rem;
       height: 2.25rem;
-    }
-    .s3-actions {
-      margin-inline-start: auto;
     }
   }
 
-  /* Tablets have no room for the labels, so Releases and GitHub become icons. Their names stay
-     for screen readers. */
+  /* Tablets: the search becomes its icon, so the sections keep their place. */
   @media (min-width: 50rem) and (max-width: 63.99rem) {
-    .s3-button {
+    .s3-search :global(button[data-open-modal]) {
       justify-content: center;
       width: 2.25rem;
       padding: 0;
+      border-color: transparent;
+      background: transparent;
     }
-    .s3-label {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
+    .s3-search :global(button[data-open-modal] > :not(svg)) {
+      display: none;
     }
   }
 </style>

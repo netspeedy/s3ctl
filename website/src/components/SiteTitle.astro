@@ -1,4 +1,5 @@
 ---
+// The mark and the name, linking home. The chevron after it (VersionMenu.astro) opens the versions.
 import Mark from "./Mark.astro";
 
 const { siteTitleHref } = Astro.locals.starlightRoute;
@@ -7,8 +8,6 @@ const { siteTitleHref } = Astro.locals.starlightRoute;
 <a href={siteTitleHref} class="s3-site-title">
   <Mark size={26} />
   <span class="s3-name" translate="no">s3ctl</span>
-  <span class="s3-divider" aria-hidden="true"></span>
-  <span class="s3-docs-label">Docs</span>
 </a>
 
 <style>
@@ -25,22 +24,5 @@ const { siteTitleHref } = Astro.locals.starlightRoute;
     font-size: 1.0625rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-  }
-  .s3-divider {
-    width: 1px;
-    height: 1.125rem;
-    background-color: var(--sl-color-gray-5);
-  }
-  .s3-docs-label {
-    font-size: 0.9375rem;
-    font-weight: 500;
-    color: var(--sl-color-gray-3);
-  }
-  /* The smallest phones need the room for the version pill. */
-  @media (max-width: 23.99rem) {
-    .s3-divider,
-    .s3-docs-label {
-      display: none;
-    }
   }
 </style>

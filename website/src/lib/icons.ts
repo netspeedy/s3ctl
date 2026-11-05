@@ -13,6 +13,7 @@ export const icons = {
   chevron: '<path d="M6 9l6 6 6-6"/>',
   clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
   external: '<path d="M8 16L16 8M9 8h7v7"/>',
+  close: '<path d="M6 6l12 12M18 6L6 18"/>',
 };
 
 /** GitHub's mark, a filled 16x16 path. */

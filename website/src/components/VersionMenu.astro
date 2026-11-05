@@ -1,6 +1,7 @@
 ---
-// The version pill in the header. It opens a list of every docs line with its newest release, the
-// line being read ticked and the latest marked, then that line's release notes and every release.
+// The chevron after the name in the header. It opens a list of every docs line with its newest
+// release, the line being read ticked and the latest marked, then that line's release notes and
+// every release.
 // Choosing a line opens the same page in it when the page exists there, or the line's first page
 // when it doesn't. An archived line only knows itself when it's built, so it fetches the list from
 // the site root when it loads.
@@ -18,14 +19,13 @@ const current = docs.versions.find((version) => version.version === docs.current
   data-root={siteRoot}
 >
   <button
-    class:list={["s3-version", { archived: docs.archived }]}
+    class="s3-version"
     type="button"
+    aria-label={`Documentation version, ${docs.current}`}
     title="Documentation version"
     aria-expanded="false"
     aria-controls="s3-versions"
   >
-    <span class="s3-dot" aria-hidden="true"></span>
-    {docs.current}
     <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons.chevron} />
   </button>
   <div id="s3-versions" class="s3-versions" hidden>
@@ -130,52 +130,41 @@ const current = docs.versions.find((version) => version.version === docs.current
 </script>
 
 <style>
+  /* Static, so the list is placed against the name in the header rather than the chevron. */
   .s3-version-menu {
-    position: relative;
     display: flex;
     flex: none;
   }
   .s3-version {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    height: 1.5rem;
-    padding: 0 0.4375rem 0 0.5625rem;
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    width: 1.625rem;
+    height: 1.625rem;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
     background: transparent;
-    font-family: var(--__sl-font-mono);
-    font-size: var(--sl-text-xs);
-    font-weight: 500;
-    color: var(--sl-color-gray-2);
+    color: var(--sl-color-gray-3);
     cursor: pointer;
   }
-  .s3-version:hover {
-    border-color: var(--sl-color-gray-4);
+  .s3-version:hover,
+  .s3-version[aria-expanded="true"] {
+    background-color: var(--s3-hover-fill);
     color: var(--sl-color-white);
   }
-  .s3-version[aria-expanded="true"] {
-    border-color: transparent;
-    background-color: var(--s3-current-bg);
-    color: var(--s3-current-ink);
-  }
-  .s3-version.archived {
-    border-color: var(--s3-c3-line);
-    color: var(--s3-c3-ink);
-  }
-  .s3-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: var(--s3-ok-dot);
-  }
-  .archived .s3-dot {
-    background-color: var(--s3-c3);
-  }
   .s3-version svg {
-    width: 0.75rem;
-    height: 0.75rem;
+    width: 0.875rem;
+    height: 0.875rem;
     stroke-width: 2.2;
+    transition: transform 0.15s;
+  }
+  .s3-version[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .s3-version svg {
+      transition: none;
+    }
   }
   svg {
     width: 0.9375rem;
@@ -190,8 +179,8 @@ const current = docs.versions.find((version) => version.version === docs.current
 
   .s3-versions {
     position: absolute;
-    inset-inline-start: 0;
-    top: calc(100% + 0.5rem);
+    inset-inline-start: -0.25rem;
+    top: calc(100% - 0.25rem);
     z-index: 10;
     width: 18rem;
     padding: 6px;
