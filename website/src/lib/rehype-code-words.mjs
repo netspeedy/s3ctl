@@ -20,7 +20,7 @@ export default function rehypeCodeWords() {
               ? {
                   type: "element",
                   tagName: "span",
-                  properties: { className: ["s3-word"] },
+                  properties: { className: ["ns-word"] },
                   children: [{ type: "text", value: part }],
                 }
               : { type: "text", value: part },

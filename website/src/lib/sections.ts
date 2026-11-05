@@ -1,6 +1,6 @@
 // The four sidebar groups each have a colour and an icon. The sidebar draws each group's tile
 // from here (Sidebar.astro), the page's group colours its breadcrumb, step numbers, list markers,
-// table of contents and pager (Head.astro sets --s3-page-* for that), and cards pointing into a
+// table of contents and pager (Head.astro sets --ns-page-* for that), and cards pointing into a
 // group take its colour.
 //
 // The header's tabs each own some of the groups, and a page's sidebar only shows the groups of its

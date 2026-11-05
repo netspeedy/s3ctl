@@ -11,6 +11,10 @@ The sidebar groups, their colours and icons, and which header tab shows which gr
 are defined in `src/lib/sections.ts` and matched to the sidebar in
 `astro.config.mjs` by label.
 
+The components and styles are the same in every netspeedy docs site and use the
+`ns-` prefix. What's particular to s3ctl, such as its name, description, links and
+footer columns, is in `src/lib/site.ts`.
+
 ## Working on it
 
 Run these from the repository root:
@@ -20,6 +24,7 @@ make website-install   # npm ci, from package-lock.json
 make website-dev       # local server with live reload
 make website-build     # production build into website/dist/
 make website-check     # every page, the search index, icons, share card and internal links
+make website-test      # the theme, header, version menu and an archived line in headless Chrome
 make website-capture   # desktop and phone screenshots in both themes into website/.captures/
 ```
 

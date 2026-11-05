@@ -11,58 +11,58 @@ import { docs, links, siteRoot } from "../lib/site";
 const current = docs.versions.find((version) => version.version === docs.current)!;
 ---
 
-<s3ctl-version-menu
-  class="s3-version-menu"
+<ns-version-menu
+  class="ns-version-menu"
   data-archived={docs.archived ? "" : undefined}
   data-current={docs.current}
   data-base={current.url}
   data-root={siteRoot}
 >
   <button
-    class="s3-version"
+    class="ns-version"
     type="button"
     aria-label={`Documentation version, ${docs.current}`}
     title="Documentation version"
     aria-expanded="false"
-    aria-controls="s3-versions"
+    aria-controls="ns-versions"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons.chevron} />
   </button>
-  <div id="s3-versions" class="s3-versions" hidden>
-    <p id="s3-versions-title">Documentation version</p>
-    <ul aria-labelledby="s3-versions-title">
+  <div id="ns-versions" class="ns-versions" hidden>
+    <p id="ns-versions-title">Documentation version</p>
+    <ul aria-labelledby="ns-versions-title">
       {
         docs.versions.map(({ version, release, url, latest }) => (
           <li>
             <a href={url} data-version={version} aria-current={version === docs.current ? "true" : undefined}>
               {release ? (
                 <>
-                  <span class="s3-line">{version}</span>
-                  <span class="s3-release">{release}</span>
-                  <span class="s3-latest">{latest && "Latest"}</span>
+                  <span class="ns-line">{version}</span>
+                  <span class="ns-release">{release}</span>
+                  <span class="ns-latest">{latest && "Latest"}</span>
                 </>
               ) : (
-                <span class="s3-word">The latest docs</span>
+                <span class="ns-word">The latest docs</span>
               )}
-              <svg class="s3-tick" viewBox="0 0 24 24" aria-hidden="true" set:html={icons.check} />
+              <svg class="ns-tick" viewBox="0 0 24 24" aria-hidden="true" set:html={icons.check} />
             </a>
           </li>
         ))
       }
     </ul>
     <hr />
-    <a class="s3-out" href={current.notes}>
+    <a class="ns-out" href={current.notes}>
       <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons.tag} />
       Release notes for {current.release}
-      <svg class="s3-external" viewBox="0 0 24 24" aria-hidden="true" set:html={icons.external} />
+      <svg class="ns-external" viewBox="0 0 24 24" aria-hidden="true" set:html={icons.external} />
     </a>
-    <a class="s3-out" href={links.releases}>
+    <a class="ns-out" href={links.releases}>
       <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons.clock} />
       All releases
-      <svg class="s3-external" viewBox="0 0 24 24" aria-hidden="true" set:html={icons.external} />
+      <svg class="ns-external" viewBox="0 0 24 24" aria-hidden="true" set:html={icons.external} />
     </a>
   </div>
-</s3ctl-version-menu>
+</ns-version-menu>
 
 <script>
   import { loadVersions, samePageIn } from "../lib/versions";
@@ -71,8 +71,8 @@ const current = docs.versions.find((version) => version.version === docs.current
   // focus elsewhere closes it.
   class VersionMenu extends HTMLElement {
     connectedCallback() {
-      const button = this.querySelector<HTMLButtonElement>(".s3-version")!;
-      const panel = this.querySelector<HTMLElement>(".s3-versions")!;
+      const button = this.querySelector<HTMLButtonElement>(".ns-version")!;
+      const panel = this.querySelector<HTMLElement>(".ns-versions")!;
       const list = panel.querySelector("ul")!;
       const { base = "", root = "/", current } = this.dataset;
 
@@ -108,7 +108,7 @@ const current = docs.versions.find((version) => version.version === docs.current
       if (this.dataset.archived === undefined) return;
       // Rows are copies of this line's own row, which keeps the styles' scope attributes.
       loadVersions(root).then((versions) => {
-        const template = list.querySelector(".s3-line")?.closest("li");
+        const template = list.querySelector(".ns-line")?.closest("li");
         if (!versions || !template) return;
         list.replaceChildren(
           ...versions.map(({ version, release, url, latest }) => {
@@ -118,9 +118,9 @@ const current = docs.versions.find((version) => version.version === docs.current
             link.dataset.version = version;
             if (version === current) link.setAttribute("aria-current", "true");
             else link.removeAttribute("aria-current");
-            item.querySelector(".s3-line")!.textContent = version;
-            item.querySelector(".s3-release")!.textContent = release;
-            item.querySelector(".s3-latest")!.textContent = latest ? "Latest" : "";
+            item.querySelector(".ns-line")!.textContent = version;
+            item.querySelector(".ns-release")!.textContent = release;
+            item.querySelector(".ns-latest")!.textContent = latest ? "Latest" : "";
             return item;
           }),
         );
@@ -128,16 +128,16 @@ const current = docs.versions.find((version) => version.version === docs.current
     }
   }
 
-  customElements.define("s3ctl-version-menu", VersionMenu);
+  customElements.define("ns-version-menu", VersionMenu);
 </script>
 
 <style>
   /* Static, so the list is placed against the name in the header rather than the chevron. */
-  .s3-version-menu {
+  .ns-version-menu {
     display: flex;
     flex: none;
   }
-  .s3-version {
+  .ns-version {
     display: grid;
     place-items: center;
     width: 1.625rem;
@@ -149,22 +149,22 @@ const current = docs.versions.find((version) => version.version === docs.current
     color: var(--sl-color-gray-3);
     cursor: pointer;
   }
-  .s3-version:hover,
-  .s3-version[aria-expanded="true"] {
-    background-color: var(--s3-hover-fill);
+  .ns-version:hover,
+  .ns-version[aria-expanded="true"] {
+    background-color: var(--ns-hover-fill);
     color: var(--sl-color-white);
   }
-  .s3-version svg {
+  .ns-version svg {
     width: 0.875rem;
     height: 0.875rem;
     stroke-width: 2.2;
     transition: transform 0.15s;
   }
-  .s3-version[aria-expanded="true"] svg {
+  .ns-version[aria-expanded="true"] svg {
     transform: rotate(180deg);
   }
   @media (prefers-reduced-motion: reduce) {
-    .s3-version svg {
+    .ns-version svg {
       transition: none;
     }
   }
@@ -181,7 +181,7 @@ const current = docs.versions.find((version) => version.version === docs.current
 
   /* The heading and the release links stay put, and the lines scroll between them: about nine
      at most, and never past the bottom of the window, since the header doesn't scroll. */
-  .s3-versions {
+  .ns-versions {
     position: absolute;
     inset-inline-start: -0.25rem;
     top: calc(100% - 0.25rem);
@@ -193,18 +193,18 @@ const current = docs.versions.find((version) => version.version === docs.current
     padding: 6px;
     border: 1px solid var(--sl-color-gray-5);
     border-radius: 12px;
-    background-color: var(--s3-menu-bg);
-    box-shadow: var(--s3-menu-shadow);
+    background-color: var(--ns-menu-bg);
+    box-shadow: var(--ns-menu-shadow);
     font-size: var(--sl-text-sm);
   }
-  #s3-versions-title {
+  #ns-versions-title {
     margin: 0;
     padding: 0.5rem 0.625rem 0.375rem;
     font-size: var(--sl-text-xs);
     font-weight: 500;
     color: var(--sl-color-gray-3);
   }
-  .s3-versions[hidden] {
+  .ns-versions[hidden] {
     display: none;
   }
   ul {
@@ -232,41 +232,41 @@ const current = docs.versions.find((version) => version.version === docs.current
   }
   li a:hover,
   li a:focus-visible {
-    background-color: var(--s3-hover-fill);
+    background-color: var(--ns-hover-fill);
   }
   li a[aria-current="true"] {
-    background-color: var(--s3-hover-fill);
+    background-color: var(--ns-hover-fill);
   }
-  .s3-line {
+  .ns-line {
     font-family: var(--__sl-font-mono);
     font-size: var(--sl-text-xs);
     font-weight: 600;
     color: var(--sl-color-white);
   }
-  .s3-release {
+  .ns-release {
     font-family: var(--__sl-font-mono);
     font-size: var(--sl-text-xs);
   }
-  .s3-word {
+  .ns-word {
     grid-column: 1 / 4;
     color: var(--sl-color-white);
   }
-  .s3-latest:not(:empty) {
+  .ns-latest:not(:empty) {
     padding: 0.0625rem 0.4375rem;
     border-radius: 999px;
-    background-color: color-mix(in srgb, var(--s3-ok) 14%, transparent);
+    background-color: color-mix(in srgb, var(--ns-ok) 14%, transparent);
     font-size: var(--sl-text-2xs);
     font-weight: 600;
-    color: var(--s3-ok);
+    color: var(--ns-ok);
   }
-  .s3-tick {
+  .ns-tick {
     width: 1rem;
     height: 1rem;
     stroke-width: 2;
     color: var(--sl-color-text-accent);
     visibility: hidden;
   }
-  [aria-current="true"] .s3-tick {
+  [aria-current="true"] .ns-tick {
     visibility: visible;
   }
   hr {
@@ -275,7 +275,7 @@ const current = docs.versions.find((version) => version.version === docs.current
     border: 0;
     background-color: var(--sl-color-hairline-shade);
   }
-  .s3-out {
+  .ns-out {
     display: flex;
     align-items: center;
     gap: 0.5625rem;
@@ -284,12 +284,12 @@ const current = docs.versions.find((version) => version.version === docs.current
     color: var(--sl-color-gray-2);
     text-decoration: none;
   }
-  .s3-out:hover,
-  .s3-out:focus-visible {
-    background-color: var(--s3-hover-fill);
+  .ns-out:hover,
+  .ns-out:focus-visible {
+    background-color: var(--ns-hover-fill);
     color: var(--sl-color-white);
   }
-  .s3-external {
+  .ns-external {
     width: 0.75rem;
     height: 0.75rem;
     margin-inline-start: auto;
@@ -298,12 +298,12 @@ const current = docs.versions.find((version) => version.version === docs.current
 
   /* On phones the list spans the screen under the bar, wherever the pill sits. */
   @media (max-width: 49.99rem) {
-    .s3-version-menu {
+    .ns-version-menu {
       position: static;
     }
-    .s3-versions {
+    .ns-versions {
       position: fixed;
-      top: calc(var(--s3-bar) - 0.25rem);
+      top: calc(var(--ns-bar) - 0.25rem);
       inset-inline: 1rem;
       width: auto;
     }

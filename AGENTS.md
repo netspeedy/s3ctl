@@ -27,6 +27,14 @@
   `website/src/lib/sections.ts`, matched to the sidebar in
   `website/astro.config.mjs` by label, so adding or renaming a group means
   updating `sections` and `tabs` there.
+- The site's components and styles are shared with the other netspeedy docs
+  sites, so their classes, custom properties and elements use the neutral
+  `ns-` prefix and they don't name s3ctl. What's particular to s3ctl (its
+  name, description, links, footer columns and the home page's directory
+  line) lives in `website/src/lib/site.ts`, and the pages written for s3ctl
+  are `HomeTop.astro`, `InstallTabs.astro` and `src/pages/404.astro`. Keep it
+  that way, so a change to a shared file can be copied to the other sites as
+  it is.
 - The docs are versioned by release line. Only the latest line lives in
   `website/src/content/docs`; never copy pages into per-version folders. When a
   new minor ships, the release workflow rebuilds the outgoing line from git with

@@ -1,17 +1,18 @@
 ---
 // The mark and the name, linking home. The chevron after it (VersionMenu.astro) opens the versions.
+import { product } from "../lib/site";
 import Mark from "./Mark.astro";
 
 const { siteTitleHref } = Astro.locals.starlightRoute;
 ---
 
-<a href={siteTitleHref} class="s3-site-title">
+<a href={siteTitleHref} class="ns-site-title">
   <Mark size={26} />
-  <span class="s3-name" translate="no">s3ctl</span>
+  <span class="ns-name" translate="no">{product.name}</span>
 </a>
 
 <style>
-  .s3-site-title {
+  .ns-site-title {
     display: inline-flex;
     align-items: center;
     gap: 0.625rem;
@@ -20,7 +21,7 @@ const { siteTitleHref } = Astro.locals.starlightRoute;
     text-decoration: none;
     white-space: nowrap;
   }
-  .s3-name {
+  .ns-name {
     font-size: 1.0625rem;
     font-weight: 700;
     letter-spacing: -0.02em;

@@ -2,10 +2,11 @@
 //
 // It checks that every page in src/content/docs was built, that search was indexed, that the
 // icons and share card are the sizes link previews and browsers expect, that every page carries
-// the share and icon tags, and that every link into the site resolves under the /s3ctl/ base
-// GitHub Pages serves it from.
+// the share and icon tags, and that every link into the site resolves under the base GitHub
+// Pages serves it from. The site root comes from the build's versions.json, where the latest line
+// is listed at the root.
 //
-// With SITE_ARCHIVE set, dist/ is an archived release line built for /s3ctl/<line>/, and its links
+// With SITE_ARCHIVE set, dist/ is an archived release line built for <root><line>/, and its links
 // to the root (the latest docs and the other lines) can't be checked from here. Without it, any
 // archived lines the Pages workflow has unpacked into dist/<line>/ are checked with the rest.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
@@ -15,9 +16,7 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
 const docs = path.join(root, "src", "content", "docs");
-const siteRoot = "/s3ctl/";
 const archive = process.env.SITE_ARCHIVE || undefined;
-const base = archive ? `${siteRoot}${archive}/` : siteRoot;
 const errors = [];
 
 const fail = (message) => errors.push(message);
@@ -53,6 +52,20 @@ if (!existsSync(path.join(dist, "index.html"))) {
   console.error("dist/index.html is missing; run `npm run build` first.");
   process.exit(1);
 }
+
+// Where the site lives: the root from the latest line's entry in versions.json, and the host from
+// the home page's canonical link, so the share card's absolute address can be checked.
+const versionsFile = path.join(dist, "versions.json");
+const siteRoot = existsSync(versionsFile)
+  ? JSON.parse(readFileSync(versionsFile, "utf8")).versions?.find?.((version) => version.latest)?.url
+  : undefined;
+const canonical = /<link rel="canonical" href="([^"]+)"/.exec(readFileSync(path.join(dist, "index.html"), "utf8"))?.[1];
+if (typeof siteRoot !== "string" || !siteRoot.startsWith("/") || !canonical) {
+  console.error("dist/versions.json has no latest line, or dist/index.html has no canonical link; rebuild the site.");
+  process.exit(1);
+}
+const card = `${new URL(canonical).origin}${siteRoot}og-image.png?v=`;
+const base = archive ? `${siteRoot}${archive}/` : siteRoot;
 
 // Every content page has a built route.
 const pages = walk(docs, (file) => /\.mdx?$/.test(file)).map((file) => {
@@ -106,13 +119,13 @@ const required = (pageBase) => [
   [`<link rel="shortcut icon" href="${pageBase}favicon.svg" type="image/svg+xml"`, "the SVG favicon"],
   [`<link rel="icon" href="${pageBase}favicon.ico" sizes="32x32"`, "the favicon.ico fallback"],
   [`<link rel="apple-touch-icon" href="${pageBase}apple-touch-icon.png"`, "the Apple touch icon"],
-  ['<meta property="og:image" content="https://netspeedy.github.io/s3ctl/og-image.png?v=', "og:image with a ?v= cache key"],
+  [`<meta property="og:image" content="${card}`, "og:image with a ?v= cache key"],
   ['<meta property="og:image:type" content="image/png"', "og:image:type"],
   ['<meta property="og:image:width" content="1200"', "og:image:width"],
   ['<meta property="og:image:height" content="630"', "og:image:height"],
   ['<meta property="og:image:alt"', "og:image:alt"],
   ['<meta name="twitter:card" content="summary_large_image"', "a large twitter:card"],
-  ['<meta name="twitter:image" content="https://netspeedy.github.io/s3ctl/og-image.png?v=', "twitter:image"],
+  [`<meta name="twitter:image" content="${card}`, "twitter:image"],
 ];
 
 for (const file of walk(dist, (f) => f.endsWith(".html"))) {

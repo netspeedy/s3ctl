@@ -7,7 +7,7 @@
 //
 // The docs are versioned by release line (v0.8, v0.9 and so on). The latest line is built at the
 // site root. When a newer line ships, the release workflow builds the old one again with
-// SITE_ARCHIVE set to its line, which moves it under the root as /s3ctl/v0.8/, and the Pages
+// SITE_ARCHIVE set to its line, which moves it under the root as <root>v0.8/, and the Pages
 // workflow puts each archived line back beside the latest one and lists them in docs_versions.
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -101,7 +101,7 @@ export interface DocsVersion {
   version: string;
   /** The line's newest release, such as v0.8.38. */
   release: string;
-  /** Where the line's docs start, such as /s3ctl/v0.8/. */
+  /** Where the line's docs start, such as <root>v0.8/. */
   url: string;
   /** The newest release's notes. */
   notes: string;
@@ -111,11 +111,11 @@ export interface DocsVersion {
 const archive = process.env.SITE_ARCHIVE || undefined;
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 
-/** The site root every line lives under, /s3ctl/, also in an archived build. */
+/** The site root every line lives under, also in an archived build. */
 export const siteRoot = archive ? base.slice(0, base.length - archive.length - 1) : base;
 
 /**
- * A link from the root, such as /s3ctl/quickstart/, as a link to that page in the line being
+ * A link from the root, such as <root>quickstart/, as a link to that page in the line being
  * built. In the latest line it's unchanged. rehype-archive-links.mjs does the same for the pages.
  */
 export const docsHref = (href: string) =>
@@ -153,3 +153,47 @@ function resolveDocs() {
 
 /** Which line these docs are, whether it's an archived one, and every line published. */
 export const docs = resolveDocs();
+
+// ------------------------------------------------------------------ this project's copy
+//
+// What the shared components say about this project. The components themselves are the same in
+// every netspeedy site, so a project's name, description and footer links live here.
+
+export const product = {
+  name: "s3ctl",
+  description: "A single-binary CLI for creating S3-compatible buckets and issuing bucket-scoped credentials.",
+};
+
+/** The line under "Browse the docs" on the home page. */
+export const directorySubtitle = "From a first bucket to every flag.";
+
+/** The site footer's link columns. */
+export const footerColumns = [
+  {
+    title: "Docs",
+    items: [
+      { label: "Introduction", href: `${base}introduction/` },
+      { label: "Quickstart", href: `${base}quickstart/` },
+      { label: "Installation", href: `${base}installation/` },
+      { label: "CLI reference", href: `${base}reference/cli/` },
+    ],
+  },
+  {
+    title: "Project",
+    items: [
+      { label: "GitHub", href: links.repo },
+      { label: "Releases", href: links.releases },
+      { label: "Issues", href: links.issues },
+      { label: "Examples", href: links.examples },
+    ],
+  },
+  {
+    title: "Install",
+    items: [
+      { label: "Homebrew tap", href: links.homebrew },
+      { label: "APT repository", href: `${base}installation/#signed-apt-repository` },
+      { label: "Install script", href: `${base}installation/#installer-script` },
+      { label: "GHCR image", href: links.container },
+    ],
+  },
+];

@@ -1,9 +1,9 @@
 /*
-  The s3ctl docs theme on top of Starlight. Colours come from the brand palette in
+  The docs theme on top of Starlight. Colours come from the brand palette in
   scripts/readme/build_readme_hero.py: ink, cyan and deep cyan, with amber for warnings.
 
-  Each sidebar group has its own colour (--s3-c1 to --s3-c4: cyan, indigo, amber, green), and a
-  page takes its group's as --s3-page-*, which Head.astro sets. Light mode uses darker partners,
+  Each sidebar group has its own colour (--ns-c1 to --ns-c4: cyan, indigo, amber, green), and a
+  page takes its group's as --ns-page-*, which Head.astro sets. Light mode uses darker partners,
   because the banner's cyan and amber are made for a dark ground.
 
   Starlight keeps its tokens in cascade layers, so these unlayered rules win. The light values
@@ -50,37 +50,37 @@
   --sl-color-hairline: #1c222b;
   --sl-color-hairline-shade: #1c222b;
 
-  --s3-mark: #4bd8ff;
-  --s3-current-bg: var(--sl-color-accent-low);
-  --s3-current-ink: #9ad8ff;
-  --s3-ok: #6fd8a5;
-  --s3-ok-dot: #3cd788;
-  --s3-search-bg: var(--sl-color-gray-7);
-  --s3-menu-bg: var(--sl-color-gray-7);
-  --s3-menu-shadow: 0 18px 40px -14px rgb(0 0 0 / 0.45);
-  --s3-num-ink: #04121f;
+  --ns-mark: #4bd8ff;
+  --ns-current-bg: var(--sl-color-accent-low);
+  --ns-current-ink: #9ad8ff;
+  --ns-ok: #6fd8a5;
+  --ns-ok-dot: #3cd788;
+  --ns-search-bg: var(--sl-color-gray-7);
+  --ns-menu-bg: var(--sl-color-gray-7);
+  --ns-menu-shadow: 0 18px 40px -14px rgb(0 0 0 / 0.45);
+  --ns-num-ink: #04121f;
 
-  --s3-c1: #4bd8ff;
-  --s3-c1-bg: rgb(75 216 255 / 0.09);
-  --s3-c1-line: rgb(75 216 255 / 0.24);
-  --s3-c1-ink: #c4f1ff;
-  --s3-c2: #9aa6ff;
-  --s3-c2-bg: rgb(110 125 230 / 0.13);
-  --s3-c2-line: rgb(140 155 255 / 0.26);
-  --s3-c2-ink: #d4d9ff;
-  --s3-c3: #f5b841;
-  --s3-c3-bg: rgb(245 184 65 / 0.09);
-  --s3-c3-line: rgb(245 184 65 / 0.24);
-  --s3-c3-ink: #fde1a7;
-  --s3-c4: #3cd788;
-  --s3-c4-bg: rgb(60 215 136 / 0.09);
-  --s3-c4-line: rgb(60 215 136 / 0.24);
-  --s3-c4-ink: #bdf2d6;
-  --s3-c1-fill: rgb(75 216 255 / 0.15);
-  --s3-c2-fill: rgb(140 155 255 / 0.17);
-  --s3-c3-fill: rgb(245 184 65 / 0.15);
-  --s3-c4-fill: rgb(60 215 136 / 0.15);
-  --s3-hover-fill: #12161d;
+  --ns-c1: #4bd8ff;
+  --ns-c1-bg: rgb(75 216 255 / 0.09);
+  --ns-c1-line: rgb(75 216 255 / 0.24);
+  --ns-c1-ink: #c4f1ff;
+  --ns-c2: #9aa6ff;
+  --ns-c2-bg: rgb(110 125 230 / 0.13);
+  --ns-c2-line: rgb(140 155 255 / 0.26);
+  --ns-c2-ink: #d4d9ff;
+  --ns-c3: #f5b841;
+  --ns-c3-bg: rgb(245 184 65 / 0.09);
+  --ns-c3-line: rgb(245 184 65 / 0.24);
+  --ns-c3-ink: #fde1a7;
+  --ns-c4: #3cd788;
+  --ns-c4-bg: rgb(60 215 136 / 0.09);
+  --ns-c4-line: rgb(60 215 136 / 0.24);
+  --ns-c4-ink: #bdf2d6;
+  --ns-c1-fill: rgb(75 216 255 / 0.15);
+  --ns-c2-fill: rgb(140 155 255 / 0.17);
+  --ns-c3-fill: rgb(245 184 65 / 0.15);
+  --ns-c4-fill: rgb(60 215 136 / 0.15);
+  --ns-hover-fill: #12161d;
 
   --sl-text-h1: clamp(1.875rem, 1.45rem + 1.4vw, 2.375rem);
   --sl-text-h2: 1.5rem;
@@ -96,9 +96,9 @@
 
   /* On phones the header is the bar with the section tabs in a row under it; from tablet width up
      it's one row (Header.astro). */
-  --s3-bar: 3.5rem;
-  --s3-tabs: 2.75rem;
-  --sl-nav-height: calc(var(--s3-bar) + var(--s3-tabs));
+  --ns-bar: 3.5rem;
+  --ns-tabs: 2.75rem;
+  --sl-nav-height: calc(var(--ns-bar) + var(--ns-tabs));
 }
 
 :root[data-theme="light"],
@@ -138,43 +138,43 @@
   --sl-color-hairline: #eef0f3;
   --sl-color-hairline-shade: var(--sl-color-gray-6);
 
-  --s3-mark: #0b74b8;
-  --s3-current-bg: var(--sl-color-accent-low);
-  --s3-current-ink: #0a5a90;
-  --s3-ok: #1c7c4d;
-  --s3-ok-dot: #22a06b;
-  --s3-search-bg: var(--sl-color-gray-7);
-  --s3-menu-bg: #ffffff;
-  --s3-menu-shadow: 0 18px 40px -14px rgb(11 18 32 / 0.25);
-  --s3-num-ink: #ffffff;
+  --ns-mark: #0b74b8;
+  --ns-current-bg: var(--sl-color-accent-low);
+  --ns-current-ink: #0a5a90;
+  --ns-ok: #1c7c4d;
+  --ns-ok-dot: #22a06b;
+  --ns-search-bg: var(--sl-color-gray-7);
+  --ns-menu-bg: #ffffff;
+  --ns-menu-shadow: 0 18px 40px -14px rgb(11 18 32 / 0.25);
+  --ns-num-ink: #ffffff;
 
-  --s3-c1: #0b74b8;
-  --s3-c1-bg: #eaf4fb;
-  --s3-c1-line: #cfe5f5;
-  --s3-c1-ink: #0a4f7d;
-  --s3-c2: #3b4bb8;
-  --s3-c2-bg: #eef0fb;
-  --s3-c2-line: #d8dcf4;
-  --s3-c2-ink: #2b388c;
-  --s3-c3: #a35f00;
-  --s3-c3-bg: #fdf4e2;
-  --s3-c3-line: #f2dfb4;
-  --s3-c3-ink: #5c3700;
-  --s3-c4: #1c7c4d;
-  --s3-c4-bg: #e9f6ef;
-  --s3-c4-line: #c8e8d6;
-  --s3-c4-ink: #145a38;
-  --s3-c1-fill: #e0eef9;
-  --s3-c2-fill: #e7e9fa;
-  --s3-c3-fill: #fbeed3;
-  --s3-c4-fill: #ddf2e6;
-  --s3-hover-fill: #f4f5f7;
+  --ns-c1: #0b74b8;
+  --ns-c1-bg: #eaf4fb;
+  --ns-c1-line: #cfe5f5;
+  --ns-c1-ink: #0a4f7d;
+  --ns-c2: #3b4bb8;
+  --ns-c2-bg: #eef0fb;
+  --ns-c2-line: #d8dcf4;
+  --ns-c2-ink: #2b388c;
+  --ns-c3: #a35f00;
+  --ns-c3-bg: #fdf4e2;
+  --ns-c3-line: #f2dfb4;
+  --ns-c3-ink: #5c3700;
+  --ns-c4: #1c7c4d;
+  --ns-c4-bg: #e9f6ef;
+  --ns-c4-line: #c8e8d6;
+  --ns-c4-ink: #145a38;
+  --ns-c1-fill: #e0eef9;
+  --ns-c2-fill: #e7e9fa;
+  --ns-c3-fill: #fbeed3;
+  --ns-c4-fill: #ddf2e6;
+  --ns-hover-fill: #f4f5f7;
 }
 
 @media (min-width: 50em) {
   :root {
-    --s3-bar: 4rem;
-    --sl-nav-height: var(--s3-bar);
+    --ns-bar: 4rem;
+    --sl-nav-height: var(--ns-bar);
     --sl-nav-pad-x: 1.5rem;
   }
 }
@@ -194,7 +194,7 @@ header.header {
   icon, filled softly while the menu is open, in place of Starlight's solid circle.
 */
 .sl-menu-button {
-  top: calc((var(--s3-bar) - var(--sl-menu-button-size)) / 2) !important;
+  top: calc((var(--ns-bar) - var(--sl-menu-button-size)) / 2) !important;
   align-items: center;
   justify-content: center;
   padding: 0;
@@ -206,16 +206,16 @@ header.header {
   box-shadow: none;
 }
 .sl-menu-button:has(~ :popover-open) {
-  background-color: var(--s3-current-bg);
-  color: var(--s3-current-ink);
+  background-color: var(--ns-current-bg);
+  color: var(--ns-current-ink);
 }
 
 /*
   Sidebar: each group label gets its colour and icon in a small tile, and the current page is
-  marked in its group's colour. Sidebar.astro wraps each group in .s3-group and sets the colour and
+  marked in its group's colour. Sidebar.astro wraps each group in .ns-group and sets the colour and
   icon from src/lib/sections.ts, so the wrappers replace Starlight's spacing between groups.
 */
-.s3-group + .s3-group {
+.ns-group + .ns-group {
   margin-top: 0.75rem;
 }
 .sidebar-content .top-level > li > details > summary {
@@ -270,14 +270,14 @@ header.header {
   border-radius: 8px;
 }
 .sidebar-content a:hover {
-  background-color: var(--s3-hover-fill);
+  background-color: var(--ns-hover-fill);
   color: var(--sl-color-white);
 }
 .sidebar-content a[aria-current="page"],
 .sidebar-content a[aria-current="page"]:hover,
 .sidebar-content a[aria-current="page"]:focus {
   background-color: var(--cf, var(--sl-color-accent-low));
-  color: var(--ci, var(--s3-current-ink));
+  color: var(--ci, var(--ns-current-ink));
   font-weight: 600;
 }
 
@@ -295,7 +295,7 @@ starlight-toc a {
   border-radius: 0;
 }
 starlight-toc a[aria-current="true"] {
-  border-inline-start-color: var(--s3-page);
+  border-inline-start-color: var(--ns-page);
   color: var(--sl-color-white);
 }
 starlight-toc ul ul a {
@@ -319,21 +319,21 @@ starlight-toc ul ul a {
 }
 .sl-markdown-content ul > li::marker,
 .sl-markdown-content ol:not(.sl-steps) > li::marker {
-  color: var(--s3-page);
+  color: var(--ns-page);
   font-weight: 600;
 }
 
 /* Steps: numbers filled with the page's colour on a soft ring, joined by a fading line. */
 .sl-steps > li::before {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--s3-page) 78%, #ffffff), var(--s3-page));
-  box-shadow: 0 0 0 4px var(--s3-page-bg);
-  color: var(--s3-num-ink);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ns-page) 78%, #ffffff), var(--ns-page));
+  box-shadow: 0 0 0 4px var(--ns-page-bg);
+  color: var(--ns-num-ink);
   font-weight: 700;
 }
 .sl-steps > li::after {
   --guide-width: 2px;
   border-radius: 2px;
-  background: linear-gradient(180deg, var(--s3-page-line), var(--sl-color-hairline-shade));
+  background: linear-gradient(180deg, var(--ns-page-line), var(--sl-color-hairline-shade));
 }
 
 /*
@@ -349,22 +349,22 @@ starlight-toc ul ul a {
   color: var(--sl-color-gray-2);
 }
 .starlight-aside--note {
-  --cc: var(--s3-c1);
-  --cb: var(--s3-c1-bg);
-  --cl: var(--s3-c1-line);
-  --sl-color-asides-text-accent: var(--s3-c1-ink);
+  --cc: var(--ns-c1);
+  --cb: var(--ns-c1-bg);
+  --cl: var(--ns-c1-line);
+  --sl-color-asides-text-accent: var(--ns-c1-ink);
 }
 .starlight-aside--tip {
-  --cc: var(--s3-c4);
-  --cb: var(--s3-c4-bg);
-  --cl: var(--s3-c4-line);
-  --sl-color-asides-text-accent: var(--s3-c4-ink);
+  --cc: var(--ns-c4);
+  --cb: var(--ns-c4-bg);
+  --cl: var(--ns-c4-line);
+  --sl-color-asides-text-accent: var(--ns-c4-ink);
 }
 .starlight-aside--caution {
-  --cc: var(--s3-c3);
-  --cb: var(--s3-c3-bg);
-  --cl: var(--s3-c3-line);
-  --sl-color-asides-text-accent: var(--s3-c3-ink);
+  --cc: var(--ns-c3);
+  --cb: var(--ns-c3-bg);
+  --cl: var(--ns-c3-line);
+  --sl-color-asides-text-accent: var(--ns-c3-ink);
 }
 .starlight-aside--danger {
   --cc: var(--sl-color-red);
@@ -403,7 +403,7 @@ starlight-toc ul ul a {
   background-color: var(--sl-color-bg-inline-code);
 }
 /* Each word of inline code stays whole; see src/lib/rehype-code-words.mjs. */
-.s3-word {
+.ns-word {
   white-space: nowrap;
 }
 .sl-markdown-content table {
@@ -447,18 +447,18 @@ starlight-toc ul ul a {
 }
 
 /* Wide tables scroll inside their own box rather than the page. */
-.s3-table {
+.ns-table {
   overflow-x: auto;
   border: 1px solid var(--sl-color-hairline-shade);
   border-radius: 10px;
 }
-.s3-table table {
+.ns-table table {
   margin: 0;
   min-width: 36rem;
   border: 0;
   border-radius: 0;
 }
-.s3-table tr:last-child td {
+.ns-table tr:last-child td {
   border-bottom: 0;
 }
 
@@ -477,12 +477,12 @@ starlight-toc ul ul a {
 .pagination-links a > span {
   font-size: var(--sl-text-sm);
   font-weight: 500;
-  color: var(--s3-page);
+  color: var(--ns-page);
 }
 .pagination-links .link-title {
   font-size: var(--sl-text-base);
   font-weight: 600;
 }
 .pagination-links svg {
-  color: var(--s3-page);
+  color: var(--ns-page);
 }

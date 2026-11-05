@@ -17,37 +17,37 @@ const { title, description } = entry.data;
   !home && (
     <>
       {section && (
-        <p class="s3-crumbs">
+        <p class="ns-crumbs">
           <SectionIcon section={section} />
-          <span class="s3-section">{section.label}</span>
-          <span class="s3-sep" aria-hidden="true">
+          <span class="ns-section">{section.label}</span>
+          <span class="ns-sep" aria-hidden="true">
             /
           </span>
-          <span class="s3-here">{title}</span>
+          <span class="ns-here">{title}</span>
         </p>
       )}
       <h1 id={PAGE_TITLE_ID}>{title}</h1>
-      {description && <p class="s3-lead">{description}</p>}
+      {description && <p class="ns-lead">{description}</p>}
     </>
   )
 }
 
 <style>
-  .s3-crumbs {
+  .ns-crumbs {
     display: flex;
     align-items: center;
     gap: 0.5625rem;
     margin: 0.5rem 0 0;
     font-size: var(--sl-text-sm);
   }
-  .s3-section {
+  .ns-section {
     font-weight: 600;
-    color: var(--s3-page);
+    color: var(--ns-page);
   }
-  .s3-sep {
+  .ns-sep {
     color: var(--sl-color-gray-3);
   }
-  .s3-here {
+  .ns-here {
     color: var(--sl-color-gray-2);
   }
   h1 {
@@ -58,7 +58,7 @@ const { title, description } = entry.data;
     letter-spacing: -0.03em;
     color: var(--sl-color-white);
   }
-  .s3-lead {
+  .ns-lead {
     margin: 0.875rem 0 0;
     max-width: 42rem;
     font-size: var(--sl-text-lg);
