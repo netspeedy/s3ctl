@@ -50,4 +50,5 @@ to rebuild an archive by hand.
 Deploy Pages Site runs on every push to `main`, when a release is published and
 after each Release Assets run. It builds the latest line, unpacks the archived
 lines into it, runs `make website-check` over the result and deploys it. Dependabot
-checks the npm dependencies here daily.
+checks the npm dependencies here daily and titles its pull requests `chore:`, so a
+site update doesn't cut a CLI release.

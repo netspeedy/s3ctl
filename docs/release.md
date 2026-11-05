@@ -109,7 +109,10 @@ come from `make readme-hero`, along with the README banner.
 
 Dependency updates are managed by Dependabot. Related AWS SDK for Go v2 module
 updates are grouped into one pull request so shared `go.mod` and `go.sum`
-changes do not create a queue of conflicting PRs.
+changes do not create a queue of conflicting PRs. Go module and container
+updates are titled `deps:` and `container:`, which cut a release, since they
+change what ships. The docs site's npm updates are titled `chore:`, which
+doesn't, so a site dependency bump never publishes a new binary.
 
 The automation auto-merge workflow runs after `Build and Validate` succeeds and
 daily at 05:00 UTC. It handles Dependabot PRs and first-party automation PRs,

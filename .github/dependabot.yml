@@ -56,6 +56,8 @@ updates:
       - dependencies
       - docker
 
+  # The docs site isn't part of the CLI, so its updates use chore, which doesn't cut a release.
+  # deps would, and every site dependency bump would ship a new binary and Homebrew formula.
   - package-ecosystem: npm
     directory: /website
     open-pull-requests-limit: 10
@@ -68,7 +70,7 @@ updates:
           - "version-update:semver-minor"
           - "version-update:semver-patch"
     commit-message:
-      prefix: "deps"
+      prefix: "chore"
     labels:
       - dependencies
       - website
