@@ -1,9 +1,11 @@
-// The four sidebar groups each have a colour. The page's group colours its breadcrumb, step
-// numbers, list markers, table of contents and pager (Head.astro sets --s3-page-* for that), and
-// cards pointing into a group take its colour.
+// The four sidebar groups each have a colour and an icon. The sidebar draws each group's tile
+// from here (Sidebar.astro), the page's group colours its breadcrumb, step numbers, list markers,
+// table of contents and pager (Head.astro sets --s3-page-* for that), and cards pointing into a
+// group take its colour.
 //
-// The sidebar's own group icons and colours are in theme.css, by position, so they follow the
-// group order in astro.config.mjs. Keep the two in step if the groups change.
+// The header's tabs each own some of the groups, and a page's sidebar only shows the groups of its
+// tab (routeData.ts narrows it). Keep `sections` and `tabs` in step with the sidebar in
+// astro.config.mjs.
 
 export type Hue = "c1" | "c2" | "c3" | "c4";
 
@@ -12,7 +14,7 @@ export interface Section {
   hue: Hue;
   /** One line under the group's name in the home page's directory. */
   blurb: string;
-  /** The inside of a 24x24 stroke icon. theme.css carries the same paths for the sidebar. */
+  /** The inside of a 24x24 stroke icon. */
   icon: string;
 }
 
@@ -45,6 +47,18 @@ export const sections: Section[] = [
   },
 ];
 
+export interface Tab {
+  label: string;
+  /** The sidebar groups this tab owns, by label. */
+  groups: string[];
+}
+
+export const tabs: Tab[] = [
+  { label: "Documentation", groups: ["Getting started", "Guides"] },
+  { label: "OVHcloud", groups: ["OVHcloud"] },
+  { label: "Reference", groups: ["Reference"] },
+];
+
 interface Link {
   type: "link";
   label: string;
@@ -57,6 +71,9 @@ interface Group {
   entries: Entry[];
 }
 type Entry = Link | Group;
+
+const linksIn = (list: readonly Entry[]): Link[] =>
+  list.flatMap((entry) => (entry.type === "link" ? [entry] : linksIn(entry.entries)));
 
 /** The top-level group holding a link that passes `match`. */
 function groupOf(entries: readonly Entry[], match: (link: Link) => boolean): Section | undefined {
@@ -71,13 +88,28 @@ function groupOf(entries: readonly Entry[], match: (link: Link) => boolean): Sec
 
 /** Each sidebar group with its section and the links in it, in sidebar order. */
 export function directory(sidebar: readonly Entry[]) {
-  const links = (list: readonly Entry[]): Link[] =>
-    list.flatMap((entry) => (entry.type === "link" ? [entry] : links(entry.entries)));
   return sidebar.flatMap((entry) => {
     if (entry.type !== "group") return [];
     const section = sections.find((candidate) => candidate.label === entry.label);
-    return section ? [{ section, links: links(entry.entries) }] : [];
+    return section ? [{ section, links: linksIn(entry.entries) }] : [];
   });
+}
+
+/** Each tab with the page it opens on (its first group's first page) and whether it's current. */
+export function tabsFor(sidebar: readonly Entry[]) {
+  return tabs.map((tab) => {
+    const groups = sidebar.filter((entry): entry is Group => entry.type === "group" && tab.groups.includes(entry.label));
+    const links = groups.flatMap((group) => linksIn(group.entries));
+    return { ...tab, href: links[0]?.href, current: links.some((link) => link.isCurrent) };
+  });
+}
+
+/** The group's icon as a CSS mask image, for the sidebar's tiles. */
+export function iconMask(section: Section): string {
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.1" ` +
+    `stroke-linecap="round" stroke-linejoin="round">${section.icon}</svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 
 /** The section of the page being rendered, or undefined for pages outside the sidebar. */

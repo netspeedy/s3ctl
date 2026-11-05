@@ -22,10 +22,11 @@
 - The mark, the README banner, the social cards and the site's icons all come
   from `scripts/readme/build_readme_hero.py` via `make readme-hero`. Change the
   generator, not the generated files.
-- Each sidebar group has its own colour and icon. Their labels, colours and
-  icons are in `website/src/lib/sections.ts`, but the sidebar draws its group
-  icons from `website/src/styles/theme.css` by position. Adding, renaming or
-  reordering a group in `website/astro.config.mjs` means updating both.
+- Each sidebar group has its own colour and icon, and each header tab owns
+  some of the groups and shows only those in its sidebar. Both are in
+  `website/src/lib/sections.ts`, matched to the sidebar in
+  `website/astro.config.mjs` by label, so adding or renaming a group means
+  updating `sections` and `tabs` there.
 - Keep the website out of `.github/`. Dependabot stopped being able to open npm
   pull requests for manifests under `.github/` in June 2026 (its create-PR call
   is rejected as "invalid or unauthorized changes"), which is why it lives at

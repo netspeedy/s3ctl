@@ -1,0 +1,93 @@
+---
+// Starlight's banner, plus a notice at the top of every page of an archived line. It's written to
+// read on its own, and once the root's versions.json loads it names the latest release and links
+// to the same page in the latest docs, or to their first page if this one isn't there.
+import Default from "@astrojs/starlight/components/Banner.astro";
+import { icons } from "../lib/icons";
+import { docs, siteRoot } from "../lib/site";
+
+const base = docs.versions.find((version) => version.version === docs.current)!.url;
+---
+
+{
+  docs.archived && (
+    <s3ctl-archived-notice class="s3-archived" data-root={siteRoot} data-base={base} data-pagefind-ignore>
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons.clock} />
+        <p>
+          <b>You're reading the docs for {docs.current}<span data-older>, an older version</span>.</b>{" "}
+          <span data-latest-release />{" "}
+          <a href={siteRoot} data-latest-link>Read the latest docs</a>
+        </p>
+      </div>
+    </s3ctl-archived-notice>
+  )
+}
+<Default />
+
+<script>
+  import { loadVersions, samePageIn } from "../lib/versions";
+
+  class ArchivedNotice extends HTMLElement {
+    async connectedCallback() {
+      const { root = "/", base = "" } = this.dataset;
+      const latest = (await loadVersions(root))?.find((version) => version.latest);
+      if (!latest) return;
+      this.querySelector("[data-older]")?.remove();
+      this.querySelector("[data-latest-release]")!.textContent = `The latest release is ${latest.release}.`;
+      const link = this.querySelector<HTMLAnchorElement>("[data-latest-link]")!;
+      link.textContent = `Read this page in ${latest.version}`;
+      link.href = await samePageIn(latest.url, base);
+    }
+  }
+
+  customElements.define("s3ctl-archived-notice", ArchivedNotice);
+</script>
+
+<style>
+  .s3-archived {
+    display: block;
+    padding: 1.5rem var(--sl-content-pad-x) 0;
+  }
+  div {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    max-width: var(--sl-content-width);
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--s3-c3-line);
+    border-radius: 12px;
+    background-color: var(--s3-c3-bg);
+  }
+  svg {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-top: 0.125rem;
+    fill: none;
+    stroke: var(--s3-c3);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  p {
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    line-height: 1.6;
+    color: var(--sl-color-gray-2);
+  }
+  b {
+    font-weight: 600;
+    color: var(--s3-c3-ink);
+  }
+  a {
+    font-weight: 600;
+    color: var(--s3-c3-ink);
+    text-underline-offset: 3px;
+  }
+  @media (min-width: 72rem) {
+    div {
+      margin-inline: var(--sl-content-margin-inline, auto);
+    }
+  }
+</style>

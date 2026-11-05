@@ -36,4 +36,11 @@ const { siteTitleHref } = Astro.locals.starlightRoute;
     font-weight: 500;
     color: var(--sl-color-gray-3);
   }
+  /* The smallest phones need the room for the version pill. */
+  @media (max-width: 23.99rem) {
+    .s3-divider,
+    .s3-docs-label {
+      display: none;
+    }
+  }
 </style>
