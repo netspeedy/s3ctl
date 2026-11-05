@@ -240,7 +240,10 @@ docker run --rm \
 Stable releases publish Linux and macOS archives, Debian packages, signed
 checksums, GHCR images, release-hub metadata and signed APT repository metadata.
 Release candidates use tags such as `v1.2.3-rc.1` while a version is being
-validated. [docs/release.md](docs/release.md) has the release, website preview and
+validated. Updates from Dependabot and this repository's own workflows go from
+candidate to stable on their own, while a change a person merged waits at the
+candidate until someone runs Promote Release Candidate.
+[docs/release.md](docs/release.md) has the release, website preview and
 dependency update notes.
 
 ## Development

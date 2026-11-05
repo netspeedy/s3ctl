@@ -8,6 +8,20 @@ Release candidates use tags such as `v1.2.3-rc.1` while a version is being
 validated. Production installs should use the latest stable release unless you
 are intentionally testing a candidate build.
 
+Every validated push to `main` that carries a release-bearing commit tags a
+release candidate and waits for its archives, packages and image to publish.
+`scripts/release/next-release.sh` decides which commits count: `feat:`, `fix:`,
+`perf:`, `revert:`, `deps:`, `container:`, `build:`, `packaging:` and
+`release:`, plus breaking changes. If every release-bearing commit since the
+last stable release came from Dependabot, Renovate or this repository's own
+workflows, the Automated Release Candidate workflow then promotes the same
+commit to a stable tag. If any came from a person, it stops at the candidate,
+and someone promotes it with the `Promote Release Candidate` workflow when it's
+ready. `scripts/release/automated-only.sh` makes that call, by author email,
+since a squash merge's author name comes from a profile anyone can edit. While
+a candidate waits, each further validated push to `main` tags the next one,
+docs-only pushes included.
+
 Stable releases publish:
 
 - Linux and macOS archives for `amd64`, `arm64`, and Linux `arm/v7`
@@ -111,8 +125,9 @@ Dependency updates are managed by Dependabot. Related AWS SDK for Go v2 module
 updates are grouped into one pull request so shared `go.mod` and `go.sum`
 changes do not create a queue of conflicting PRs. Go module and container
 updates are titled `deps:` and `container:`, which cut a release, since they
-change what ships. The docs site's npm updates are titled `chore:`, which
-doesn't, so a site dependency bump never publishes a new binary.
+change what ships, and go all the way to stable without anyone promoting them.
+The docs site's npm updates are titled `chore:`, which doesn't, so a site
+dependency bump never publishes a new binary.
 
 The automation auto-merge workflow runs after `Build and Validate` succeeds and
 daily at 05:00 UTC. It handles Dependabot PRs and first-party automation PRs,
