@@ -125,3 +125,9 @@ validation-only `Container Image` build on its branch instead, and the daily
 run merges it once both have passed on the PR head. The daily run asks for a
 green `Container Image` run for any PR it merges, because `Build and Validate`
 doesn't build the image.
+
+The refresh is titled `build:` when it moves the Go toolchain in `go.mod` or the
+build image in `Dockerfile`, since the release binary and the image are built
+with them, so a Go point release ships like any other dependency update. When
+only the `golangci-lint` pin changed it's titled `chore:`, which doesn't cut a
+release.
