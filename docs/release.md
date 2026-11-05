@@ -61,9 +61,9 @@ could leave pages rendered by the old code.
 
 The Pages workflow resolves the latest release and the APT signing key before it
 builds, and passes them to the site in `SITE_METADATA_FILE`, so the published
-pages carry the real version, date and fingerprint. Local and pull request builds
-fall back to the newest local tag and leave the rest out. The same JSON is still
-published as `website-metadata.json`.
+pages carry the real version and signing key fingerprint. Local and pull request
+builds fall back to the newest local tag and leave the fingerprint out. The same
+JSON is still published as `website-metadata.json`.
 
 ### Versioned docs
 
@@ -87,9 +87,8 @@ the docs were versioned, and their commits can't build under a line's own path.
 
 To build an archived line by hand, for example to replace a lost archive, check
 out the commit the script prints and build it with the line set. Without
-`SITE_METADATA_FILE` the pages leave out the release date and APT fingerprint;
-the docs-archive job in `.github/workflows/release-assets.yml` shows how it writes
-that file.
+`SITE_METADATA_FILE` the pages leave out the APT fingerprint; the docs-archive
+job in `.github/workflows/release-assets.yml` shows how it writes that file.
 
 ```bash
 git checkout "$(bash scripts/release/docs-archive-commit.sh v0.8.38 v0.9.0)"
