@@ -229,31 +229,13 @@ jobs:
 
           if [[ "${ref_name}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
             prerelease=true
-            stable_tag="${ref_name%-rc.*}"
-            previous_tag="$(
-              git tag --list "${stable_tag}-rc.*" --sort=-v:refname \
-                | grep -vx "${ref_name}" \
-                | head -n1 || true
-            )"
-            if [ -z "${previous_tag}" ]; then
-              previous_tag="$(
-                git for-each-ref --sort=-v:refname --format='%(refname:short)' refs/tags/v* \
-                  | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' \
-                  | head -n1 || true
-              )"
-            fi
           elif [[ "${ref_name}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             prerelease=false
-            previous_tag="$(
-              git for-each-ref --sort=-v:refname --format='%(refname:short)' refs/tags/v* \
-                | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' \
-                | grep -vx "${ref_name}" \
-                | head -n1 || true
-            )"
           else
             echo "Unsupported release tag format: ${ref_name}" >&2
             exit 1
           fi
+          previous_tag="$(bash scripts/release/previous-tag.sh "${ref_name}")"
 
           {
             echo "prerelease=${prerelease}"
@@ -370,13 +352,7 @@ jobs:
             skip "\`${RELEASE_REF}\` doesn't start a new line, so no docs are archived."
           fi
 
-          # The stable release just before this one, which may not be the newest when an older
-          # release is published again by hand.
-          previous_tag="$(
-            git for-each-ref --sort=v:refname --format='%(refname:short)' refs/tags/v* \
-              | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' \
-              | awk -v ref="${RELEASE_REF}" '$0 == ref { print previous; exit } { previous = $0 }'
-          )"
+          previous_tag="$(bash scripts/release/previous-tag.sh "${RELEASE_REF}")"
           if [ -z "${previous_tag}" ]; then
             skip "\`${RELEASE_REF}\` is the first release, so there's no earlier line to archive."
           fi
