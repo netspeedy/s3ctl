@@ -21,12 +21,14 @@ normalize_deb_version() {
 }
 
 deb_version="$(normalize_deb_version "${version_input}")"
+# GitHub rewrites ~ in release asset names, but Debian needs it inside the package.
+asset_version="${deb_version//\~/.}"
 staging_root="$(mktemp -d)"
 package_root="${staging_root}/${package_name}_${deb_version}_${deb_arch}"
 control_dir="${package_root}/DEBIAN"
 bin_dir="${package_root}/usr/bin"
 doc_dir="${package_root}/usr/share/doc/${package_name}"
-output_path="${output_dir}/${package_name}_${deb_version}_${deb_arch}.deb"
+output_path="${output_dir}/${package_name}_${asset_version}_${deb_arch}.deb"
 
 cleanup() {
   rm -rf "${staging_root}"
