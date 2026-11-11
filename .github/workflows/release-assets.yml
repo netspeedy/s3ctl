@@ -48,13 +48,118 @@ jobs:
           git fetch origin "${default_branch}:refs/remotes/origin/${default_branch}" --force
           git merge-base --is-ancestor "${release_commit}" "refs/remotes/origin/${default_branch}"
 
+  binaries:
+    name: Build Binary ${{ matrix.label }}
+    if: |
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'workflow_dispatch' && startsWith(inputs.release_ref || '', 'v'))
+    runs-on: ubuntu-latest
+    needs:
+      - verify-release-tag
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - label: linux/amd64
+            goos: linux
+            goarch: amd64
+            goarm: ""
+            artifact_name: s3ctl-linux-amd64
+            deb_arch: amd64
+          - label: linux/arm64
+            goos: linux
+            goarch: arm64
+            goarm: ""
+            artifact_name: s3ctl-linux-arm64
+            deb_arch: arm64
+          - label: linux/arm/v7
+            goos: linux
+            goarch: arm
+            goarm: "7"
+            artifact_name: s3ctl-linux-armv7
+            deb_arch: armhf
+          - label: darwin/amd64
+            goos: darwin
+            goarch: amd64
+            goarm: ""
+            artifact_name: s3ctl-darwin-amd64
+            deb_arch: ""
+          - label: darwin/arm64
+            goos: darwin
+            goarch: arm64
+            goarm: ""
+            artifact_name: s3ctl-darwin-arm64
+            deb_arch: ""
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          ref: ${{ env.CHECKOUT_REF }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Compute build metadata
+        id: meta
+        run: |
+          {
+            echo "version=${RELEASE_REF:-dev}"
+            echo "commit=$(git rev-parse HEAD)"
+            echo "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build release binary
+        run: |
+          mkdir -p dist
+          make build-cross \
+            VERSION=${{ steps.meta.outputs.version }} \
+            COMMIT=${{ steps.meta.outputs.commit }} \
+            BUILD_DATE=${{ steps.meta.outputs.build_date }} \
+            GOOS=${{ matrix.goos }} \
+            GOARCH=${{ matrix.goarch }} \
+            GOARM=${{ matrix.goarm }} \
+            OUTPUT=dist/${{ matrix.artifact_name }}
+
+      - name: Archive binary
+        run: |
+          cd dist
+          tar -czf ${{ matrix.artifact_name }}.tar.gz ${{ matrix.artifact_name }}
+
+      - name: Build Debian package
+        if: ${{ matrix.deb_arch != '' }}
+        run: |
+          bash scripts/package/build-deb-package.sh \
+            dist/${{ matrix.artifact_name }} \
+            dist \
+            "${{ steps.meta.outputs.version }}" \
+            "${{ matrix.deb_arch }}"
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: binaries-${{ matrix.artifact_name }}
+          path: dist/${{ matrix.artifact_name }}.tar.gz
+
+      - name: Upload Debian package artifact
+        if: ${{ matrix.deb_arch != '' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: deb-${{ matrix.artifact_name }}
+          path: dist/*.deb
+
   publish:
     name: Publish GitHub Release
     if: |
       startsWith(github.ref, 'refs/tags/v') ||
       (github.event_name == 'workflow_dispatch' && startsWith(inputs.release_ref || '', 'v'))
     needs:
-      - verify-release-tag
+      - binaries
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -67,35 +172,11 @@ jobs:
           persist-credentials: false
           ref: ${{ env.CHECKOUT_REF }}
 
-      - name: Set up Go
-        uses: actions/setup-go@v7
+      - name: Download release artifacts
+        uses: actions/download-artifact@v8
         with:
-          go-version-file: go.mod
-          cache: true
-          cache-dependency-path: go.sum
-
-      - name: Build binaries and Debian packages
-        run: |
-          set -euo pipefail
-          version="${RELEASE_REF:-dev}"
-          commit="$(git rev-parse HEAD)"
-          build_date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          mkdir -p dist
-          build() {
-            local goos="$1" goarch="$2" goarm="$3" name="$4" deb_arch="$5"
-            make build-cross VERSION="${version}" COMMIT="${commit}" \
-              BUILD_DATE="${build_date}" GOOS="${goos}" GOARCH="${goarch}" \
-              GOARM="${goarm}" OUTPUT="dist/${name}"
-            tar -C dist -czf "dist/${name}.tar.gz" "${name}"
-            if [[ -n "${deb_arch}" ]]; then
-              bash scripts/package/build-deb-package.sh "dist/${name}" dist "${version}" "${deb_arch}"
-            fi
-          }
-          build linux amd64 '' s3ctl-linux-amd64 amd64
-          build linux arm64 '' s3ctl-linux-arm64 arm64
-          build linux arm 7 s3ctl-linux-armv7 armhf
-          build darwin amd64 '' s3ctl-darwin-amd64 ''
-          build darwin arm64 '' s3ctl-darwin-arm64 ''
+          path: dist
+          merge-multiple: true
 
       - name: Generate checksums
         run: |
@@ -241,8 +322,11 @@ jobs:
     needs:
       - publish
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    outputs:
+      built: ${{ steps.build.outputs.built }}
+      asset: ${{ steps.line.outputs.asset }}
+      tag: ${{ steps.line.outputs.tag }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -351,10 +435,31 @@ jobs:
           echo "::warning::The ${{ steps.line.outputs.line }} docs archive didn't build, so the line isn't published. See docs/release.md to build it by hand."
           echo "The archive didn't build; see the step log. docs/release.md has the steps to build it by hand." >> "${GITHUB_STEP_SUMMARY}"
 
-      - name: Attach archived docs to the line's last release
+      - name: Upload archived docs
         if: steps.build.outputs.built == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: docs-archive
+          path: ${{ steps.line.outputs.asset }}
+
+  publish-docs-archive:
+    name: Publish Archived Docs
+    if: needs.docs-archive.outputs.built == 'true'
+    needs:
+      - docs-archive
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download archived docs
+        uses: actions/download-artifact@v8
+        with:
+          name: docs-archive
+
+      - name: Attach them to the line's last release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ steps.line.outputs.tag }}
-          ASSET: ${{ steps.line.outputs.asset }}
+          TAG: ${{ needs.docs-archive.outputs.tag }}
+          ASSET: ${{ needs.docs-archive.outputs.asset }}
         run: gh release upload "${TAG}" "${ASSET}" --clobber --repo "${GITHUB_REPOSITORY}"

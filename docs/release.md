@@ -36,14 +36,6 @@ Stable releases publish:
 - when a release starts a new line, such as `v0.9.0`, an `s3ctl-docs-v0.8.tar.gz`
   archive of the previous line's docs, attached to that line's last release
 
-The Release Assets workflow builds the archives and packages in its publish
-job, signs their checksums, then attaches the files to the GitHub Release. It
-attaches a versioned docs archive from the job that builds it. These workflows
-do not retain intermediate GitHub Actions artifacts or Docker build records.
-Candidate package filenames use `.rcN` because GitHub rewrites `~` in asset
-names; the Debian version inside the package remains `~rcN` so APT orders it
-before the stable release.
-
 ## Website
 
 The site at https://netspeedy.github.io/s3ctl/ is the s3ctl documentation, built

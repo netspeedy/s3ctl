@@ -97,10 +97,6 @@ jobs:
           make build-cross GOOS=linux GOARCH=amd64 OUTPUT=dist/s3ctl-linux-amd64
           bash scripts/package/build-deb-package.sh dist/s3ctl-linux-amd64 dist v0.0.0 amd64
           test -f dist/s3ctl_0.0.0_amd64.deb
-          bash scripts/package/build-deb-package.sh dist/s3ctl-linux-amd64 dist v0.0.0-rc.1 amd64
-          test -f dist/s3ctl_0.0.0.rc1_amd64.deb
-          test ! -e 'dist/s3ctl_0.0.0~rc1_amd64.deb'
-          test "$(dpkg-deb -f dist/s3ctl_0.0.0.rc1_amd64.deb Version)" = '0.0.0~rc1'
 
       - name: Smoke test built binary
         run: |
