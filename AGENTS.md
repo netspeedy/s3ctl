@@ -136,6 +136,11 @@
   signing or publish credentials.
 - If workflow behavior changes, update the README and any operator-facing docs
   in the same change when user-visible behavior changes.
+- Build and Validate and Container Image skip jobs for changes confined to
+  `website/`, `docs/`, `assets/`, `LICENSE` and root Markdown
+  (`docs/release.md` explains). If the binary, the packages, the lint or the
+  image ever read a file under one of those paths, take it off the list in both
+  workflows.
 - Treat destructive storage operations as security-sensitive. Keep object
   removal guarded by explicit confirmation, allow unforced bucket deletes only
   after proving the bucket is empty, preserve dry-run behavior, and verify
