@@ -24,6 +24,16 @@ the `netspeedybot` author the gate recognises. While
 a candidate waits, each further validated push to `main` tags the next one,
 docs-only pushes included.
 
+Build and Validate and Container Image only run what a change can affect. A
+pull request or push to `main` confined to `website/`, `docs/`, `assets/`,
+`LICENSE` and Markdown files at the root skips the lint and the image build, and
+runs Quality only when it touches the site, because the Go tests read its CLI
+reference page. Both workflows still conclude successfully, so auto-merge and
+the release candidate flow treat the change as validated. On `main` the change
+is measured from the last commit Build and Validate passed on, not the previous
+push, so a run cancelled by a newer push can't let code through untested. Tags
+and manual dispatches always run everything.
+
 Stable releases publish:
 
 - Linux and macOS archives for `amd64`, `arm64`, and Linux `arm/v7`
