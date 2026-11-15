@@ -145,7 +145,6 @@ jobs:
         with:
           name: binaries-${{ matrix.artifact_name }}
           path: dist/${{ matrix.artifact_name }}.tar.gz
-          retention-days: 1
 
       - name: Upload Debian package artifact
         if: ${{ matrix.deb_arch != '' }}
@@ -153,7 +152,6 @@ jobs:
         with:
           name: deb-${{ matrix.artifact_name }}
           path: dist/*.deb
-          retention-days: 1
 
   publish:
     name: Publish GitHub Release
@@ -443,7 +441,6 @@ jobs:
         with:
           name: docs-archive
           path: ${{ steps.line.outputs.asset }}
-          retention-days: 1
 
   publish-docs-archive:
     name: Publish Archived Docs
